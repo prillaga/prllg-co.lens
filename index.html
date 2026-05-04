@@ -1,0 +1,1030 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="Prillaga&amp;Co. Lens — boutique camera rental in Iloilo. Nikon DSLR, lenses, and DJI gimbal.">
+  <title>Prillaga&amp;Co. Lens | Rent. Shoot. Create.</title>
+  <script src="site-config.js"></script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    @media (prefers-reduced-motion: no-preference) {
+      html { scroll-behavior: smooth; }
+    }
+    body { margin: 0; background: #0a0a0a; color: #f5f5f5; padding-bottom: 170px; }
+    .skip-link {
+      position: absolute; left: 12px; top: 12px; z-index: 2000;
+      padding: 10px 16px; background: #d4af37; color: #111; font-weight: 700;
+      font-family: Arial, sans-serif; font-size: 14px; text-decoration: none;
+      border-radius: 6px; transform: translateY(-120%); transition: transform 0.2s ease;
+    }
+    .skip-link:focus { transform: translateY(0); outline: 2px solid #fff; outline-offset: 2px; }
+    section[id]:not(#home), footer[id] { scroll-margin-top: 84px; }
+    #home { scroll-margin-top: 0; }
+    a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+      outline: 2px solid #d4af37; outline-offset: 3px;
+    }
+    input, select, textarea { min-height: 44px; }
+    textarea { min-height: 120px; resize: vertical; }
+    #site-header {
+      background: transparent !important;
+      border-bottom: none !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+    }
+    nav.site-nav {
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: flex-end;
+      gap: 2px 10px;
+      font-family: Arial, Helvetica, sans-serif;
+    }
+    nav.site-nav a {
+      text-decoration: none;
+      color: rgba(245, 245, 245, 0.92);
+      font-weight: 500;
+      font-size: 14px;
+      letter-spacing: 0.03em;
+      white-space: nowrap;
+      padding: 8px 8px;
+      border-radius: 6px;
+      transition: color 0.15s ease, background 0.15s ease;
+    }
+    nav.site-nav a:hover { color: #fff; background: rgba(255, 255, 255, 0.08); }
+    nav.site-nav a.is-active { color: #d4af37; font-weight: 600; }
+    .units-scroll {
+      -webkit-overflow-scrolling: touch;
+      scroll-snap-type: x proximity;
+      scrollbar-color: #3a3a3a #1a1a1a;
+    }
+    .units-scroll > div { scroll-snap-align: start; }
+    a[href*="book-now"], button[type="submit"] {
+      transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+    }
+    a[href*="book-now"]:hover, button[type="submit"]:hover {
+      transform: translateY(-2px); filter: brightness(1.05);
+    }
+    @media (max-width: 768px) {
+      #site-header { flex-wrap: wrap; gap: 12px; padding: 12px 16px !important; }
+      #home h1 { font-size: clamp(26px, 7vw, 48px) !important; padding: 0 16px; }
+      #home > p { font-size: clamp(15px, 3.5vw, 20px) !important; padding: 0 16px; }
+    }
+    .brand-lockup {
+      display: inline-flex;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 0.15em 0.45em;
+      line-height: 1.08;
+      text-decoration: none;
+    }
+    .brand-lockup .brand-name {
+      font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, 'Times New Roman', serif;
+      font-weight: 500;
+      font-size: clamp(1.7rem, 3vw, 2.05rem);
+      letter-spacing: 0.1em;
+      color: #f4ebd0;
+      text-shadow:
+        0 1px 0 rgba(0, 0, 0, 0.45),
+        0 2px 28px rgba(212, 175, 55, 0.22);
+    }
+    .brand-lockup .brand-amp {
+      font-style: italic;
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      opacity: 0.95;
+    }
+    .brand-lockup .brand-line {
+      font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, 'Times New Roman', serif;
+      font-weight: 500;
+      font-size: clamp(1.7rem, 3vw, 2.05rem);
+      letter-spacing: 0.1em;
+      color: #f4ebd0;
+      text-shadow:
+        0 1px 0 rgba(0, 0, 0, 0.45),
+        0 2px 28px rgba(212, 175, 55, 0.22);
+    }
+    .lux-heading {
+      font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
+      font-weight: 500;
+      font-size: clamp(1.65rem, 3.8vw, 2.25rem);
+      letter-spacing: 0.38em;
+      text-transform: uppercase;
+      color: #e8d89c;
+      text-align: center;
+      text-shadow: 0 0 36px rgba(212, 175, 55, 0.12);
+    }
+    .booking-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 2500;
+      overflow-y: auto;
+      -webkit-overflow-scrolling: touch;
+      padding: 24px 16px 32px;
+    }
+    .booking-modal[hidden] { display: none !important; }
+    .booking-modal__backdrop {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.82);
+      cursor: pointer;
+    }
+    .booking-modal__panel {
+      position: relative;
+      z-index: 1;
+      width: 100%;
+      max-width: 720px;
+      margin: 12px auto 24px;
+      background: #0f0f0f;
+      border: 1px solid #333;
+      border-radius: 12px;
+      box-shadow: 0 24px 48px rgba(0, 0, 0, 0.55);
+    }
+    .booking-modal__close {
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      z-index: 2;
+      width: 44px;
+      height: 44px;
+      border: 1px solid #3a3a3a;
+      border-radius: 8px;
+      background: #1a1a1a;
+      color: #f5f5f5;
+      font-size: 26px;
+      line-height: 1;
+      cursor: pointer;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0;
+    }
+    .booking-modal__close:hover { background: #252525; }
+    #availability-calendar {
+      background: #0e0e0e;
+      padding: 70px 20px;
+      font-family: Arial, sans-serif;
+    }
+    #availability-calendar .home-cal-inner { max-width: 720px; margin: 0 auto; }
+    #availability-calendar .home-cal-toolbar {
+      display: flex; flex-wrap: wrap; align-items: flex-end; justify-content: space-between; gap: 16px;
+      margin-bottom: 18px;
+    }
+    #availability-calendar .home-cal-toolbar label {
+      display: block; font-size: 13px; color: #d4af37; margin-bottom: 6px;
+    }
+    #availability-calendar .home-cal-toolbar select {
+      min-width: 200px; max-width: 100%; padding: 10px 12px; border-radius: 8px;
+      border: 1px solid #333; background: #141414; color: #fff; font-size: 14px;
+    }
+    #availability-calendar .home-month-nav {
+      display: flex; align-items: center; gap: 10px;
+    }
+    #availability-calendar .home-month-nav button {
+      width: 40px; height: 40px; border-radius: 8px; border: 1px solid #3a3a3a;
+      background: #1a1a1a; color: #f5f5f5; font-size: 18px; cursor: pointer; line-height: 1;
+    }
+    #availability-calendar .home-month-nav button:hover { background: #252525; }
+    #availability-calendar .home-month-title {
+      font-family: 'Playfair Display', Georgia, serif; font-size: 1.1rem; color: #f4ebd0;
+      min-width: 180px; text-align: center;
+    }
+    #availability-calendar .home-cal-wrap {
+      background: #111; border: 1px solid #2a2a2a; border-radius: 12px; padding: 14px 10px 18px;
+      overflow-x: auto;
+    }
+    #availability-calendar .home-cal-weekdays {
+      display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px;
+      margin-bottom: 8px; font-size: 10px; letter-spacing: 0.1em; text-transform: uppercase;
+      color: #888; text-align: center;
+    }
+    #availability-calendar .home-cal-grid {
+      display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px;
+    }
+    #availability-calendar .home-cal-cell {
+      aspect-ratio: 1; min-height: 36px; max-height: 80px;
+      border-radius: 8px; border: 1px solid #2a2a2a; background: #161616;
+      display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+      padding: 5px 3px; font-size: 12px; color: #ccc;
+    }
+    #availability-calendar .home-cal-cell.out { background: transparent; border-color: transparent; color: #555; }
+    #availability-calendar .home-cal-cell .num { font-weight: 600; color: #eee; }
+    #availability-calendar .home-cal-cell.today { border-color: #d4af37; box-shadow: 0 0 0 1px rgba(212, 175, 55, 0.22) inset; }
+    #availability-calendar .home-cal-cell.approved { background: #2a1818; border-color: #6b3030; color: #e8b4b4; }
+    #availability-calendar .home-cal-cell.pending { background: #2a2618; border-color: #6b5a30; color: #e8dcb4; }
+    #availability-calendar .home-cal-cell.both { background: #2a1a18; border-color: #6b4030; }
+    #availability-calendar .home-cal-cell .tag { font-size: 8px; margin-top: 3px; text-align: center; line-height: 1.15; }
+    #availability-calendar .home-cal-legend {
+      display: flex; flex-wrap: wrap; gap: 14px 20px; margin-top: 16px; font-size: 12px; color: #9a9a9a;
+    }
+    #availability-calendar .home-cal-legend span { display: inline-flex; align-items: center; gap: 6px; }
+    #availability-calendar .home-cal-legend .sw { width: 12px; height: 12px; border-radius: 3px; border: 1px solid #333; flex-shrink: 0; }
+    #availability-calendar .home-cal-legend .sw.av { background: #161616; }
+    #availability-calendar .home-cal-legend .sw.ap { background: #2a1818; border-color: #6b3030; }
+    #availability-calendar .home-cal-legend .sw.pe { background: #2a2618; border-color: #6b5a30; }
+    #availability-calendar .home-cal-foot {
+      margin-top: 18px; font-size: 13px; line-height: 1.55; color: #8a8a8a; text-align: center;
+    }
+    #availability-calendar .home-cal-foot a { color: #d4af37; }
+  </style>
+  <link rel="stylesheet" href="site-nav.css">
+  <script src="site-nav.js" defer></script>
+</head>
+<body>
+<a class="skip-link" href="#book-now">Skip to booking form</a>
+<header id="site-header" style="display: flex; justify-content: space-between; align-items: center; padding: 16px 32px; background: transparent; font-family: Arial, sans-serif; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; border-bottom: none;">
+  <div>
+    <a href="#home" class="brand-lockup" aria-label="Prillaga and Co. Lens home">
+      <span class="brand-name">Prillaga<span class="brand-amp">&amp;</span>Co.</span><span class="brand-line">Lens</span>
+    </a>
+  </div>
+  <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="site-main-nav" aria-label="Open menu">
+    <span></span><span></span><span></span>
+  </button>
+  <nav id="site-main-nav" class="site-nav" aria-label="Main">
+    <a href="#home" data-nav="home">Home</a>
+    <a href="about-us.html" data-nav="about">About Us</a>
+    <a href="units.html" data-nav="units">Units</a>
+    <a href="#availability-calendar" data-nav="availability">Availability</a>
+    <a href="#rental-policy" data-nav="policy">Rental Policy</a>
+    <a href="rental-agreement.html" data-nav="agreement">Agreement</a>
+    <a href="payment-methods.html" data-nav="payment">Payment</a>
+    <a href="#contact-page" data-nav="contact">Contact</a>
+  </nav>
+</header>
+<section id="home" style="position: relative; height: 100vh; background: #000; overflow: hidden;">
+  <video autoplay muted loop playsinline style="width: 100%; height: 100%; object-fit: cover; background: #000;">
+    <source src="half bg.mp4" type="video/mp4">
+    Your browser does not support the video tag.
+  </video>
+  <h1 style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); margin: 0; color: #ffffff; font-family: 'Playfair Display', 'Times New Roman', serif; font-size: 48px; letter-spacing: 1px; text-align: center; z-index: 5;">
+    Sharper Vision, Greater Stories
+  </h1>
+  <p style="position: absolute; top: calc(50% + 46px); left: 50%; transform: translateX(-50%); margin: 0; color: #e8e0d0; font-family: 'Cormorant Garamond', Georgia, serif; font-size: clamp(18px, 2.8vw, 22px); font-style: italic; font-weight: 500; letter-spacing: 0.28em; text-align: center; z-index: 5;">
+    Rent · Shoot · Create
+  </p>
+  <a href="#book-now" style="position: absolute; top: calc(50% + 95px); left: 50%; transform: translateX(-50%); display: inline-block; padding: 13px 34px; background: linear-gradient(135deg, #f3d77b 0%, #d4af37 45%, #b8901f 100%); color: #111; text-decoration: none; font-family: 'Playfair Display', 'Times New Roman', serif; font-size: 17px; font-weight: 700; border: 1px solid rgba(255, 230, 150, 0.75); border-radius: 999px; letter-spacing: 1.5px; text-transform: uppercase; box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35), 0 0 12px rgba(212, 175, 55, 0.35) inset; z-index: 5;">
+    Book Now
+  </a>
+</section>
+<section id="units" style="background: #111111; padding: 70px 20px; color: #f5f5f5; font-family: Arial, sans-serif;">
+  <div style="max-width: 1280px; margin: 0 auto;">
+    <h2 class="lux-heading" style="margin: 0 0 30px 0;">
+      Units
+    </h2>
+    <div class="units-scroll" style="display: flex; flex-wrap: nowrap; gap: 14px; justify-content: flex-start; overflow-x: auto; padding-bottom: 12px;">
+    <div style="width: 400px; min-width: 400px; background: #101010; border: 1px solid #232323; border-radius: 10px; overflow: hidden; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);">
+      <img src="C:/Users/HUAWEI/.cursor/projects/c-Users-HUAWEI-Documents/assets/c__Users_HUAWEI_AppData_Roaming_Cursor_User_workspaceStorage_d1fd8ebdcecd247ba2bb8988d1b99094_images_image-dccf77bb-0b3f-4be9-840c-e688aa7907eb.png" alt="Nikon DSLR Flipscreen w/ kitlens 15-80mm" loading="lazy" decoding="async" style="width: 100%; height: 260px; object-fit: cover; display: block;">
+      <div style="padding: 12px 14px 16px 14px; text-align: left;">
+        <h3 style="margin: 0 0 10px 0; color: #f5f5f5; font-family: Avenir, 'Avenir Next', 'Century Gothic', Arial, sans-serif; font-size: 18px; line-height: 1.35;">
+          Nikon DSLR Flipscreen w/ kitlens 15-80mm
+        </h3>
+        <p style="margin: 0 0 10px 0; color: #d4af37; font-size: 14px;">450/day | 400/day (3 days up)</p>
+        <a href="#book-now" data-preselect-unit="Nikon DSLR Flipscreen w/ kitlens 15-80mm" style="display: inline-block; padding: 9px 20px; background: linear-gradient(135deg, #f3d77b 0%, #d4af37 45%, #b8901f 100%); color: #111; text-decoration: none; font-family: Avenir, 'Avenir Next', 'Century Gothic', Arial, sans-serif; font-weight: 700; border-radius: 999px; letter-spacing: 1px; font-size: 14px;">
+          Inquire Now
+        </a>
+      </div>
+    </div>
+    <div style="width: 400px; min-width: 400px; background: #101010; border: 1px solid #232323; border-radius: 10px; overflow: hidden; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);">
+      <img src="C:/Users/HUAWEI/.cursor/projects/c-Users-HUAWEI-Documents/assets/c__Users_HUAWEI_AppData_Roaming_Cursor_User_workspaceStorage_d1fd8ebdcecd247ba2bb8988d1b99094_images_image-50c73d25-470e-41b2-a05a-2e2cd8c634b7.png" alt="Nikon DSLR Flipscreen w/ Zoom Lens 70-330mm" loading="lazy" decoding="async" style="width: 100%; height: 260px; object-fit: cover; display: block;">
+      <div style="padding: 12px 14px 16px 14px; text-align: left;">
+        <h3 style="margin: 0 0 10px 0; color: #f5f5f5; font-family: Avenir, 'Avenir Next', 'Century Gothic', Arial, sans-serif; font-size: 18px; line-height: 1.35;">
+          Nikon DSLR Flipscreen w/ Zoom Lens 70-330mm
+        </h3>
+        <p style="margin: 0 0 10px 0; color: #d4af37; font-size: 14px;">550/day | 500/day (3 days up)</p>
+        <a href="#book-now" data-preselect-unit="Nikon DSLR Flipscreen w/ Zoom Lens 70-330mm" style="display: inline-block; padding: 9px 20px; background: linear-gradient(135deg, #f3d77b 0%, #d4af37 45%, #b8901f 100%); color: #111; text-decoration: none; font-family: Avenir, 'Avenir Next', 'Century Gothic', Arial, sans-serif; font-weight: 700; border-radius: 999px; letter-spacing: 1px; font-size: 14px;">
+          Inquire Now
+        </a>
+      </div>
+    </div>
+    <div style="width: 400px; min-width: 400px; background: #101010; border: 1px solid #232323; border-radius: 10px; overflow: hidden; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);">
+      <img src="C:/Users/HUAWEI/.cursor/projects/c-Users-HUAWEI-Documents/assets/c__Users_HUAWEI_AppData_Roaming_Cursor_User_workspaceStorage_d1fd8ebdcecd247ba2bb8988d1b99094_images_image-94718a39-d800-4996-b72d-e97c2604b104.png" alt="Zoom Lens 70-330mm" loading="lazy" decoding="async" style="width: 100%; height: 260px; object-fit: cover; display: block;">
+      <div style="padding: 12px 14px 16px 14px; text-align: left;">
+        <h3 style="margin: 0 0 10px 0; color: #f5f5f5; font-family: Avenir, 'Avenir Next', 'Century Gothic', Arial, sans-serif; font-size: 18px; line-height: 1.35;">
+          Zoom Lens 70-330mm
+        </h3>
+        <p style="margin: 0 0 10px 0; color: #d4af37; font-size: 14px;">300/day</p>
+        <a href="#book-now" data-preselect-unit="Zoom Lens 70-330mm" style="display: inline-block; padding: 9px 20px; background: linear-gradient(135deg, #f3d77b 0%, #d4af37 45%, #b8901f 100%); color: #111; text-decoration: none; font-family: Avenir, 'Avenir Next', 'Century Gothic', Arial, sans-serif; font-weight: 700; border-radius: 999px; letter-spacing: 1px; font-size: 14px;">
+          Inquire Now
+        </a>
+      </div>
+    </div>
+    <div style="width: 400px; min-width: 400px; background: #101010; border: 1px solid #232323; border-radius: 10px; overflow: hidden; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);">
+      <img src="C:/Users/HUAWEI/.cursor/projects/c-Users-HUAWEI-Documents/assets/c__Users_HUAWEI_AppData_Roaming_Cursor_User_workspaceStorage_d1fd8ebdcecd247ba2bb8988d1b99094_images_image-3d70cec5-87ac-4af5-93cc-423c7f86e47a.png" alt="DJI OSMO MOBILE 3 GIMBAL" loading="lazy" decoding="async" style="width: 100%; height: 260px; object-fit: cover; display: block;">
+      <div style="padding: 12px 14px 16px 14px; text-align: left;">
+        <h3 style="margin: 0 0 10px 0; color: #f5f5f5; font-family: Avenir, 'Avenir Next', 'Century Gothic', Arial, sans-serif; font-size: 18px; line-height: 1.35;">
+          DJI OSMO MOBILE 3 GIMBAL
+        </h3>
+        <p style="margin: 0 0 10px 0; color: #d4af37; font-size: 14px;">300/day</p>
+        <a href="#book-now" data-preselect-unit="DJI OSMO MOBILE 3 GIMBAL" style="display: inline-block; padding: 9px 20px; background: linear-gradient(135deg, #f3d77b 0%, #d4af37 45%, #b8901f 100%); color: #111; text-decoration: none; font-family: Avenir, 'Avenir Next', 'Century Gothic', Arial, sans-serif; font-weight: 700; border-radius: 999px; letter-spacing: 1px; font-size: 14px;">
+          Inquire Now
+        </a>
+      </div>
+    </div>
+    </div>
+  </div>
+</section>
+<section id="availability-calendar" aria-labelledby="availability-calendar-title">
+  <div class="home-cal-inner">
+    <h2 id="availability-calendar-title" class="lux-heading" style="margin: 0 0 10px 0;">
+      Availability
+    </h2>
+    <p style="text-align: center; margin: 0 0 22px 0; color: #9a9a9a; font-size: 14px; line-height: 1.5;">
+      Red dates are confirmed bookings; amber is a pending request. Pick a unit or see any hold across gear.
+    </p>
+    <div class="home-cal-toolbar">
+      <div>
+        <label for="homeUnitSelect">Equipment</label>
+        <select id="homeUnitSelect" aria-label="Choose unit for availability calendar">
+          <option value="">Any item — busy if any unit has a hold</option>
+          <option value="nikon-kit">Nikon DSLR Flipscreen w/ kitlens 15-80mm</option>
+          <option value="nikon-zoom">Nikon DSLR Flipscreen w/ Zoom Lens 70-330mm</option>
+          <option value="zoom-lens">Zoom Lens 70-330mm</option>
+          <option value="dji-gimbal">DJI OSMO MOBILE 3 GIMBAL</option>
+        </select>
+      </div>
+      <div class="home-month-nav" aria-label="Change month">
+        <button type="button" id="homeCalPrev" aria-label="Previous month">&lsaquo;</button>
+        <div class="home-month-title" id="homeCalMonthTitle" role="status"></div>
+        <button type="button" id="homeCalNext" aria-label="Next month">&rsaquo;</button>
+      </div>
+    </div>
+    <div class="home-cal-wrap">
+      <div class="home-cal-weekdays">
+        <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+      </div>
+      <div class="home-cal-grid" id="homeCalGrid" aria-live="polite"></div>
+    </div>
+    <div class="home-cal-legend">
+      <span><span class="sw av" aria-hidden="true"></span> Available</span>
+      <span><span class="sw ap" aria-hidden="true"></span> Booked</span>
+      <span><span class="sw pe" aria-hidden="true"></span> Pending</span>
+    </div>
+    <p class="home-cal-foot">
+      Calendar uses this browser’s saved schedule (same as staff confirmations). Ready to book? <a href="#book-now">Open the booking form</a> · <a href="availability.html">Full-page calendar</a>
+    </p>
+  </div>
+</section>
+<section id="rental-policy" style="background: #0b0b0b; padding: 70px 20px; color: #f5f5f5; font-family: Arial, sans-serif;">
+  <div style="max-width: 900px; margin: 0 auto;">
+    <h2 class="lux-heading" style="margin: 0 0 16px 0;">
+      Rental Policy
+    </h2>
+    <h3 style="margin: 0 0 16px 0; color: #f5f5f5; font-size: 22px; letter-spacing: 1px;">📸 HOW TO RENT</h3>
+    <div style="display: grid; gap: 12px;">
+      <div style="background: #141414; border: 1px solid #272727; border-radius: 10px; padding: 14px;">
+        <p style="margin: 0; line-height: 1.7; color: #dedede; font-size: 16px;"><strong>1.</strong> Send us a message with your preferred rental date and the camera you would like to rent.<br>We will check availability and confirm your booking.</p>
+      </div>
+      <div style="background: #141414; border: 1px solid #272727; border-radius: 10px; padding: 14px;">
+        <p style="margin: 0; line-height: 1.7; color: #dedede; font-size: 16px;"><strong>2.</strong> Pay a ₱100 reservation fee to secure your slot.<br>✔ First to pay, first served.<br>✔ <a href="payment-methods.html" style="color: #d4af37;">Payment methods</a> (GCash, Maya, GoTyme, online banking, and more).<br>✔ The reservation fee will be deducted from the total rental amount.<br>✔ Pay your balance payment upon meet up.</p>
+      </div>
+      <div style="background: #141414; border: 1px solid #272727; border-radius: 10px; padding: 14px;">
+        <p style="margin: 0; line-height: 1.7; color: #dedede; font-size: 16px;"><strong>3.</strong> Pick-up locations: SM City, Robinsons Main, JKS Vape Shop - North Baluarte, University Dorm, University of San Agustin</p>
+      </div>
+      <div style="background: #141414; border: 1px solid #272727; border-radius: 10px; padding: 14px;">
+        <p style="margin: 0; line-height: 1.7; color: #dedede; font-size: 16px;"><strong>4.</strong> Sign the rental agreement (<a href="rental-agreement.html" style="color: #d4af37;">sign online here</a>) and leave one (1) valid ID as a deposit upon meet up. Pay your balance.<br>✔ Your valid ID will be returned once the camera is safely returned and checked.</p>
+      </div>
+      <div style="background: #141414; border: 1px solid #272727; border-radius: 10px; padding: 14px;">
+        <p style="margin: 0; line-height: 1.7; color: #dedede; font-size: 16px;"><strong>5.</strong> Handle the camera with care as if it were your own.<br>The renter is responsible for any damages, loss, or missing accessories.</p>
+      </div>
+      <div style="background: #141414; border: 1px solid #272727; border-radius: 10px; padding: 14px;">
+        <p style="margin: 0 0 8px 0; line-height: 1.7; color: #f5f5f5; font-size: 16px;"><strong>📌 Additional Reminders:</strong></p>
+        <p style="margin: 0; line-height: 1.7; color: #dedede; font-size: 16px;">• Late returns may be subject to additional charges.<br>• Please check the unit upon pick-up to ensure everything is complete and working properly.<br>• Make sure the camera is returned on time and in good condition.</p>
+      </div>
+    </div>
+    <p style="margin: 16px 0 0 0; line-height: 1.7; color: #dedede; font-size: 16px;">Thank you for choosing us! We look forward to serving you 📷✨</p>
+  </div>
+</section>
+<footer id="contact-page" style="background: #050505; color: #f5f5f5; font-family: Arial, sans-serif; padding: 36px 20px 26px 20px;">
+  <div style="max-width: 980px; margin: 0 auto;">
+    <div style="display: flex; align-items: center; justify-content: flex-start; gap: 12px; margin-bottom: 16px;">
+      <div style="display: flex; align-items: center; gap: 12px;">
+        <h3 style="margin: 0; font-size: 22px; font-weight: 500; letter-spacing: 1px;">FOLLOW US</h3>
+        <a href="https://www.facebook.com/share/18f1Q2HMER/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" aria-label="Facebook"
+          style="display: inline-flex; width: 34px; height: 34px; border-radius: 50%; align-items: center; justify-content: center; background: #ffffff; color: #111111; text-decoration: none; font-size: 22px; font-weight: 700;">
+          f
+        </a>
+      </div>
+    </div>
+    <div style="height: 1px; background: #222222; margin: 8px 0 18px 0;"></div>
+    <div style="display: flex; flex-wrap: wrap; gap: 12px; justify-content: center;">
+      <a href="https://www.facebook.com/share/18f1Q2HMER/?mibextid=wwXIfr" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 8px; text-decoration: none; color: #d9d9d9; border: 1px solid #2a2a2a; border-radius: 999px; padding: 8px 12px; font-size: 14px;">
+        <span>📘</span><span>Facebook</span>
+      </a>
+      <a class="prillaga-messenger-link" href="javascript:void(0)" target="_blank" rel="noopener noreferrer" style="display: inline-flex; align-items: center; gap: 8px; text-decoration: none; color: #d9d9d9; border: 1px solid #2a2a2a; border-radius: 999px; padding: 8px 12px; font-size: 14px;">
+        <span>💬</span><span>Messenger</span>
+      </a>
+      <a href="tel:09947552646" style="display: inline-flex; align-items: center; gap: 8px; text-decoration: none; color: #d9d9d9; border: 1px solid #2a2a2a; border-radius: 999px; padding: 8px 12px; font-size: 14px;">
+        <span>📞</span><span>09947552646</span>
+      </a>
+    </div>
+    <p style="margin: 14px 0 0 0; text-align: center; color: #8f8f8f; font-size: 14px;">
+      &copy; 2026 Prillaga&amp;Co. Lens. All rights reserved.
+    </p>
+  </div>
+</footer>
+<a class="prillaga-messenger-link" href="javascript:void(0)" target="_blank" rel="noopener noreferrer" aria-label="Inquire Now" style="position: fixed; right: 20px; bottom: 20px; z-index: 999; display: inline-flex; align-items: center; justify-content: center; width: 62px; height: 62px; border-radius: 50%; background: linear-gradient(135deg, #f3d77b 0%, #d4af37 45%, #b8901f 100%); color: #111; text-decoration: none; font-size: 28px; font-weight: 700; box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35);">
+  💬
+</a>
+<a class="prillaga-messenger-link" href="javascript:void(0)" target="_blank" rel="noopener noreferrer" style="position: fixed; right: 92px; bottom: 36px; z-index: 998; background: #111; color: #f5f5f5; text-decoration: none; font-family: Avenir, 'Avenir Next', 'Century Gothic', Arial, sans-serif; font-size: 13px; letter-spacing: 0.5px; padding: 7px 10px; border-radius: 999px; border: 1px solid #2e2e2e;">
+  Inquire Now
+</a>
+<a href="#book-now" aria-label="Book now" style="position: fixed; right: 20px; bottom: 94px; z-index: 1000; display: inline-flex; align-items: center; justify-content: center; width: 62px; height: 62px; border-radius: 50%; background: linear-gradient(135deg, #f3d77b 0%, #d4af37 45%, #b8901f 100%); color: #111; text-decoration: none; font-size: 26px; line-height: 1; box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35); border: 1px solid rgba(255, 230, 150, 0.75);">📅</a>
+<div id="booking-modal" class="booking-modal" hidden role="dialog" aria-modal="true" aria-labelledby="booking-modal-title">
+  <div class="booking-modal__backdrop" aria-hidden="true"></div>
+  <div class="booking-modal__panel">
+    <button type="button" class="booking-modal__close" aria-label="Close booking form">&times;</button>
+    <section id="book-now" style="background: transparent; padding: 56px 20px 28px; color: #f5f5f5; font-family: Arial, sans-serif;">
+  <h2 id="booking-modal-title" class="lux-heading" style="margin: 0 0 24px 0;">
+    Booking
+  </h2>
+  <form onsubmit="handleBookingSubmit(event)" style="max-width: 680px; margin: 0 auto; display: grid; gap: 14px;">
+    <input type="text" name="fullName" placeholder="Full Name" autocomplete="name" required style="padding: 12px 14px; border: 1px solid #2e2e2e; border-radius: 6px; background: #171717; color: #ffffff; font-size: 15px;">
+    <input type="email" name="email" placeholder="Email Address" autocomplete="email" required style="padding: 12px 14px; border: 1px solid #2e2e2e; border-radius: 6px; background: #171717; color: #ffffff; font-size: 15px;">
+    <input type="tel" name="phone" placeholder="Phone Number" autocomplete="tel" required style="padding: 12px 14px; border: 1px solid #2e2e2e; border-radius: 6px; background: #171717; color: #ffffff; font-size: 15px;">
+    <select name="pickupLocation" required style="padding: 12px 14px; border: 1px solid #2e2e2e; border-radius: 6px; background: #171717; color: #ffffff; font-size: 15px;">
+      <option value="">Pick Up Location</option>
+      <option value="jks-vapeshop-north-baluarte-molo">JKS Vapeshop North Baluarte Molo</option>
+      <option value="robinson-main">Robinson Main</option>
+      <option value="sm-city">SM City</option>
+    </select>
+    <select name="pickupTime" required style="padding: 12px 14px; border: 1px solid #2e2e2e; border-radius: 6px; background: #171717; color: #ffffff; font-size: 15px;">
+      <option value="">Pick Up Time</option>
+      <option value="07:00">7:00 AM</option>
+      <option value="08:00">8:00 AM</option>
+      <option value="09:00">9:00 AM</option>
+      <option value="10:00">10:00 AM</option>
+      <option value="11:00">11:00 AM</option>
+      <option value="12:00">12:00 PM</option>
+      <option value="13:00">1:00 PM</option>
+      <option value="14:00">2:00 PM</option>
+      <option value="15:00">3:00 PM</option>
+      <option value="16:00">4:00 PM</option>
+      <option value="17:00">5:00 PM</option>
+      <option value="18:00">6:00 PM</option>
+      <option value="19:00">7:00 PM</option>
+      <option value="20:00">8:00 PM</option>
+    </select>
+    <label for="rentalDate" style="font-size: 14px; color: #d4af37; letter-spacing: 0.5px;">Rental Date</label>
+    <input id="rentalDate" type="date" name="rentalDate" required onfocus="this.showPicker && this.showPicker()" onclick="this.showPicker && this.showPicker()" style="padding: 12px 14px; border: 1px solid #2e2e2e; border-radius: 6px; background: #171717; color: #ffffff; font-size: 15px;">
+    <label for="returnDate" style="font-size: 14px; color: #d4af37; letter-spacing: 0.5px;">Return Date</label>
+    <input id="returnDate" type="date" name="returnDate" required onfocus="this.showPicker && this.showPicker()" onclick="this.showPicker && this.showPicker()" style="padding: 12px 14px; border: 1px solid #2e2e2e; border-radius: 6px; background: #171717; color: #ffffff; font-size: 15px;">
+    <p id="calendarAvailabilityNotice" style="margin: -4px 0 6px 0; font-size: 13px; line-height: 1.45; min-height: 1.4em; color: #9a9a9a;"></p>
+    <select name="units" required onchange="updateUnitPricing()" style="padding: 12px 14px; border: 1px solid #2e2e2e; border-radius: 6px; background: #171717; color: #ffffff; font-size: 15px;">
+      <option value="">Select Units</option>
+      <option value="Nikon DSLR Flipscreen w/ kitlens 15-80mm">Nikon DSLR Flipscreen w/ kitlens 15-80mm</option>
+      <option value="Nikon DSLR Flipscreen w/ Zoom Lens 70-330mm">Nikon DSLR Flipscreen w/ Zoom Lens 70-330mm</option>
+      <option value="DJI OSMO MOBILE 3 GIMBAL">DJI OSMO MOBILE 3 GIMBAL</option>
+      <option value="Zoom Lens 70-330mm">Zoom Lens 70-330mm</option>
+    </select>
+    <select name="additionalRent" onchange="updateUnitPricing()" style="padding: 12px 14px; border: 1px solid #2e2e2e; border-radius: 6px; background: #171717; color: #ffffff; font-size: 15px;">
+      <option value="">Additional to rent (optional)</option>
+      <option value="None">None</option>
+      <option value="Extra Battery ₱100">Extra Battery ₱100</option>
+      <option value="Zoom Lens ₱300">Zoom Lens ₱300</option>
+    </select>
+    <p id="unitPriceDisplay" style="margin: -6px 0 2px 0; color: #d4af37; font-size: 14px;">Select a unit to view price details.</p>
+    <select name="rentalDuration" required onchange="toggleOtherDaysInput(); updateUnitPricing();" style="padding: 12px 14px; border: 1px solid #2e2e2e; border-radius: 6px; background: #171717; color: #ffffff; font-size: 15px;">
+      <option value="">Select Duration</option>
+      <option value="1">1 day</option>
+      <option value="2">2 days</option>
+      <option value="3">3 days</option>
+      <option value="4">4 days up</option>
+      <option value="other">Others</option>
+    </select>
+    <input id="otherDaysInput" type="number" name="otherDays" min="1" placeholder="Enter number of days" style="display: none; padding: 12px 14px; border: 1px solid #2e2e2e; border-radius: 6px; background: #171717; color: #ffffff; font-size: 15px;">
+    <p id="estimatedPriceDisplay" style="margin: -6px 0 2px 0; color: #f0f0f0; font-size: 14px;">Total Price (Unit Price x Duration) will show here.</p>
+    <textarea name="notes" placeholder="Project details or special requests" rows="5" style="padding: 12px 14px; border: 1px solid #2e2e2e; border-radius: 6px; background: #171717; color: #ffffff; font-size: 15px;"></textarea>
+    <p style="margin: 0; padding: 10px 12px; border: 1px solid #2e2e2e; border-radius: 6px; background: #151515; color: #d4af37; font-size: 14px; line-height: 1.6;">
+      Note: To reserve your slots, wait for the confirmation in Messenger and send the reservation fee of 100 pesos in GCash. <a href="payment-methods.html" style="color: #d4af37;">Other payment options</a>
+    </p>
+    <button type="submit" style="padding: 14px 22px; border: 0; border-radius: 999px; background: linear-gradient(135deg, #f3d77b 0%, #d4af37 45%, #b8901f 100%); color: #111; font-family: Avenir, 'Avenir Next', 'Century Gothic', Arial, sans-serif; font-size: 15px; font-weight: 700; letter-spacing: 1px; cursor: pointer;">
+      Submit Booking
+    </button>
+  </form>
+</section>
+  </div>
+</div>
+<script>
+  (function applyPrillagaMessengerLinkHrefs() {
+    var base = window.prillagaMessengerBaseUrl ? window.prillagaMessengerBaseUrl() : "";
+    if (!base) return;
+    document.querySelectorAll("a.prillaga-messenger-link").forEach(function (a) {
+      a.setAttribute("href", base);
+    });
+  })();
+
+  var unitPricingRules = {
+    "Nikon DSLR Flipscreen w/ kitlens 15-80mm": { baseRate: 450, longRate: 400, hasLongRate: true },
+    "Nikon DSLR Flipscreen w/ Zoom Lens 70-330mm": { baseRate: 550, longRate: 500, hasLongRate: true },
+    "DJI OSMO MOBILE 3 GIMBAL": { baseRate: 300, longRate: 300, hasLongRate: false },
+    "Zoom Lens 70-330mm": { baseRate: 300, longRate: 300, hasLongRate: false }
+  };
+  var additionalRentPricingRules = {
+    "Extra Battery ₱100": 100,
+    "Zoom Lens ₱300": 300,
+    "None": 0
+  };
+
+  var CAL_STORAGE_KEY = "prillaga_lens_bookings_v1";
+  var CAL_CHANNEL_NAME = "prillaga-availability-v1";
+  var calendarFormUnitToId = {
+    "Nikon DSLR Flipscreen w/ kitlens 15-80mm": "nikon-kit",
+    "Nikon DSLR Flipscreen w/ Zoom Lens 70-330mm": "nikon-zoom",
+    "Zoom Lens 70-330mm": "zoom-lens",
+    "DJI OSMO MOBILE 3 GIMBAL": "dji-gimbal"
+  };
+
+  /**
+   * Facebook Messenger cannot send a message for the user; m.me only opens a draft and Meta requires a Send tap.
+   * Put your business email here (activate once at https://formsubmit.co) to receive the full booking by email the instant they click Submit — no need for you to wait on Messenger Send.
+   * Leave "" to only open Messenger with the same text prefilled (guest must tap Send there for it to reach you).
+   */
+  var BOOKING_INBOX_EMAIL = "";
+
+  var bookingModalLastFocus = null;
+
+  function openBookingModal(preselectUnit) {
+    var modal = document.getElementById("booking-modal");
+    if (!modal) return;
+    bookingModalLastFocus = document.activeElement;
+    modal.removeAttribute("hidden");
+    document.body.style.overflow = "hidden";
+    var section = document.getElementById("book-now");
+    if (preselectUnit && section) {
+      var sel = section.querySelector('select[name="units"]');
+      if (sel) {
+        var i;
+        for (i = 0; i < sel.options.length; i++) {
+          if (sel.options[i].value === preselectUnit) {
+            sel.selectedIndex = i;
+            break;
+          }
+        }
+      }
+    }
+    updateUnitPricing();
+    updateCalendarAvailabilityNotice();
+    var closeBtn = modal.querySelector(".booking-modal__close");
+    if (closeBtn) closeBtn.focus();
+  }
+
+  function closeBookingModal() {
+    var modal = document.getElementById("booking-modal");
+    if (!modal || modal.hasAttribute("hidden")) return;
+    modal.setAttribute("hidden", "");
+    document.body.style.overflow = "";
+    if (bookingModalLastFocus && typeof bookingModalLastFocus.focus === "function") {
+      bookingModalLastFocus.focus();
+    }
+    bookingModalLastFocus = null;
+  }
+
+  function initBookingModal() {
+    var modal = document.getElementById("booking-modal");
+    if (!modal) return;
+    document.querySelectorAll('a[href="#book-now"]').forEach(function (link) {
+      link.addEventListener("click", function (e) {
+        e.preventDefault();
+        var pre = link.getAttribute("data-preselect-unit") || "";
+        openBookingModal(pre);
+      });
+    });
+    var closeBtn = modal.querySelector(".booking-modal__close");
+    if (closeBtn) {
+      closeBtn.addEventListener("click", closeBookingModal);
+    }
+    var backdrop = modal.querySelector(".booking-modal__backdrop");
+    if (backdrop) {
+      backdrop.addEventListener("click", closeBookingModal);
+    }
+    document.addEventListener("keydown", function (e) {
+      if (e.key === "Escape" && modal && !modal.hasAttribute("hidden")) {
+        closeBookingModal();
+      }
+    });
+  }
+
+  function tryOpenBookingFromUrl() {
+    try {
+      var sp = new URLSearchParams(window.location.search);
+      var unit = sp.get("unit") || "";
+      var hashBook = window.location.hash === "#book-now";
+      if (!unit && !hashBook) return;
+      openBookingModal(unit);
+      var path = window.location.pathname;
+      var file = path.substring(path.lastIndexOf("/") + 1) || "index.html";
+      history.replaceState(null, "", file);
+    } catch (err) {}
+  }
+
+  function calCompareDates(a, b) {
+    return a < b ? -1 : a > b ? 1 : 0;
+  }
+  function calRangesOverlap(s1, e1, s2, e2) {
+    return calCompareDates(s1, e2) <= 0 && calCompareDates(s2, e1) <= 0;
+  }
+  function calLoadBookings() {
+    try {
+      var raw = localStorage.getItem(CAL_STORAGE_KEY);
+      var arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr : [];
+    } catch (e) {
+      return [];
+    }
+  }
+  function calFindConflict(unitLabel, start, end) {
+    var uid = calendarFormUnitToId[unitLabel];
+    if (!uid || !start || !end) return null;
+    var s = start;
+    var e = end;
+    if (calCompareDates(s, e) > 0) {
+      var tmp = s;
+      s = e;
+      e = tmp;
+    }
+    var list = calLoadBookings();
+    var pendingHit = null;
+    var approvedHit = null;
+    for (var i = 0; i < list.length; i++) {
+      var b = list[i];
+      if (b.unitId !== uid || b.status === "rejected") continue;
+      if (!calRangesOverlap(s, e, b.start, b.end)) continue;
+      if (b.status === "approved") {
+        approvedHit = b;
+        break;
+      }
+      if (b.status === "pending") pendingHit = b;
+    }
+    if (approvedHit) return { type: "approved", booking: approvedHit };
+    if (pendingHit) return { type: "pending", booking: pendingHit };
+    return null;
+  }
+  function updateCalendarAvailabilityNotice() {
+    var el = document.getElementById("calendarAvailabilityNotice");
+    if (!el) return;
+    var form = document.querySelector("#book-now form");
+    if (!form) return;
+    var uf = form.querySelector('select[name="units"]');
+    var rd = form.querySelector('input[name="rentalDate"]');
+    var rt = form.querySelector('input[name="returnDate"]');
+    var unitText = uf && uf.selectedIndex > 0 ? uf.options[uf.selectedIndex].text : "";
+    var start = rd ? rd.value : "";
+    var end = rt ? rt.value : "";
+    if (!unitText || !start || !end) {
+      el.textContent = "";
+      el.style.color = "#9a9a9a";
+      return;
+    }
+    var c = calFindConflict(unitText, start, end);
+    if (!c) {
+      el.textContent = "Availability calendar (this browser): no overlap with pending or confirmed bookings for this unit.";
+      el.style.color = "#8aaf9a";
+      return;
+    }
+    if (c.type === "approved") {
+      el.textContent = "These dates overlap a confirmed booking on the calendar for this unit. Choose other dates or another unit — Messenger submit will be blocked.";
+      el.style.color = "#e8a0a0";
+      return;
+    }
+    el.textContent = "These dates overlap a pending calendar request for this unit. You may still submit; staff may confirm whichever request applies first.";
+    el.style.color = "#e8d080";
+  }
+
+  var homeCalYear;
+  var homeCalMonth;
+  function homeCalPad(n) { return n < 10 ? "0" + n : String(n); }
+  function homeCalYmd(y, m, d) { return y + "-" + homeCalPad(m) + "-" + homeCalPad(d); }
+  function homeDayInBookingRange(dayStr, start, end) {
+    return calCompareDates(start, dayStr) <= 0 && calCompareDates(dayStr, end) <= 0;
+  }
+  function homeDayStatus(dayStr, unitFilter) {
+    var list = calLoadBookings();
+    var hasApproved = false;
+    var hasPending = false;
+    var i;
+    for (i = 0; i < list.length; i++) {
+      var b = list[i];
+      if (b.status === "rejected") continue;
+      if (unitFilter && b.unitId !== unitFilter) continue;
+      if (!homeDayInBookingRange(dayStr, b.start, b.end)) continue;
+      if (b.status === "approved") hasApproved = true;
+      else if (b.status === "pending") hasPending = true;
+    }
+    return { hasApproved: hasApproved, hasPending: hasPending };
+  }
+  function renderHomeAvailabilityCalendar() {
+    var grid = document.getElementById("homeCalGrid");
+    var titleEl = document.getElementById("homeCalMonthTitle");
+    var unitSel = document.getElementById("homeUnitSelect");
+    if (!grid || !titleEl || !unitSel) return;
+    var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    titleEl.textContent = monthNames[homeCalMonth] + " " + homeCalYear;
+    var first = new Date(homeCalYear, homeCalMonth, 1);
+    var startPad = first.getDay();
+    var daysInMonth = new Date(homeCalYear, homeCalMonth + 1, 0).getDate();
+    var today = new Date();
+    var todayStr = homeCalYmd(today.getFullYear(), today.getMonth() + 1, today.getDate());
+    var unitFilter = unitSel.value;
+    grid.innerHTML = "";
+    var i;
+    for (i = 0; i < startPad; i++) {
+      var empty = document.createElement("div");
+      empty.className = "home-cal-cell out";
+      empty.setAttribute("aria-hidden", "true");
+      grid.appendChild(empty);
+    }
+    for (i = 1; i <= daysInMonth; i++) {
+      var dayStr = homeCalYmd(homeCalYear, homeCalMonth + 1, i);
+      var st = homeDayStatus(dayStr, unitFilter);
+      var cell = document.createElement("div");
+      cell.className = "home-cal-cell";
+      if (dayStr === todayStr) cell.classList.add("today");
+      if (st.hasApproved && st.hasPending) cell.classList.add("both");
+      else if (st.hasApproved) cell.classList.add("approved");
+      else if (st.hasPending) cell.classList.add("pending");
+      var num = document.createElement("span");
+      num.className = "num";
+      num.textContent = String(i);
+      cell.appendChild(num);
+      if (st.hasApproved || st.hasPending) {
+        var tag = document.createElement("span");
+        tag.className = "tag";
+        if (st.hasApproved && st.hasPending) tag.textContent = "Booked + pending";
+        else if (st.hasApproved) tag.textContent = "Booked";
+        else tag.textContent = "Pending";
+        cell.appendChild(tag);
+      }
+      var label = st.hasApproved ? "Booked" : st.hasPending ? "Pending" : "Available";
+      cell.setAttribute("aria-label", monthNames[homeCalMonth] + " " + i + ", " + homeCalYear + ", " + label);
+      grid.appendChild(cell);
+    }
+  }
+  function initHomeAvailabilityCalendar() {
+    var grid = document.getElementById("homeCalGrid");
+    if (!grid) return;
+    var now = new Date();
+    homeCalYear = now.getFullYear();
+    homeCalMonth = now.getMonth();
+    var prev = document.getElementById("homeCalPrev");
+    var next = document.getElementById("homeCalNext");
+    var unitSel = document.getElementById("homeUnitSelect");
+    if (prev) {
+      prev.addEventListener("click", function () {
+        homeCalMonth--;
+        if (homeCalMonth < 0) { homeCalMonth = 11; homeCalYear--; }
+        renderHomeAvailabilityCalendar();
+      });
+    }
+    if (next) {
+      next.addEventListener("click", function () {
+        homeCalMonth++;
+        if (homeCalMonth > 11) { homeCalMonth = 0; homeCalYear++; }
+        renderHomeAvailabilityCalendar();
+      });
+    }
+    if (unitSel) {
+      unitSel.addEventListener("change", renderHomeAvailabilityCalendar);
+    }
+    renderHomeAvailabilityCalendar();
+  }
+
+  function toggleOtherDaysInput() {
+    var durationField = document.querySelector('select[name="rentalDuration"]');
+    var otherDaysInput = document.getElementById("otherDaysInput");
+    if (!durationField || !otherDaysInput) return;
+    var isOther = durationField.value === "other";
+    otherDaysInput.style.display = isOther ? "block" : "none";
+    otherDaysInput.required = isOther;
+    if (!isOther) {
+      otherDaysInput.value = "";
+    }
+  }
+
+  function getSelectedDays(form) {
+    var duration = form.querySelector('select[name="rentalDuration"]');
+    var otherDays = form.querySelector('input[name="otherDays"]');
+    if (!duration) return 0;
+    if (duration.value === "other") {
+      return parseInt(otherDays && otherDays.value ? otherDays.value : "0", 10) || 0;
+    }
+    if (duration.value === "4") {
+      return 4;
+    }
+    return parseInt(duration.value || "0", 10) || 0;
+  }
+
+  function formatPrice(value) {
+    return "₱" + value.toLocaleString("en-PH");
+  }
+
+  function updateUnitPricing() {
+    var form = document.querySelector('#book-now form');
+    if (!form) return;
+    var unitsField = form.querySelector('select[name="units"]');
+    var durationField = form.querySelector('select[name="rentalDuration"]');
+    var additionalRentField = form.querySelector('select[name="additionalRent"]');
+    var unitPriceDisplay = document.getElementById("unitPriceDisplay");
+    var estimatedPriceDisplay = document.getElementById("estimatedPriceDisplay");
+    var selectedUnit = unitsField ? unitsField.value : "";
+    var selectedAdditionalRent = additionalRentField ? additionalRentField.value : "";
+    var pricing = unitPricingRules[selectedUnit];
+    var additionalPrice = additionalRentPricingRules[selectedAdditionalRent] || 0;
+
+    if (!pricing) {
+      if (unitPriceDisplay) unitPriceDisplay.textContent = "Select a unit to view price details.";
+      if (estimatedPriceDisplay) estimatedPriceDisplay.textContent = "Total Price (Unit Price x Duration) will show here.";
+      return;
+    }
+
+    if (pricing.hasLongRate) {
+      unitPriceDisplay.textContent = "Rate: " + formatPrice(pricing.baseRate) + "/day | " + formatPrice(pricing.longRate) + "/day (3 days up)";
+    } else {
+      unitPriceDisplay.textContent = "Rate: " + formatPrice(pricing.baseRate) + "/day";
+    }
+
+    var days = getSelectedDays(form);
+    if (!durationField || !durationField.value || days <= 0) {
+      estimatedPriceDisplay.textContent = "Total Price (Unit Price x Duration) will show here.";
+      return;
+    }
+
+    var appliedDailyRate = pricing.baseRate;
+    if (pricing.hasLongRate && days >= 3) {
+      appliedDailyRate = pricing.longRate;
+    }
+    var unitSubtotal = appliedDailyRate * days;
+    var total = unitSubtotal + additionalPrice;
+    if (additionalPrice > 0) {
+      estimatedPriceDisplay.textContent = "Total Price: (" + formatPrice(appliedDailyRate) + " x " + days + " day(s)) + " + formatPrice(additionalPrice) + " = " + formatPrice(total);
+    } else {
+      estimatedPriceDisplay.textContent = "Total Price: " + formatPrice(appliedDailyRate) + " x " + days + " day(s) = " + formatPrice(total);
+    }
+  }
+
+  function openMessengerPrefilled(messengerUrl) {
+    var w = window.open(messengerUrl, "_blank", "noopener,noreferrer");
+    if (!w || w.closed) {
+      window.location.href = messengerUrl;
+      return;
+    }
+    closeBookingModal();
+  }
+
+  function deliverBookingAfterSubmit(fullName, email, phone, message, messengerUrl) {
+    var inbox = typeof BOOKING_INBOX_EMAIL === "string" ? BOOKING_INBOX_EMAIL.trim() : "";
+    if (!inbox) {
+      openMessengerPrefilled(messengerUrl);
+      return;
+    }
+    fetch("https://formsubmit.co/ajax/" + encodeURIComponent(inbox), {
+      method: "POST",
+      headers: { "Content-Type": "application/json", Accept: "application/json" },
+      body: JSON.stringify({
+        name: fullName,
+        email: email,
+        phone: phone,
+        message: message,
+        _subject: "Prillaga booking — " + fullName,
+        _replyto: email,
+        _template: "table",
+        _captcha: false
+      })
+    }).finally(function () {
+      openMessengerPrefilled(messengerUrl);
+    });
+  }
+
+  function handleBookingSubmit(event) {
+    event.preventDefault();
+
+    var form = event.target;
+    var data = new FormData(form);
+
+    var fullName = data.get("fullName") || "";
+    var email = data.get("email") || "";
+    var phone = data.get("phone") || "";
+    var pickupLocation = data.get("pickupLocation") || "";
+    var pickupTime = data.get("pickupTime") || "";
+    var rentalDate = data.get("rentalDate") || "";
+    var returnDate = data.get("returnDate") || "";
+    var units = data.get("units") || "";
+    var additionalRent = data.get("additionalRent") || "None";
+    var rentalDuration = data.get("rentalDuration") || "";
+    var otherDays = data.get("otherDays") || "";
+    var notes = data.get("notes") || "";
+
+    var unitsField = form.querySelector('select[name="units"]');
+    var pickupLocationField = form.querySelector('select[name="pickupLocation"]');
+    var pickupTimeField = form.querySelector('select[name="pickupTime"]');
+
+    var selectedUnitText = unitsField && unitsField.selectedIndex >= 0 ? unitsField.options[unitsField.selectedIndex].text : units;
+    var calConflict = calFindConflict(selectedUnitText, rentalDate, returnDate);
+    if (calConflict && calConflict.type === "approved") {
+      alert("Those dates are already booked for this unit on the availability calendar. Please change rental/return dates or pick another unit.");
+      updateCalendarAvailabilityNotice();
+      return;
+    }
+    if (calConflict && calConflict.type === "pending") {
+      if (!window.confirm("These dates overlap a pending calendar request for this unit. Open Messenger anyway?")) {
+        return;
+      }
+    }
+    var selectedPickupLocationText = pickupLocationField && pickupLocationField.selectedIndex >= 0 ? pickupLocationField.options[pickupLocationField.selectedIndex].text : pickupLocation;
+    var selectedPickupTimeText = pickupTimeField && pickupTimeField.selectedIndex >= 0 ? pickupTimeField.options[pickupTimeField.selectedIndex].text : pickupTime;
+    var selectedDays = getSelectedDays(form);
+    var durationText = rentalDuration === "other" ? ("Others (" + otherDays + " day(s))") : (rentalDuration === "4" ? "4 days up" : rentalDuration + " day(s)");
+    var selectedPricing = unitPricingRules[selectedUnitText];
+    var selectedRate = selectedPricing ? ((selectedPricing.hasLongRate && selectedDays >= 3) ? selectedPricing.longRate : selectedPricing.baseRate) : 0;
+    var selectedAdditionalPrice = additionalRentPricingRules[additionalRent] || 0;
+    var estimatedTotalText = selectedRate > 0 && selectedDays > 0 ? formatPrice((selectedRate * selectedDays) + selectedAdditionalPrice) : "To be confirmed";
+
+    var message =
+      "I want to reserve my slots. Please confirm my dates.\n\n" +
+      "Full Name: " + fullName + "\n" +
+      "Email: " + email + "\n" +
+      "Phone: " + phone + "\n" +
+      "Pick Up Location: " + selectedPickupLocationText + "\n" +
+      "Pick Up Time: " + selectedPickupTimeText + "\n" +
+      "Rental Date: " + rentalDate + "\n" +
+      "Return Date: " + returnDate + "\n" +
+      "Units: " + selectedUnitText + "\n" +
+      "Additional to rent: " + additionalRent + "\n" +
+      "Duration: " + durationText + "\n" +
+      "Total Price (Unit Price x Duration): " + estimatedTotalText + "\n" +
+      "Notes: " + notes;
+
+    var messengerUrl = window.prillagaMessengerUrlWithText ? window.prillagaMessengerUrlWithText(message) : "";
+    if (!messengerUrl) {
+      alert("Messenger Page ID is missing. Place site-config.js in the same folder as this page.");
+      return;
+    }
+    deliverBookingAfterSubmit(fullName, email, phone, message, messengerUrl);
+  }
+
+  function initRentalReturnDates() {
+    var rental = document.getElementById("rentalDate");
+    var ret = document.getElementById("returnDate");
+    if (!rental || !ret) return;
+    function sync() {
+      var start = rental.value;
+      if (start) {
+        ret.min = start;
+        if (ret.value && ret.value < start) ret.value = start;
+      } else {
+        ret.removeAttribute("min");
+      }
+    }
+    rental.addEventListener("change", sync);
+    rental.addEventListener("input", sync);
+    sync();
+  }
+
+  document.addEventListener("DOMContentLoaded", function () {
+    initBookingModal();
+    tryOpenBookingFromUrl();
+    initHomeAvailabilityCalendar();
+    initRentalReturnDates();
+    toggleOtherDaysInput();
+    updateUnitPricing();
+    var otherDaysInput = document.getElementById("otherDaysInput");
+    if (otherDaysInput) {
+      otherDaysInput.addEventListener("input", updateUnitPricing);
+    }
+    var bookForm = document.querySelector("#book-now form");
+    if (bookForm) {
+      updateCalendarAvailabilityNotice();
+      bookForm.addEventListener("change", function (e) {
+        var t = e.target;
+        if (t && (t.name === "rentalDate" || t.name === "returnDate" || t.name === "units")) {
+          updateCalendarAvailabilityNotice();
+        }
+      });
+      bookForm.addEventListener("input", function (e) {
+        var t = e.target;
+        if (t && (t.name === "rentalDate" || t.name === "returnDate")) {
+          updateCalendarAvailabilityNotice();
+        }
+      });
+    }
+    window.addEventListener("storage", function (e) {
+      if (e.key === CAL_STORAGE_KEY) {
+        updateCalendarAvailabilityNotice();
+        renderHomeAvailabilityCalendar();
+      }
+    });
+    if (typeof BroadcastChannel !== "undefined") {
+      var calCh = new BroadcastChannel(CAL_CHANNEL_NAME);
+      calCh.addEventListener("message", function () {
+        updateCalendarAvailabilityNotice();
+        renderHomeAvailabilityCalendar();
+      });
+    }
+  });
+</script>
+</body>
+</html>

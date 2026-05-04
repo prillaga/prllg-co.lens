@@ -1,0 +1,143 @@
+/**
+ * Hamburger always visible; links open in a full-screen overlay.
+ * Expects: #site-header, button.nav-toggle, nav#site-main-nav.site-nav
+ */
+
+.nav-toggle {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  gap: 5px;
+  width: 44px;
+  height: 44px;
+  padding: 0;
+  margin: 0;
+  margin-left: auto;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  border-radius: 8px;
+  flex-shrink: 0;
+  z-index: 1201;
+  position: relative;
+  -webkit-tap-highlight-color: transparent;
+}
+
+.nav-toggle:hover {
+  background: rgba(255, 255, 255, 0.08);
+}
+
+.nav-toggle:focus-visible {
+  outline: 2px solid #d4af37;
+  outline-offset: 3px;
+}
+
+.nav-toggle span {
+  display: block;
+  width: 22px;
+  height: 2px;
+  background: #ececec;
+  border-radius: 1px;
+  transition: transform 0.22s ease, opacity 0.2s ease;
+}
+
+#site-header.nav-open .nav-toggle span:nth-child(1) {
+  transform: translateY(7px) rotate(45deg);
+}
+
+#site-header.nav-open .nav-toggle span:nth-child(2) {
+  opacity: 0;
+}
+
+#site-header.nav-open .nav-toggle span:nth-child(3) {
+  transform: translateY(-7px) rotate(-45deg);
+}
+
+#site-header {
+  flex-wrap: nowrap !important;
+}
+
+#site-header nav.site-nav {
+  display: none;
+  position: fixed;
+  inset: 0;
+  padding: max(72px, calc(16px + env(safe-area-inset-top))) 20px max(32px, env(safe-area-inset-bottom));
+  margin: 0 !important;
+  width: 100% !important;
+  max-width: none !important;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  gap: 0;
+  background: rgba(6, 6, 6, 0.96);
+  backdrop-filter: blur(10px);
+  -webkit-backdrop-filter: blur(10px);
+  z-index: 1100;
+  overflow-y: auto;
+  -webkit-overflow-scrolling: touch;
+}
+
+#site-header.nav-open nav.site-nav {
+  display: flex;
+}
+
+#site-header nav.site-nav a {
+  display: flex;
+  align-items: center;
+  padding: 16px 14px;
+  border-bottom: 1px solid #2a2a2a;
+  border-radius: 0;
+  font-size: 16px;
+  white-space: normal;
+  text-align: left;
+}
+
+#site-header nav.site-nav a[data-nav]::before {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.1em;
+  min-width: 2.1em;
+  margin-right: 12px;
+  font-size: 1.2em;
+  line-height: 1;
+  flex-shrink: 0;
+  opacity: 0.95;
+}
+
+#site-header nav.site-nav a[data-nav="home"]::before {
+  content: "🏠";
+}
+
+#site-header nav.site-nav a[data-nav="about"]::before {
+  content: "👤";
+}
+
+#site-header nav.site-nav a[data-nav="units"]::before {
+  content: "📷";
+}
+
+#site-header nav.site-nav a[data-nav="availability"]::before {
+  content: "📅";
+}
+
+#site-header nav.site-nav a[data-nav="policy"]::before {
+  content: "📋";
+}
+
+#site-header nav.site-nav a[data-nav="agreement"]::before {
+  content: "✍️";
+}
+
+#site-header nav.site-nav a[data-nav="payment"]::before {
+  content: "💳";
+}
+
+#site-header nav.site-nav a[data-nav="contact"]::before {
+  content: "💬";
+}
+
+#site-header nav.site-nav a:last-of-type {
+  border-bottom: 0;
+}
