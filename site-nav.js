@@ -14,7 +14,8 @@
     }
 
     function setOpen(open) {
-      header.classList.toggle("nav-open", !!open);
+      var isOpen = !!open;
+      header.classList.toggle("nav-open", isOpen);
       syncAria();
     }
 
@@ -53,6 +54,12 @@
     document.addEventListener("keydown", function (e) {
       if (e.key === "Escape") close();
     });
+
+    function onResizeNav() {
+      syncAria();
+    }
+
+    window.addEventListener("resize", onResizeNav);
 
     syncAria();
   }

@@ -29,30 +29,6 @@
       -webkit-backdrop-filter: none !important;
       position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
     }
-    nav.site-nav {
-      display: flex;
-      flex-wrap: wrap;
-      align-items: center;
-      justify-content: flex-end;
-      gap: 2px 10px;
-      font-family: Arial, Helvetica, sans-serif;
-    }
-    nav.site-nav a {
-      text-decoration: none;
-      color: rgba(245, 245, 245, 0.92);
-      font-weight: 500;
-      font-size: 14px;
-      letter-spacing: 0.03em;
-      white-space: nowrap;
-      padding: 8px 8px;
-      border-radius: 6px;
-      transition: color 0.15s ease, background 0.15s ease;
-    }
-    nav.site-nav a:hover { color: #fff; background: rgba(255, 255, 255, 0.08); }
-    nav.site-nav a.is-active { color: #d4af37; font-weight: 600; }
-    @media (max-width: 768px) {
-      #site-header nav.site-nav { width: 100%; justify-content: flex-start; flex-wrap: wrap; gap: 4px 8px; }
-    }
     .brand-lockup {
       display: inline-flex; align-items: baseline; flex-wrap: wrap; gap: 0.15em 0.45em;
       line-height: 1.08; text-decoration: none;
@@ -141,7 +117,11 @@
       <span class="brand-name">Prillaga<span class="brand-amp">&amp;</span>Co.</span><span class="brand-line">Lens</span>
     </a>
     <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="site-main-nav" aria-label="Open menu">
-      <span></span><span></span><span></span>
+      <span class="nav-toggle__bars" aria-hidden="true">
+        <span class="nav-toggle__bar"></span>
+        <span class="nav-toggle__bar"></span>
+        <span class="nav-toggle__bar"></span>
+      </span>
     </button>
     <nav id="site-main-nav" class="site-nav" aria-label="Main">
       <a href="index.html#home" data-nav="home">Home</a>
