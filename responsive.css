@@ -7,11 +7,29 @@
 html {
   overflow-x: hidden;
   color-scheme: dark;
+  background-color: #0a0a0a;
+}
+
+@keyframes prillaga-page-enter {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @media (prefers-reduced-motion: no-preference) {
   html {
     scroll-behavior: smooth;
+    opacity: 0;
+    animation: prillaga-page-enter 0.58s cubic-bezier(0.22, 1, 0.46, 1) forwards;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html {
+    scroll-behavior: auto;
   }
 }
 
@@ -677,97 +695,22 @@ label,
   }
 }
 
-/* ----- Page opening animation (all pages that load this stylesheet) ----- */
-/* Curtain overlay: does not use transform on body (keeps position:fixed descendants correct). */
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: 4500;
-  pointer-events: auto;
-  background:
-    radial-gradient(ellipse 110% 65% at 50% 0%, rgba(212, 175, 55, 0.16) 0%, transparent 58%),
-    linear-gradient(180deg, #040404 0%, #0c0a08 42%, #060606 100%);
-  animation: prillaga-curtain-out 0.82s cubic-bezier(0.33, 0.86, 0.24, 1) forwards;
-}
-
-@keyframes prillaga-curtain-out {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-  }
-}
-
+/* ----- Scroll reveal (sections / main — not #site-header) ----- */
 @media (prefers-reduced-motion: no-preference) {
-  /*
-   * Header intro: opacity only — never transform on #site-header.
-   * Transform on the header creates a containing block and breaks
-   * position:fixed full-screen nav inside <header> (menu clips to bar height).
-   */
-  #site-header {
-    animation: prillaga-header-open 0.58s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
+  .prillaga-scroll-reveal {
+    opacity: 0;
+    transform: translate3d(0, 32px, 0);
+    transition:
+      opacity 0.72s cubic-bezier(0.22, 1, 0.46, 1),
+      transform 0.72s cubic-bezier(0.22, 1, 0.46, 1);
+    will-change: opacity, transform;
   }
 
-  @keyframes prillaga-header-open {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
-
-  /*
-   * Main flow: opacity only (no transform) so sections that wrap fixed headers
-   * (e.g. About, Payment) do not break position:fixed.
-   */
-  body > *:not(script):not(.skip-link):not(a):not(#site-header):not(#toast) {
-    animation: prillaga-content-open 0.62s cubic-bezier(0.22, 1, 0.36, 1) 0.32s both;
-  }
-
-  @keyframes prillaga-content-open {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
+  .prillaga-scroll-reveal.prillaga-scroll-reveal--in {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+    will-change: auto;
   }
 }
 
-@media (prefers-reduced-motion: reduce) {
-  body::after {
-    animation-duration: 0.22s;
-    animation-timing-function: ease-out;
-  }
-
-  #site-header {
-    animation: prillaga-header-open-soft 0.2s ease-out 0.04s both;
-  }
-
-  @keyframes prillaga-header-open-soft {
-    from {
-      opacity: 0.92;
-    }
-    to {
-      opacity: 1;
-    }
-  }
-
-  body > *:not(script):not(.skip-link):not(a):not(#site-header):not(#toast) {
-    animation: prillaga-content-open-soft 0.22s ease-out 0.08s both;
-  }
-
-  @keyframes prillaga-content-open-soft {
-    from {
-      opacity: 0.94;
-    }
-    to {
-      opacity: 1;
-    }
-  }
-}
+/* ----- Page enter: single smooth fade on <html> (no curtain, no staggered children) ----- */
