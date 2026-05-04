@@ -1,1 +1,50 @@
-[]
+[
+  {
+    "id": "b-1777923836696",
+    "unitId": "nikon-kit",
+    "start": "2026-05-06",
+    "end": "2026-05-07",
+    "status": "approved",
+    "staffBlock": true
+  },
+  {
+    "id": "b-1777923851186",
+    "unitId": "nikon-kit",
+    "start": "2026-05-15",
+    "end": "2026-05-16",
+    "status": "approved",
+    "staffBlock": true
+  },
+  {
+    "id": "b-1777923866295",
+    "unitId": "nikon-kit",
+    "start": "2026-05-23",
+    "end": "2026-05-25",
+    "status": "approved",
+    "staffBlock": true
+  },
+  {
+    "id": "b-1777923957745",
+    "unitId": "nikon-kit",
+    "start": "2026-05-26",
+    "end": "2026-05-26",
+    "status": "approved",
+    "staffBlock": true
+  },
+  {
+    "id": "b-1777924513448",
+    "unitId": "nikon-zoom",
+    "start": "2026-05-13",
+    "end": "2026-05-14",
+    "status": "approved",
+    "staffBlock": true
+  },
+  {
+    "id": "b-1777924609820",
+    "unitId": "nikon-zoom",
+    "start": "2026-05-01",
+    "end": "2026-05-04",
+    "status": "approved",
+    "staffBlock": true
+  }
+]
