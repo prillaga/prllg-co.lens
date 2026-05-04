@@ -1,0 +1,139 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="About Prillaga&amp;Co. Lens — refined camera rental for creators.">
+  <title>About Us | Prillaga&amp;Co. Lens</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    @media (prefers-reduced-motion: no-preference) {
+      html { scroll-behavior: smooth; }
+    }
+    body { margin: 0; background: #0b0b0b; color: #f5f5f5; padding-bottom: 96px; }
+    .skip-link {
+      position: absolute; left: 12px; top: 12px; z-index: 2000;
+      padding: 10px 16px; background: #d4af37; color: #111; font-weight: 700;
+      font-family: Arial, sans-serif; font-size: 14px; text-decoration: none;
+      border-radius: 6px; transform: translateY(-120%); transition: transform 0.2s ease;
+    }
+    .skip-link:focus { transform: translateY(0); outline: 2px solid #fff; outline-offset: 2px; }
+    a:focus-visible, button:focus-visible { outline: 2px solid #d4af37; outline-offset: 3px; }
+    #site-header {
+      background: transparent !important;
+      border-bottom: none !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+    }
+    @media (max-width: 768px) {
+      #site-header { flex-wrap: nowrap; gap: 10px; padding: 12px max(14px, env(safe-area-inset-right)) 12px max(14px, env(safe-area-inset-left)) !important; }
+    }
+    .brand-lockup {
+      display: inline-flex;
+      align-items: baseline;
+      flex-wrap: wrap;
+      gap: 0.15em 0.45em;
+      line-height: 1.08;
+      text-decoration: none;
+    }
+    .brand-lockup .brand-name {
+      font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, 'Times New Roman', serif;
+      font-weight: 500;
+      font-size: clamp(1.7rem, 3vw, 2.05rem);
+      letter-spacing: 0.1em;
+      color: #f4ebd0;
+      text-shadow:
+        0 1px 0 rgba(0, 0, 0, 0.45),
+        0 2px 28px rgba(212, 175, 55, 0.22);
+    }
+    .brand-lockup .brand-amp {
+      font-style: italic;
+      font-weight: 400;
+      letter-spacing: 0.02em;
+      opacity: 0.95;
+    }
+    .brand-lockup .brand-line {
+      font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, 'Times New Roman', serif;
+      font-weight: 500;
+      font-size: clamp(1.7rem, 3vw, 2.05rem);
+      letter-spacing: 0.1em;
+      color: #f4ebd0;
+      text-shadow:
+        0 1px 0 rgba(0, 0, 0, 0.45),
+        0 2px 28px rgba(212, 175, 55, 0.22);
+    }
+    .lux-page-title {
+      font-family: 'Cormorant Garamond', 'Playfair Display', Georgia, serif;
+      font-weight: 500;
+      font-size: clamp(2rem, 4vw, 2.65rem);
+      letter-spacing: 0.32em;
+      text-transform: uppercase;
+      color: #e8d89c;
+      text-shadow: 0 0 40px rgba(212, 175, 55, 0.12);
+    }
+    .about-lead {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-size: clamp(1.15rem, 2.2vw, 1.35rem);
+      line-height: 1.75;
+      color: #e4e0d8;
+    }
+    .about-tagline {
+      font-family: 'Cormorant Garamond', Georgia, serif;
+      font-style: italic;
+      font-size: 1.2rem;
+      letter-spacing: 0.06em;
+      color: #d4af37;
+    }
+  </style>
+  <link rel="stylesheet" href="site-nav.css">
+  <link rel="stylesheet" href="responsive.css">
+  <script src="site-nav.js" defer></script>
+</head>
+<body>
+<a class="skip-link" href="#about-main">Skip to content</a>
+<section class="page-shell page-shell--about">
+  <header id="site-header" style="display: flex; justify-content: space-between; align-items: center; padding: 16px max(32px, env(safe-area-inset-right)) 16px max(32px, env(safe-area-inset-left)); background: transparent; position: fixed; top: 0; left: 0; right: 0; z-index: 1000; border-bottom: none;">
+    <a href="index.html#home" class="brand-lockup" aria-label="Prillaga and Co. Lens home">
+      <span class="brand-name">Prillaga<span class="brand-amp">&amp;</span>Co.</span><span class="brand-line">Lens</span>
+    </a>
+    <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="site-main-nav" aria-label="Open menu">
+      <span class="nav-toggle__bars" aria-hidden="true">
+        <span class="nav-toggle__bar"></span>
+        <span class="nav-toggle__bar"></span>
+        <span class="nav-toggle__bar"></span>
+      </span>
+    </button>
+    <nav id="site-main-nav" class="site-nav" aria-label="Main">
+      <a href="index.html#home" data-nav="home">Home</a>
+      <a href="about-us.html" class="is-active" aria-current="page" data-nav="about">About Us</a>
+      <a href="units.html" data-nav="units">Units</a>
+      <a href="availability.html" data-nav="availability">Availability</a>
+      <a href="index.html#rental-policy" data-nav="policy">Rental Policy</a>
+      <a href="rental-agreement.html" data-nav="agreement">Agreement</a>
+      <a href="payment-methods.html" data-nav="payment">Payment</a>
+      <a href="index.html#contact-page" data-nav="contact">Contact</a>
+    </nav>
+  </header>
+
+  <div id="about-main">
+    <h1 class="lux-page-title" style="margin: 0 0 22px 0;">
+      About
+    </h1>
+    <p class="about-lead" style="margin: 0 0 16px 0;">
+      Prillaga&amp;Co. Lens is built for creators who value quality, calm service, and visual storytelling. We offer trusted camera kits and tools for shoots, projects, and events—with the polish you would expect from a private rental house.
+    </p>
+    <p class="about-lead" style="margin: 0 0 20px 0;">
+      Our aim is simple: make professional equipment effortless to reserve, with clear terms and responsive support at every step.
+    </p>
+    <p class="about-tagline" style="margin: 0; line-height: 1.6;">
+      Sharper vision, greater stories.
+    </p>
+  </div>
+</section>
+<a href="index.html#book-now" aria-label="Book now" style="position: fixed; right: 20px; bottom: 20px; z-index: 999; display: inline-flex; align-items: center; justify-content: center; width: 62px; height: 62px; border-radius: 50%; background: linear-gradient(135deg, #f3d77b 0%, #d4af37 45%, #b8901f 100%); color: #111; text-decoration: none; font-size: 26px; line-height: 1; box-shadow: 0 10px 24px rgba(0, 0, 0, 0.35); border: 1px solid rgba(255, 230, 150, 0.75);">📅</a>
+</body>
+</html>

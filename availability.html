@@ -1,0 +1,387 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="See rental availability by unit — Prillaga&amp;Co. Lens.">
+  <title>Availability | Prillaga&amp;Co. Lens</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
+  <style>
+    *, *::before, *::after { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; }
+    body { margin: 0; background: #0a0a0a; color: #f0f0f0; font-family: Arial, sans-serif; padding-bottom: 48px; }
+    a:focus-visible, button:focus-visible, select:focus-visible { outline: 2px solid #d4af37; outline-offset: 2px; }
+    .skip-link {
+      position: absolute; left: 12px; top: 12px; z-index: 2000;
+      padding: 10px 16px; background: #d4af37; color: #111; font-weight: 700;
+      font-size: 14px; text-decoration: none; border-radius: 6px;
+      transform: translateY(-120%); transition: transform 0.2s ease;
+    }
+    .skip-link:focus { transform: translateY(0); }
+    #site-header {
+      display: flex; justify-content: space-between; align-items: center;
+      flex-wrap: wrap; gap: 12px; padding: 16px 32px;
+      background: transparent !important;
+      border-bottom: none !important;
+      backdrop-filter: none !important;
+      -webkit-backdrop-filter: none !important;
+      position: fixed; top: 0; left: 0; right: 0; z-index: 1000;
+    }
+    .brand-lockup {
+      display: inline-flex; align-items: baseline; flex-wrap: wrap; gap: 0.15em 0.45em;
+      line-height: 1.08; text-decoration: none;
+    }
+    .brand-lockup .brand-name, .brand-lockup .brand-line {
+      font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 500;
+      font-size: clamp(1.5rem, 3vw, 1.95rem); letter-spacing: 0.1em; color: #f4ebd0;
+    }
+    .brand-lockup .brand-amp { font-style: italic; opacity: 0.95; }
+    .lux-heading {
+      font-family: 'Cormorant Garamond', Georgia, serif; font-weight: 500;
+      font-size: clamp(1.5rem, 3.2vw, 2rem); letter-spacing: 0.28em; text-transform: uppercase;
+      color: #e8d89c; text-align: center; margin: 0 0 8px 0;
+    }
+    main { max-width: 720px; margin: 0 auto; padding: 100px 20px 32px; }
+    .toolbar {
+      display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 14px;
+      margin-bottom: 20px;
+    }
+    .toolbar label { font-size: 13px; color: #d4af37; display: block; margin-bottom: 6px; }
+    select {
+      min-width: 220px; max-width: 100%; padding: 10px 12px; border-radius: 8px;
+      border: 1px solid #333; background: #141414; color: #fff; font-size: 14px;
+    }
+    .month-nav {
+      display: flex; align-items: center; gap: 10px;
+    }
+    .month-nav button {
+      width: 40px; height: 40px; border-radius: 8px; border: 1px solid #3a3a3a;
+      background: #1a1a1a; color: #f5f5f5; font-size: 18px; cursor: pointer; line-height: 1;
+    }
+    .month-nav button:hover { background: #252525; }
+    .month-title {
+      font-family: 'Playfair Display', Georgia, serif; font-size: 1.15rem;
+      color: #f4ebd0; min-width: 200px; text-align: center;
+    }
+    .cal-wrap {
+      background: #111; border: 1px solid #2a2a2a; border-radius: 12px; padding: 16px 12px 20px;
+      overflow-x: auto;
+    }
+    .cal-weekdays {
+      display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px;
+      margin-bottom: 8px; font-size: 11px; letter-spacing: 0.12em; text-transform: uppercase;
+      color: #888; text-align: center;
+    }
+    .cal-grid {
+      display: grid; grid-template-columns: repeat(7, 1fr); gap: 4px;
+    }
+    .cal-cell {
+      aspect-ratio: 1; min-height: 40px; max-height: 88px;
+      border-radius: 8px; border: 1px solid #2a2a2a; background: #161616;
+      display: flex; flex-direction: column; align-items: center; justify-content: flex-start;
+      padding: 6px 4px; font-size: 13px; color: #ccc;
+    }
+    .cal-cell.out { background: transparent; border-color: transparent; color: #555; }
+    .cal-cell .num { font-weight: 600; color: #eee; }
+    .cal-cell.today { border-color: #d4af37; box-shadow: 0 0 0 1px rgba(212, 175, 55, 0.25) inset; }
+    .cal-cell.approved { background: #2a1818; border-color: #6b3030; color: #e8b4b4; }
+    .cal-cell.approved .num { color: #f0c4c4; }
+    .cal-cell.pending { background: #2a2618; border-color: #6b5a30; color: #e8dcb4; }
+    .cal-cell.pending .num { color: #f0e8c4; }
+    .cal-cell.both { background: #2a1a18; border-color: #6b4030; }
+    .cal-cell.closed { background: #262626; border-color: #4a4a4a; color: #c8c8c8; }
+    .cal-cell.closed .num { color: #e2e2e2; }
+    .cal-cell .tag { font-size: 9px; margin-top: 4px; text-align: center; line-height: 1.2; opacity: 0.95; }
+    .legend {
+      display: flex; flex-wrap: wrap; gap: 16px 24px; margin-top: 18px; font-size: 13px; color: #aaa;
+    }
+    .legend span { display: inline-flex; align-items: center; gap: 8px; }
+    .sw { width: 14px; height: 14px; border-radius: 4px; border: 1px solid #333; }
+    .sw.av { background: #161616; }
+    .sw.ap { background: #2a1818; border-color: #6b3030; }
+    .sw.pe { background: #2a2618; border-color: #6b5a30; }
+    .sw.na { background: #262626; border-color: #4a4a4a; }
+    .note {
+      margin-top: 22px; padding: 14px 16px; border-radius: 10px; border: 1px solid #2e2e2e;
+      background: #121212; font-size: 13px; line-height: 1.55; color: #9a9a9a;
+    }
+    .note a { color: #d4af37; }
+  </style>
+  <link rel="stylesheet" href="site-nav.css">
+  <link rel="stylesheet" href="responsive.css">
+  <script src="site-nav.js" defer></script>
+</head>
+<body>
+  <a class="skip-link" href="#availability-main">Skip to calendar</a>
+  <header id="site-header">
+    <a href="index.html#home" class="brand-lockup" aria-label="Prillaga and Co. Lens home">
+      <span class="brand-name">Prillaga<span class="brand-amp">&amp;</span>Co.</span><span class="brand-line">Lens</span>
+    </a>
+    <button type="button" class="nav-toggle" aria-expanded="false" aria-controls="site-main-nav" aria-label="Open menu">
+      <span class="nav-toggle__bars" aria-hidden="true">
+        <span class="nav-toggle__bar"></span>
+        <span class="nav-toggle__bar"></span>
+        <span class="nav-toggle__bar"></span>
+      </span>
+    </button>
+    <nav id="site-main-nav" class="site-nav" aria-label="Main">
+      <a href="index.html#home" data-nav="home">Home</a>
+      <a href="about-us.html" data-nav="about">About Us</a>
+      <a href="units.html" data-nav="units">Units</a>
+      <a href="availability.html" class="is-active" aria-current="page" data-nav="availability">Availability</a>
+      <a href="index.html#rental-policy" data-nav="policy">Rental Policy</a>
+      <a href="rental-agreement.html" data-nav="agreement">Agreement</a>
+      <a href="payment-methods.html" data-nav="payment">Payment</a>
+      <a href="index.html#contact-page" data-nav="contact">Contact</a>
+    </nav>
+  </header>
+
+  <main id="availability-main">
+    <h1 class="lux-heading">Availability</h1>
+    <p style="text-align: center; margin: 0 0 24px 0; color: #9a9a9a; font-size: 14px; line-height: 1.5;">
+      Confirmed bookings show in red. Amber is a pending request. Grey is staff-marked “not available.” The site also loads a published file (<code>availability-public.json</code>) so everyone sees the same blocks after you deploy an export from staff admin.
+    </p>
+
+    <div class="toolbar">
+      <div>
+        <label for="unitSelect">Equipment</label>
+        <select id="unitSelect" aria-label="Choose unit to view availability">
+          <option value="">Any item — day is busy if any unit has a hold</option>
+        </select>
+      </div>
+      <div class="month-nav" aria-label="Month">
+        <button type="button" id="btnPrev" aria-label="Previous month">&lsaquo;</button>
+        <div class="month-title" id="monthTitle" role="status"></div>
+        <button type="button" id="btnNext" aria-label="Next month">&rsaquo;</button>
+      </div>
+    </div>
+
+    <div class="cal-wrap">
+      <div class="cal-weekdays">
+        <div>Sun</div><div>Mon</div><div>Tue</div><div>Wed</div><div>Thu</div><div>Fri</div><div>Sat</div>
+      </div>
+      <div class="cal-grid" id="calGrid" aria-live="polite"></div>
+    </div>
+
+    <div class="legend" aria-hidden="true">
+      <span><span class="sw av"></span> Available</span>
+      <span><span class="sw ap"></span> Booked (confirmed)</span>
+      <span><span class="sw pe"></span> Pending request</span>
+      <span><span class="sw na"></span> Not available (staff)</span>
+    </div>
+
+    <p class="note">
+      <strong>Customers:</strong> busy dates come from the published <code>availability-public.json</code> on this site (same data for every visitor). <strong>Staff:</strong> open <a href="admin.html"><code>admin.html</code></a>, unlock with your PIN, update the calendar, then use <strong>Download public calendar file</strong> and replace <code>availability-public.json</code> in the project before deploy so customers always see booked and unavailable days. Local browser data still merges for quick testing on one device. Questions? <a href="index.html#book-now">Send a booking request</a> and we will confirm on Messenger.
+    </p>
+  </main>
+
+<script>
+(function () {
+  var STORAGE_KEY = "prillaga_lens_bookings_v1";
+  var CHANNEL_NAME = "prillaga-availability-v1";
+
+  var UNITS = [
+    { id: "nikon-kit", label: "Nikon DSLR Flipscreen w/ kitlens 15-80mm" },
+    { id: "nikon-zoom", label: "Nikon DSLR Flipscreen w/ Zoom Lens 70-330mm" },
+    { id: "zoom-lens", label: "Zoom Lens 70-330mm" },
+    { id: "dji-gimbal", label: "DJI OSMO MOBILE 3 GIMBAL" }
+  ];
+
+  var now = new Date();
+  var viewYear = now.getFullYear();
+  var viewMonth = now.getMonth();
+  var channel = typeof BroadcastChannel !== "undefined" ? new BroadcastChannel(CHANNEL_NAME) : null;
+  var publicBookings = null;
+
+  function pad(n) { return n < 10 ? "0" + n : String(n); }
+  function ymd(y, m, d) { return y + "-" + pad(m) + "-" + pad(d); }
+
+  function compareDates(a, b) {
+    return a < b ? -1 : a > b ? 1 : 0;
+  }
+
+  function dayInBookingRange(dayStr, start, end) {
+    return compareDates(start, dayStr) <= 0 && compareDates(dayStr, end) <= 0;
+  }
+
+  function loadBookingsLocal() {
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      var arr = raw ? JSON.parse(raw) : [];
+      return Array.isArray(arr) ? arr : [];
+    } catch (e) {
+      return [];
+    }
+  }
+
+  function mergePublicAndLocal(remote, local) {
+    var map = {};
+    var i;
+    for (i = 0; i < remote.length; i++) {
+      var r = remote[i];
+      if (!r || !r.id || !r.unitId || !r.start || !r.end) continue;
+      if (r.status !== "approved" && r.status !== "pending") continue;
+      map[String(r.id)] = r;
+    }
+    for (i = 0; i < local.length; i++) {
+      var l = local[i];
+      if (!l || !l.id) continue;
+      map[String(l.id)] = l;
+    }
+    var out = [];
+    for (var k in map) {
+      if (Object.prototype.hasOwnProperty.call(map, k)) out.push(map[k]);
+    }
+    return out;
+  }
+
+  function loadBookingsMerged() {
+    var local = loadBookingsLocal();
+    var remote = publicBookings === null ? [] : publicBookings;
+    return mergePublicAndLocal(remote, local);
+  }
+
+  function fetchPublicBookings(cb) {
+    fetch("./availability-public.json", { cache: "no-store" })
+      .then(function (res) {
+        return res.ok ? res.json() : [];
+      })
+      .then(function (data) {
+        publicBookings = Array.isArray(data) ? data : [];
+        if (cb) cb();
+      })
+      .catch(function () {
+        publicBookings = [];
+        if (cb) cb();
+      });
+  }
+
+  function statusForDay(dayStr, unitFilter) {
+    var list = loadBookingsMerged();
+    var hasCustomerApproved = false;
+    var hasStaffApproved = false;
+    var hasPending = false;
+    for (var i = 0; i < list.length; i++) {
+      var b = list[i];
+      if (b.status === "rejected") continue;
+      if (unitFilter && b.unitId !== unitFilter) continue;
+      if (!dayInBookingRange(dayStr, b.start, b.end)) continue;
+      if (b.status === "approved") {
+        if (b.staffBlock) hasStaffApproved = true;
+        else hasCustomerApproved = true;
+      } else if (b.status === "pending") {
+        hasPending = true;
+      }
+    }
+    return {
+      hasCustomerApproved: hasCustomerApproved,
+      hasStaffApproved: hasStaffApproved,
+      hasPending: hasPending,
+      hasApproved: hasCustomerApproved || hasStaffApproved
+    };
+  }
+
+  function fillUnitSelect() {
+    var sel = document.getElementById("unitSelect");
+    UNITS.forEach(function (u) {
+      var opt = document.createElement("option");
+      opt.value = u.id;
+      opt.textContent = u.label;
+      sel.appendChild(opt);
+    });
+  }
+
+  function renderMonth() {
+    var title = document.getElementById("monthTitle");
+    var grid = document.getElementById("calGrid");
+    var monthNames = ["January", "February", "March", "April", "May", "June", "July", "August", "September", "October", "November", "December"];
+    title.textContent = monthNames[viewMonth] + " " + viewYear;
+
+    var first = new Date(viewYear, viewMonth, 1);
+    var startPad = first.getDay();
+    var daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+    var today = new Date();
+    var todayStr = ymd(today.getFullYear(), today.getMonth() + 1, today.getDate());
+    var unitFilter = document.getElementById("unitSelect").value;
+
+    grid.innerHTML = "";
+    var i;
+    for (i = 0; i < startPad; i++) {
+      var empty = document.createElement("div");
+      empty.className = "cal-cell out";
+      empty.setAttribute("aria-hidden", "true");
+      grid.appendChild(empty);
+    }
+    for (i = 1; i <= daysInMonth; i++) {
+      var dayStr = ymd(viewYear, viewMonth + 1, i);
+      var st = statusForDay(dayStr, unitFilter);
+      var cell = document.createElement("div");
+      cell.className = "cal-cell";
+      if (dayStr === todayStr) cell.classList.add("today");
+      if (st.hasCustomerApproved && st.hasPending) cell.classList.add("both");
+      else if (st.hasStaffApproved && st.hasPending) cell.classList.add("both");
+      else if (st.hasCustomerApproved) cell.classList.add("approved");
+      else if (st.hasStaffApproved) cell.classList.add("closed");
+      else if (st.hasPending) cell.classList.add("pending");
+
+      var num = document.createElement("span");
+      num.className = "num";
+      num.textContent = String(i);
+      cell.appendChild(num);
+
+      if (st.hasApproved || st.hasPending) {
+        var tag = document.createElement("span");
+        tag.className = "tag";
+        if (st.hasCustomerApproved && st.hasPending) tag.textContent = "Booked + pending";
+        else if (st.hasStaffApproved && st.hasPending) tag.textContent = "Closed + pending";
+        else if (st.hasCustomerApproved) tag.textContent = "Booked";
+        else if (st.hasStaffApproved) tag.textContent = "Unavailable";
+        else tag.textContent = "Pending";
+        cell.appendChild(tag);
+      }
+
+      var label = st.hasCustomerApproved
+        ? "Booked"
+        : st.hasStaffApproved
+          ? "Not available"
+          : st.hasPending
+            ? "Pending request"
+            : "Available";
+      cell.setAttribute("role", "gridcell");
+      cell.setAttribute("aria-label", monthNames[viewMonth] + " " + i + ", " + viewYear + ", " + label);
+      grid.appendChild(cell);
+    }
+  }
+
+  document.getElementById("btnPrev").addEventListener("click", function () {
+    viewMonth--;
+    if (viewMonth < 0) { viewMonth = 11; viewYear--; }
+    renderMonth();
+  });
+  document.getElementById("btnNext").addEventListener("click", function () {
+    viewMonth++;
+    if (viewMonth > 11) { viewMonth = 0; viewYear++; }
+    renderMonth();
+  });
+  document.getElementById("unitSelect").addEventListener("change", renderMonth);
+
+  window.addEventListener("storage", function (e) {
+    if (e.key === STORAGE_KEY) renderMonth();
+  });
+  if (channel) {
+    channel.addEventListener("message", function () {
+      renderMonth();
+    });
+  }
+
+  fillUnitSelect();
+  renderMonth();
+  fetchPublicBookings(function () {
+    renderMonth();
+  });
+})();
+</script>
+</body>
+</html>
