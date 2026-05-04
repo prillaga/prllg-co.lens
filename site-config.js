@@ -28,7 +28,7 @@ window.prillagaMessengerUrlWithText = function (text) {
 window.PRILLAGA_GCASH_NUMBER = "09947552646";
 
 /**
- * GCash QR image: filename next to your HTML (e.g. "gcash-qr.png") or full URL.
+ * GCash QR image: relative path (e.g. "images/gcash-qr.png") or full URL.
  * Leave "" to hide the QR block until you add the file and set this.
  */
-window.PRILLAGA_GCASH_QR_SRC = "gcash-qr.png";
+window.PRILLAGA_GCASH_QR_SRC = "images/gcash-qr.png";

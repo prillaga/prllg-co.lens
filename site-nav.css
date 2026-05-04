@@ -3,6 +3,19 @@
  * Expects: #site-header, button.nav-toggle, nav#site-main-nav.site-nav
  */
 
+#site-header {
+  flex-wrap: nowrap !important;
+  isolation: isolate;
+  /* Above fixed FABs (often z-index 1000); below booking modal (~2500) */
+  z-index: 1200 !important;
+}
+
+/* Full-screen nav sits under the bar; keep brand + toggle above the overlay layer */
+#site-header > :first-child {
+  position: relative;
+  z-index: 2;
+}
+
 .nav-toggle {
   display: flex;
   flex-direction: column;
@@ -19,8 +32,11 @@
   cursor: pointer;
   border-radius: 8px;
   flex-shrink: 0;
-  z-index: 1201;
   position: relative;
+  z-index: 2;
+  touch-action: manipulation;
+  -webkit-user-select: none;
+  user-select: none;
   -webkit-tap-highlight-color: transparent;
 }
 
@@ -39,7 +55,7 @@
   height: 2px;
   background: #ececec;
   border-radius: 1px;
-  transition: transform 0.22s ease, opacity 0.2s ease;
+  transition: transform 0.26s ease, opacity 0.22s ease;
 }
 
 #site-header.nav-open .nav-toggle span:nth-child(1) {
@@ -54,12 +70,8 @@
   transform: translateY(-7px) rotate(-45deg);
 }
 
-#site-header {
-  flex-wrap: nowrap !important;
-}
-
 #site-header nav.site-nav {
-  display: none;
+  display: flex;
   position: fixed;
   inset: 0;
   padding: max(72px, calc(16px + env(safe-area-inset-top))) 20px max(32px, env(safe-area-inset-bottom));
@@ -73,13 +85,41 @@
   background: rgba(6, 6, 6, 0.96);
   backdrop-filter: blur(10px);
   -webkit-backdrop-filter: blur(10px);
-  z-index: 1100;
+  z-index: 0;
   overflow-y: auto;
   -webkit-overflow-scrolling: touch;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  transform: translate3d(0, -10px, 0);
+  transition:
+    opacity 0.28s ease,
+    transform 0.28s ease,
+    visibility 0s linear 0.28s;
 }
 
 #site-header.nav-open nav.site-nav {
-  display: flex;
+  opacity: 1;
+  visibility: visible;
+  pointer-events: auto;
+  transform: translate3d(0, 0, 0);
+  transition:
+    opacity 0.28s ease,
+    transform 0.28s ease,
+    visibility 0s linear 0s;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #site-header nav.site-nav {
+    transform: none !important;
+    transition: opacity 0.2s ease, visibility 0s linear 0.2s !important;
+  }
+  #site-header.nav-open nav.site-nav {
+    transition: opacity 0.2s ease, visibility 0s linear 0s !important;
+  }
+  .nav-toggle span {
+    transition: transform 0.2s ease, opacity 0.2s ease !important;
+  }
 }
 
 #site-header nav.site-nav a {
