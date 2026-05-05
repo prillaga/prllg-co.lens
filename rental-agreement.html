@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html { -webkit-text-size-adjust: 100%; }
@@ -209,6 +210,24 @@
           <option value="Zoom Lens 70-330mm">Zoom Lens 70-330mm</option>
         </select>
       </div>
+      <div class="doc-grid2">
+        <div class="doc-field">
+          <label for="additionalRent1">Additional rent 1</label>
+          <select id="additionalRent1" name="additional_rent_1">
+            <option value="None">None</option>
+            <option value="Extra Battery ₱100">Extra Battery ₱100</option>
+            <option value="Zoom Lens ₱300">Zoom Lens ₱300</option>
+          </select>
+        </div>
+        <div class="doc-field">
+          <label for="additionalRent2">Additional rent 2</label>
+          <select id="additionalRent2" name="additional_rent_2">
+            <option value="None">None</option>
+            <option value="Extra Battery ₱100">Extra Battery ₱100</option>
+            <option value="Zoom Lens ₱300">Zoom Lens ₱300</option>
+          </select>
+        </div>
+      </div>
 
       <h2>Verification</h2>
       <p class="contacts-head">3 Facebook contacts / family, friends, relatives</p>
@@ -283,6 +302,7 @@
   </main>
 
 <script src="site-config.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
 (function () {
@@ -372,6 +392,12 @@
   });
 
   document.getElementById("agreementDate").value = todayInputDate();
+  var rentalDateInput = document.getElementById("rentalDate");
+  var returnDateInput = document.getElementById("returnDate");
+  if (window.flatpickr && rentalDateInput && returnDateInput) {
+    flatpickr(rentalDateInput, { dateFormat: "Y-m-d", minDate: "today", disableMobile: true });
+    flatpickr(returnDateInput, { dateFormat: "Y-m-d", minDate: "today", disableMobile: true });
+  }
 
   (function preselectRentedUnitFromUrl() {
     try {
@@ -448,33 +474,73 @@
     if (!businessEmail) {
       return Promise.reject(new Error("Business email is missing."));
     }
-    var endpoint = "https://formsubmit.co/ajax/" + encodeURIComponent(businessEmail);
-    var formData = new FormData();
-    formData.append("_subject", subject || "Signed rental agreement photo");
-    formData.append("_captcha", "false");
-    formData.append("_template", "table");
-    if (data.email) formData.append("_cc", data.email);
-    formData.append("customer_name", data.renterName);
-    formData.append("customer_email", data.email);
-    formData.append("cellphone", data.cellphone);
-    formData.append("rented_unit", data.rentedUnit);
-    formData.append("rental_date", data.rentalDate);
-    formData.append("return_date", data.returnDate);
-    formData.append("agreement_signed_at", data.signedAt);
-    formData.append("message", bodyText || "");
-    formData.append("agreement_png", blob, filename);
+    return new Promise(function (resolve, reject) {
+      var iframe = document.createElement("iframe");
+      var iframeName = "formsubmit_target_" + Date.now();
+      iframe.name = iframeName;
+      iframe.style.display = "none";
+      document.body.appendChild(iframe);
 
-    return fetch(endpoint, {
-      method: "POST",
-      headers: { Accept: "application/json" },
-      body: formData
-    }).then(function (res) {
-      if (!res.ok) {
-        throw new Error("Email service returned " + res.status + ".");
+      var form = document.createElement("form");
+      form.method = "POST";
+      form.action = "https://formsubmit.co/" + businessEmail;
+      form.enctype = "multipart/form-data";
+      form.target = iframeName;
+      form.style.display = "none";
+
+      function addHidden(name, value) {
+        var input = document.createElement("input");
+        input.type = "hidden";
+        input.name = name;
+        input.value = value == null ? "" : String(value);
+        form.appendChild(input);
       }
-      return res.json().catch(function () {
-        return { success: true };
+
+      addHidden("_subject", subject || "Signed rental agreement photo");
+      addHidden("_captcha", "false");
+      addHidden("_template", "table");
+      if (data.email) addHidden("_cc", data.email);
+      addHidden("customer_name", data.renterName);
+      addHidden("customer_email", data.email);
+      addHidden("cellphone", data.cellphone);
+      addHidden("rented_unit", data.rentedUnit);
+      addHidden("additional_rent_1", data.additionalRent1);
+      addHidden("additional_rent_2", data.additionalRent2);
+      addHidden("rental_date", data.rentalDate);
+      addHidden("return_date", data.returnDate);
+      addHidden("agreement_signed_at", data.signedAt);
+      addHidden("message", bodyText || "");
+
+      var fileInput = document.createElement("input");
+      fileInput.type = "file";
+      fileInput.name = "attachment";
+      var pngFile = new File([blob], filename, { type: "image/png" });
+      var dt = new DataTransfer();
+      dt.items.add(pngFile);
+      fileInput.files = dt.files;
+      form.appendChild(fileInput);
+
+      document.body.appendChild(form);
+
+      var done = false;
+      var timeoutId = setTimeout(function () {
+        if (done) return;
+        done = true;
+        if (form.parentNode) form.parentNode.removeChild(form);
+        if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
+        reject(new Error("Timed out while sending agreement email."));
+      }, 15000);
+
+      iframe.addEventListener("load", function () {
+        if (done) return;
+        done = true;
+        clearTimeout(timeoutId);
+        if (form.parentNode) form.parentNode.removeChild(form);
+        if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
+        resolve({ success: true });
       });
+
+      form.submit();
     });
   }
 
@@ -521,6 +587,10 @@
       data.returnDate +
       "\nRented unit: " +
       data.rentedUnit +
+      "\nAdditional rent 1: " +
+      data.additionalRent1 +
+      "\nAdditional rent 2: " +
+      data.additionalRent2 +
       "\n\n3 Facebook contacts (not fake account):\n1) " +
       data.fb1 +
       "\n2) " +
@@ -661,6 +731,8 @@
     var rentalDate = document.getElementById("rentalDate").value;
     var returnDate = document.getElementById("returnDate").value;
     var rentedUnit = document.getElementById("rentedUnit").value.trim();
+    var additionalRent1 = document.getElementById("additionalRent1").value.trim() || "None";
+    var additionalRent2 = document.getElementById("additionalRent2").value.trim() || "None";
     var fb1 = document.getElementById("fb1").value.trim();
     var fb2 = document.getElementById("fb2").value.trim();
     var fb3 = document.getElementById("fb3").value.trim();
@@ -717,6 +789,8 @@
       rentalDate: rentalDate,
       returnDate: returnDate,
       rentedUnit: rentedUnit,
+      additionalRent1: additionalRent1,
+      additionalRent2: additionalRent2,
       fb1: fb1,
       fb2: fb2,
       fb3: fb3,
