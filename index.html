@@ -300,11 +300,23 @@
     #availability-calendar .home-cal-cell.out { background: transparent; border-color: transparent; color: #555; }
     #availability-calendar .home-cal-cell .num { font-weight: 700; color: #f2f2f2; }
     #availability-calendar .home-cal-cell.today { border-color: #d4af37; box-shadow: 0 0 0 1px rgba(212, 175, 55, 0.32) inset; }
-    #availability-calendar .home-cal-cell.approved { background: #2a1717; border-color: #814646; color: #f0c6c6; }
+    #availability-calendar .home-cal-cell.approved {
+      background: linear-gradient(180deg, rgba(200, 40, 48, 0.42) 0%, rgba(120, 22, 28, 0.92) 100%);
+      border-color: #e84848;
+      color: #fff8f8;
+      box-shadow: inset 0 0 0 1px rgba(255, 120, 120, 0.2);
+    }
+    #availability-calendar .home-cal-cell.approved .num { color: #ffffff; }
+    #availability-calendar .home-cal-cell.approved .tag { color: #ffecec; font-weight: 600; }
     #availability-calendar .home-cal-cell.pending { background: #2a2415; border-color: #8b7534; color: #f0e2bb; }
-    #availability-calendar .home-cal-cell.both { background: #2b1b16; border-color: #8f5d41; color: #f0d0c0; }
-    #availability-calendar .home-cal-cell.closed { background: #262626; border-color: #4a4a4a; color: #c8c8c8; }
-    #availability-calendar .home-cal-cell.closed .num { color: #e2e2e2; }
+    #availability-calendar .home-cal-cell.both {
+      background: linear-gradient(135deg, rgba(190, 36, 44, 0.55) 0%, rgba(90, 55, 22, 0.88) 100%);
+      border-color: #e06040;
+      color: #fff5f0;
+      box-shadow: inset 0 0 0 1px rgba(255, 160, 120, 0.18);
+    }
+    #availability-calendar .home-cal-cell.both .num { color: #ffffff; }
+    #availability-calendar .home-cal-cell.both .tag { color: #fff0ea; font-weight: 600; }
     #availability-calendar .home-cal-cell .tag { font-size: 8px; margin-top: 3px; text-align: center; line-height: 1.15; opacity: 0.92; }
     #availability-calendar .home-cal-legend {
       display: flex; flex-wrap: wrap; gap: 14px 20px; margin-top: 16px; font-size: 12px; color: #9a9a9a;
@@ -312,9 +324,8 @@
     #availability-calendar .home-cal-legend span { display: inline-flex; align-items: center; gap: 6px; }
     #availability-calendar .home-cal-legend .sw { width: 12px; height: 12px; border-radius: 3px; border: 1px solid #333; flex-shrink: 0; }
     #availability-calendar .home-cal-legend .sw.av { background: #161616; }
-    #availability-calendar .home-cal-legend .sw.ap { background: #2a1818; border-color: #6b3030; }
+    #availability-calendar .home-cal-legend .sw.ap { background: linear-gradient(180deg, #c42e38 0%, #7a181e 100%); border-color: #e84848; }
     #availability-calendar .home-cal-legend .sw.pe { background: #2a2618; border-color: #6b5a30; }
-    #availability-calendar .home-cal-legend .sw.na { background: #262626; border-color: #4a4a4a; }
     #availability-calendar .home-cal-foot {
       margin-top: 18px; font-size: 13px; line-height: 1.55; color: #8a8a8a; text-align: center;
     }
@@ -455,7 +466,7 @@
       <div>
         <label for="homeUnitSelect">Equipment</label>
         <select id="homeUnitSelect" aria-label="Choose unit for availability calendar">
-          <option value="">Any item — busy if any unit has a hold</option>
+          <option value="">Any item — booked if any unit has a hold</option>
           <option value="nikon-kit">Nikon DSLR Flipscreen w/ kitlens 15-80mm</option>
           <option value="nikon-zoom">Nikon DSLR Flipscreen w/ Zoom Lens 70-330mm</option>
           <option value="zoom-lens">Zoom Lens 70-330mm</option>
@@ -476,12 +487,11 @@
     </div>
     <div class="home-cal-legend">
       <span><span class="sw av" aria-hidden="true"></span> Available</span>
-      <span><span class="sw ap" aria-hidden="true"></span> Booked</span>
+      <span><span class="sw ap" aria-hidden="true"></span> Booked (confirmed or blocked)</span>
       <span><span class="sw pe" aria-hidden="true"></span> Pending</span>
-      <span><span class="sw na" aria-hidden="true"></span> Unavailable</span>
     </div>
     <p class="home-cal-foot">
-      Busy dates load from <code>availability-public.json</code> (same for every visitor) and merge with this browser’s staff data for testing. Ready to book? <a href="#book-now">Open the booking form</a> · <a href="availability.html">Full-page calendar</a>
+      Booked dates load from <code>availability-public.json</code> (same for every visitor) and merge with this browser’s staff data for testing. Ready to book? <a href="#book-now">Open the booking form</a> · <a href="availability.html">Full-page calendar</a>
     </p>
   </div>
 </section>
@@ -907,7 +917,7 @@
       if (st.hasCustomerApproved && st.hasPending) cell.classList.add("both");
       else if (st.hasStaffApproved && st.hasPending) cell.classList.add("both");
       else if (st.hasCustomerApproved) cell.classList.add("approved");
-      else if (st.hasStaffApproved) cell.classList.add("closed");
+      else if (st.hasStaffApproved) cell.classList.add("approved");
       else if (st.hasPending) cell.classList.add("pending");
       var num = document.createElement("span");
       num.className = "num";
@@ -917,19 +927,12 @@
         var tag = document.createElement("span");
         tag.className = "tag";
         if (st.hasCustomerApproved && st.hasPending) tag.textContent = "Booked + pending";
-        else if (st.hasStaffApproved && st.hasPending) tag.textContent = "Closed + pending";
-        else if (st.hasCustomerApproved) tag.textContent = "Booked";
-        else if (st.hasStaffApproved) tag.textContent = "Unavailable";
+        else if (st.hasStaffApproved && st.hasPending) tag.textContent = "Booked + pending";
+        else if (st.hasApproved) tag.textContent = "Booked";
         else tag.textContent = "Pending";
         cell.appendChild(tag);
       }
-      var label = st.hasCustomerApproved
-        ? "Booked"
-        : st.hasStaffApproved
-          ? "Not available"
-          : st.hasPending
-            ? "Pending"
-            : "Available";
+      var label = st.hasApproved ? "Booked" : st.hasPending ? "Pending" : "Available";
       cell.setAttribute("aria-label", monthNames[homeCalMonth] + " " + i + ", " + homeCalYear + ", " + label);
       grid.appendChild(cell);
     }
