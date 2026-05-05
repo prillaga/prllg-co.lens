@@ -86,13 +86,24 @@
     .cal-cell.out { background: transparent; border-color: transparent; color: #555; }
     .cal-cell .num { font-weight: 600; color: #eee; }
     .cal-cell.today { border-color: #d4af37; box-shadow: 0 0 0 1px rgba(212, 175, 55, 0.25) inset; }
-    .cal-cell.approved { background: #2a1818; border-color: #6b3030; color: #e8b4b4; }
-    .cal-cell.approved .num { color: #f0c4c4; }
+    .cal-cell.approved {
+      background: linear-gradient(180deg, rgba(200, 40, 48, 0.42) 0%, rgba(120, 22, 28, 0.92) 100%);
+      border-color: #e84848;
+      color: #fff8f8;
+      box-shadow: inset 0 0 0 1px rgba(255, 120, 120, 0.2);
+    }
+    .cal-cell.approved .num { color: #ffffff; font-weight: 700; }
+    .cal-cell.approved .tag { color: #ffecec; font-weight: 600; }
     .cal-cell.pending { background: #2a2618; border-color: #6b5a30; color: #e8dcb4; }
     .cal-cell.pending .num { color: #f0e8c4; }
-    .cal-cell.both { background: #2a1a18; border-color: #6b4030; }
-    .cal-cell.closed { background: #262626; border-color: #4a4a4a; color: #c8c8c8; }
-    .cal-cell.closed .num { color: #e2e2e2; }
+    .cal-cell.both {
+      background: linear-gradient(135deg, rgba(190, 36, 44, 0.55) 0%, rgba(90, 55, 22, 0.88) 100%);
+      border-color: #e06040;
+      color: #fff5f0;
+      box-shadow: inset 0 0 0 1px rgba(255, 160, 120, 0.18);
+    }
+    .cal-cell.both .num { color: #ffffff; font-weight: 700; }
+    .cal-cell.both .tag { color: #fff0ea; font-weight: 600; }
     .cal-cell .tag { font-size: 9px; margin-top: 4px; text-align: center; line-height: 1.2; opacity: 0.95; }
     .legend {
       display: flex; flex-wrap: wrap; gap: 16px 24px; margin-top: 18px; font-size: 13px; color: #aaa;
@@ -100,9 +111,8 @@
     .legend span { display: inline-flex; align-items: center; gap: 8px; }
     .sw { width: 14px; height: 14px; border-radius: 4px; border: 1px solid #333; }
     .sw.av { background: #161616; }
-    .sw.ap { background: #2a1818; border-color: #6b3030; }
+    .sw.ap { background: linear-gradient(180deg, #c42e38 0%, #7a181e 100%); border-color: #e84848; }
     .sw.pe { background: #2a2618; border-color: #6b5a30; }
-    .sw.na { background: #262626; border-color: #4a4a4a; }
     .note {
       margin-top: 22px; padding: 14px 16px; border-radius: 10px; border: 1px solid #2e2e2e;
       background: #121212; font-size: 13px; line-height: 1.55; color: #9a9a9a;
@@ -142,7 +152,7 @@
   <main id="availability-main">
     <h1 class="lux-heading">Availability</h1>
     <p style="text-align: center; margin: 0 0 24px 0; color: #9a9a9a; font-size: 14px; line-height: 1.5;">
-      Confirmed bookings show in red. Amber is a pending request. Grey is staff-marked “not available.” The site also loads a published file (<code>availability-public.json</code>) so everyone sees the same blocks after you deploy an export from staff admin.
+      Confirmed bookings (including staff blocks) show in red as <strong>Booked</strong>. Amber is a pending request. The site also loads a published file (<code>availability-public.json</code>) so everyone sees the same blocks after you deploy an export from staff admin.
     </p>
 
     <div class="toolbar">
@@ -168,13 +178,12 @@
 
     <div class="legend" aria-hidden="true">
       <span><span class="sw av"></span> Available</span>
-      <span><span class="sw ap"></span> Booked (confirmed)</span>
+      <span><span class="sw ap"></span> Booked (confirmed or blocked)</span>
       <span><span class="sw pe"></span> Pending request</span>
-      <span><span class="sw na"></span> Not available (staff)</span>
     </div>
 
     <p class="note">
-      <strong>Customers:</strong> busy dates come from the published <code>availability-public.json</code> on this site (same data for every visitor). <strong>Staff:</strong> open <a href="admin.html"><code>admin.html</code></a>, unlock with your PIN, update the calendar, then use <strong>Download public calendar file</strong> and replace <code>availability-public.json</code> in the project before deploy so customers always see booked and unavailable days. Local browser data still merges for quick testing on one device. Questions? <a href="index.html#book-now">Send a booking request</a> and we will confirm on Messenger.
+      <strong>Customers:</strong> busy dates come from the published <code>availability-public.json</code> on this site (same data for every visitor). <strong>Staff:</strong> open <a href="admin.html"><code>admin.html</code></a>, unlock with your PIN, update the calendar, then use <strong>Download public calendar file</strong> and replace <code>availability-public.json</code> in the project before deploy so customers always see which days are booked. Local browser data still merges for quick testing on one device. Questions? <a href="index.html#book-now">Send a booking request</a> and we will confirm on Messenger.
     </p>
   </main>
 
@@ -324,7 +333,7 @@
       if (st.hasCustomerApproved && st.hasPending) cell.classList.add("both");
       else if (st.hasStaffApproved && st.hasPending) cell.classList.add("both");
       else if (st.hasCustomerApproved) cell.classList.add("approved");
-      else if (st.hasStaffApproved) cell.classList.add("closed");
+      else if (st.hasStaffApproved) cell.classList.add("approved");
       else if (st.hasPending) cell.classList.add("pending");
 
       var num = document.createElement("span");
@@ -336,20 +345,13 @@
         var tag = document.createElement("span");
         tag.className = "tag";
         if (st.hasCustomerApproved && st.hasPending) tag.textContent = "Booked + pending";
-        else if (st.hasStaffApproved && st.hasPending) tag.textContent = "Closed + pending";
-        else if (st.hasCustomerApproved) tag.textContent = "Booked";
-        else if (st.hasStaffApproved) tag.textContent = "Unavailable";
+        else if (st.hasStaffApproved && st.hasPending) tag.textContent = "Booked + pending";
+        else if (st.hasApproved) tag.textContent = "Booked";
         else tag.textContent = "Pending";
         cell.appendChild(tag);
       }
 
-      var label = st.hasCustomerApproved
-        ? "Booked"
-        : st.hasStaffApproved
-          ? "Not available"
-          : st.hasPending
-            ? "Pending request"
-            : "Available";
+      var label = st.hasApproved ? "Booked" : st.hasPending ? "Pending request" : "Available";
       cell.setAttribute("role", "gridcell");
       cell.setAttribute("aria-label", monthNames[viewMonth] + " " + i + ", " + viewYear + ", " + label);
       grid.appendChild(cell);
