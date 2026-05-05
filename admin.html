@@ -45,7 +45,7 @@
 <body>
   <h1>Staff — availability requests</h1>
   <p class="lead">
-    <strong>Easiest — block dates in one tap:</strong> unlock below, then use <strong>Quick block (not available)</strong>. Pick the gear, start and end dates, press <strong>Block on calendar</strong>. Home and Availability pages show those days in <strong>red</strong> immediately (same browser).
+    <strong>Easiest — block dates in one tap:</strong> unlock below, then use <strong>Quick block (shows as Booked)</strong>. Pick the gear, start and end dates, press <strong>Block on calendar</strong>. Home and Availability pages show those days in <strong>red</strong> immediately (same browser).
   </p>
   <p class="lead" style="margin-top: -8px;">
     <strong>Customer requests:</strong> use <strong>Add pending request</strong> so the calendar shows <strong>amber</strong> first; press <strong>Confirm</strong> when the rental is final (turns <strong>red</strong> and clears overlapping pendings).
@@ -59,19 +59,19 @@
   </div>
 
   <div id="panel" hidden>
-    <p class="ok">Unlocked. Use Quick block for “not available” in one step, or pending → Confirm for Messenger leads.</p>
+    <p class="ok">Unlocked. Use Quick block to mark dates as Booked in one step, or pending → Confirm for Messenger leads.</p>
     <p style="margin: 0 0 14px 0;">
       <button type="button" class="primary" id="btnExportPublic">Download public calendar file</button>
     </p>
     <p><a href="index.html#home">Home</a> · <a href="index.html#availability-calendar">Availability (homepage)</a> · <a href="availability.html">Full-page calendar</a> · <a href="index.html#book-now">Booking form</a></p>
     <div class="panel" style="border-color: #6b5a30;">
-      <h2 style="margin: 0 0 8px 0; font-size: 15px; color: #d4af37;">Quick block (not available)</h2>
+      <h2 style="margin: 0 0 8px 0; font-size: 15px; color: #d4af37;">Quick block (shows as Booked)</h2>
       <p style="margin: 0 0 14px 0; font-size: 13px; color: #9a9a9a; line-height: 1.5;">For maintenance, personal days, or any time the gear must show as booked. No amber step — dates go <strong style="color:#e8b4b4;">red</strong> on the calendar right away.</p>
       <label for="blockUnit">Equipment</label>
       <select id="blockUnit" aria-label="Unit to block"></select>
-      <label for="blockStart">First day not available</label>
+      <label for="blockStart">First day of block (Booked)</label>
       <input id="blockStart" type="date" aria-label="Block start date">
-      <label for="blockEnd">Last day not available</label>
+      <label for="blockEnd">Last day of block (Booked)</label>
       <input id="blockEnd" type="date" aria-label="Block end date">
       <label for="blockNote">Note (optional)</label>
       <input id="blockNote" type="text" placeholder="e.g. Maintenance / reserved" autocomplete="off" aria-label="Optional note for this block">
@@ -116,6 +116,7 @@
   var UNITS = [
     { id: 'nikon-kit', label: 'Nikon DSLR Flipscreen w/ kitlens 15-80mm' },
     { id: 'nikon-zoom', label: 'Nikon DSLR Flipscreen w/ Zoom Lens 70-330mm' },
+    { id: 'g6-thumb', label: 'G6 THUMB CAMERA' },
     { id: 'zoom-lens', label: 'Zoom Lens 70-330mm' },
     { id: 'dji-gimbal', label: 'DJI OSMO MOBILE 3 GIMBAL' }
   ];
@@ -271,7 +272,7 @@
       unitId: unitId,
       start: start,
       end: end,
-      customerName: note || 'Not available',
+      customerName: note || 'Booked',
       status: 'approved',
       approvedAt: Date.now(),
       staffBlock: true

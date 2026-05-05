@@ -36,6 +36,27 @@ html {
 body {
   overflow-x: hidden;
   max-width: 100%;
+  font-family: "Segoe UI", "Inter", "Helvetica Neue", Arial, sans-serif;
+  line-height: 1.55;
+}
+
+/* Unified clean body font across pages, including legacy inline Arial/Avenir blocks */
+body,
+p,
+li,
+label,
+input,
+select,
+textarea,
+button {
+  font-family: "Segoe UI", "Inter", "Helvetica Neue", Arial, sans-serif !important;
+}
+
+[style*="font-family: Arial"],
+[style*="font-family: Avenir"],
+[style*="font-family: 'Avenir Next'"],
+[style*='font-family: "Avenir Next"'] {
+  font-family: "Segoe UI", "Inter", "Helvetica Neue", Arial, sans-serif !important;
 }
 
 ::selection {
@@ -185,7 +206,7 @@ a[href="index.html#book-now"][aria-label="Book now"] {
 .home-hero__title {
   margin: 0;
   color: #ffffff;
-  font-family: "Playfair Display", "Times New Roman", serif;
+  font-family: "Playfair Display", "Times New Roman", serif !important;
   font-size: clamp(1.35rem, 5.2vw, 3rem);
   font-weight: 600;
   letter-spacing: clamp(0.02em, 0.08vw, 1px);
@@ -196,7 +217,7 @@ a[href="index.html#book-now"][aria-label="Book now"] {
 .home-hero__tagline {
   margin: 0;
   color: #e8e0d0;
-  font-family: "Cormorant Garamond", Georgia, serif;
+  font-family: "Cormorant Garamond", Georgia, serif !important;
   font-size: clamp(0.95rem, 2.8vw, 1.35rem);
   font-style: italic;
   font-weight: 500;
@@ -217,7 +238,7 @@ a[href="index.html#book-now"][aria-label="Book now"] {
   background: linear-gradient(135deg, #f3d77b 0%, #d4af37 45%, #b8901f 100%);
   color: #111;
   text-decoration: none;
-  font-family: "Playfair Display", "Times New Roman", serif;
+  font-family: "Playfair Display", "Times New Roman", serif !important;
   font-size: clamp(0.9rem, 2.4vw, 1.05rem);
   font-weight: 700;
   border: 1px solid rgba(255, 230, 150, 0.75);
