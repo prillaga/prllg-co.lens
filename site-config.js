@@ -32,3 +32,12 @@ window.PRILLAGA_GCASH_NUMBER = "09947552646";
  * Leave "" to hide the QR block until you add the file and set this.
  */
 window.PRILLAGA_GCASH_QR_SRC = "images/gcash-qr.jpg";
+
+/** Business email for booking and agreement submissions. */
+window.PRILLAGA_BUSINESS_EMAIL = "hjsescabarte2021@gmail.com";
+
+/** Trimmed business email, or "" if unset. */
+window.prillagaBusinessEmail = function () {
+  var email = typeof window.PRILLAGA_BUSINESS_EMAIL === "string" ? window.PRILLAGA_BUSINESS_EMAIL.trim() : "";
+  return email || "";
+};

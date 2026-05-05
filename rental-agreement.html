@@ -144,7 +144,7 @@
 
   <main>
     <p class="intro">
-      Fill out the form, add a <strong>photo of your valid ID</strong> (JPG, PNG, or WebP), and <strong>draw your signature</strong>. This page turns everything into one <strong>PNG image</strong> (like a clear photo of the signed agreement) so you can send it in <strong>Messenger</strong>—on many phones, pick Messenger from the share sheet; on desktop, the image downloads and this tab <strong>opens Messenger</strong> so you can <strong>attach the photo</strong> and send (use <strong>Back</strong> in the browser to return here).
+      Fill out the form, add a <strong>photo of your valid ID</strong> (JPG, PNG, or WebP), and <strong>draw your signature</strong>. This page turns everything into one <strong>PNG image</strong> (like a clear photo of the signed agreement) and sends it by email automatically to the owner, with your email copied.
     </p>
 
     <form id="agreement-form" class="doc" novalidate>
@@ -163,6 +163,10 @@
           <div class="doc-field">
             <label for="cellphone">Cellphone number</label>
             <input id="cellphone" name="cellphone" type="tel" autocomplete="tel" required>
+          </div>
+          <div class="doc-field">
+            <label for="email">Email address</label>
+            <input id="email" name="email" type="email" autocomplete="email" required>
           </div>
         </div>
         <div>
@@ -268,13 +272,13 @@
       </div>
 
       <div class="submit-wrap">
-        <button type="submit" id="btnSubmit">Create agreement photo &amp; send in Messenger</button>
+        <button type="submit" id="btnSubmit">Create agreement photo &amp; send by email</button>
       </div>
       <p id="formMsg" class="msg" role="status"></p>
     </form>
 
     <div class="config-note">
-      <strong>Note:</strong> Facebook does not allow a website to drop a file into Messenger automatically. This page builds one <strong>PNG image</strong> (form + terms + signature + ID) and either opens the system <strong>Share</strong> sheet (pick Messenger) or <strong>downloads</strong> the image, then <strong>sends you to Messenger in this tab</strong> with a prefilled message so you can <strong>attach the photo</strong> (gallery / paperclip). Use your browser <strong>Back</strong> button to return here if needed. Same Page ID as the booking form: <code>m.me/<span id="prillaga-messenger-id-display"></span></code> (set in <code>site-config.js</code>).
+      <strong>Note:</strong> This page sends the generated agreement PNG automatically to <code><span id="prillaga-business-email-display"></span></code> and copies the customer email. If automatic sending fails (network/email service issue), a fallback email draft opens so you can still send manually.
     </div>
   </main>
 
@@ -282,10 +286,10 @@
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
 (function () {
-  var messengerId = window.prillagaMessengerPageId ? window.prillagaMessengerPageId() : "";
-  var idDisplay = document.getElementById("prillaga-messenger-id-display");
-  if (idDisplay && messengerId) {
-    idDisplay.textContent = messengerId;
+  var businessEmail = window.prillagaBusinessEmail ? window.prillagaBusinessEmail() : "";
+  var emailDisplay = document.getElementById("prillaga-business-email-display");
+  if (emailDisplay) {
+    emailDisplay.textContent = businessEmail || "your-email@example.com";
   }
 
   var form = document.getElementById("agreement-form");
@@ -425,11 +429,53 @@
     });
   }
 
-  /** Opens Messenger in this tab (m.me draft). User returns via browser Back after sending. */
-  function openMessengerPrefill(text) {
-    var url = window.prillagaMessengerUrlWithText ? window.prillagaMessengerUrlWithText(text) : "";
-    if (!url) return;
-    window.location.assign(url);
+  /** Opens default mail app with prefilled subject/body and optional CC. */
+  function openEmailDraft(subject, body, ccEmail) {
+    if (!businessEmail) return;
+    var cc = (ccEmail || "").trim();
+    var mailto =
+      "mailto:" +
+      encodeURIComponent(businessEmail) +
+      "?subject=" +
+      encodeURIComponent(subject || "") +
+      (cc ? "&cc=" + encodeURIComponent(cc) : "") +
+      "&body=" +
+      encodeURIComponent(body || "");
+    window.location.assign(mailto);
+  }
+
+  function sendAgreementViaFormSubmit(blob, filename, data, subject, bodyText) {
+    if (!businessEmail) {
+      return Promise.reject(new Error("Business email is missing."));
+    }
+    var endpoint = "https://formsubmit.co/ajax/" + encodeURIComponent(businessEmail);
+    var formData = new FormData();
+    formData.append("_subject", subject || "Signed rental agreement photo");
+    formData.append("_captcha", "false");
+    formData.append("_template", "table");
+    if (data.email) formData.append("_cc", data.email);
+    formData.append("customer_name", data.renterName);
+    formData.append("customer_email", data.email);
+    formData.append("cellphone", data.cellphone);
+    formData.append("rented_unit", data.rentedUnit);
+    formData.append("rental_date", data.rentalDate);
+    formData.append("return_date", data.returnDate);
+    formData.append("agreement_signed_at", data.signedAt);
+    formData.append("message", bodyText || "");
+    formData.append("agreement_png", blob, filename);
+
+    return fetch(endpoint, {
+      method: "POST",
+      headers: { Accept: "application/json" },
+      body: formData
+    }).then(function (res) {
+      if (!res.ok) {
+        throw new Error("Email service returned " + res.status + ".");
+      }
+      return res.json().catch(function () {
+        return { success: true };
+      });
+    });
   }
 
   function buildAgreementExportNode(data, sigDataUrl, idPngDataUrl) {
@@ -461,6 +507,8 @@
       data.address +
       "\nCellphone: " +
       data.cellphone +
+      "\nEmail: " +
+      data.email +
       "\nDate (form): " +
       data.agreementDate +
       "\nAge: " +
@@ -598,14 +646,15 @@
     e.preventDefault();
     msg.className = "msg";
 
-    if (!messengerId) {
-      showMsg("Messenger Page ID is missing. Ensure site-config.js is in the same folder as this page, then reload.", false);
+    if (!businessEmail) {
+      showMsg("Business email is missing. Set PRILLAGA_BUSINESS_EMAIL in site-config.js, then reload.", false);
       return;
     }
 
     var renterName = document.getElementById("renterName").value.trim();
     var address = document.getElementById("address").value.trim();
     var cellphone = document.getElementById("cellphone").value.trim();
+    var email = document.getElementById("email").value.trim();
     var agreementDate = document.getElementById("agreementDate").value;
     var age = document.getElementById("age").value;
     var sex = document.getElementById("sex").value;
@@ -618,8 +667,8 @@
     var signature = document.getElementById("signature").value.trim();
     var idPhoto = document.getElementById("idPhoto");
 
-    if (!renterName || !address || !cellphone) {
-      showMsg("Please complete name, address, and cellphone.", false);
+    if (!renterName || !address || !cellphone || !email) {
+      showMsg("Please complete name, address, cellphone, and email.", false);
       return;
     }
     if (!agreementDate || !age || !sex || !rentalDate || !returnDate || !rentedUnit) {
@@ -661,6 +710,7 @@
       renterName: renterName,
       address: address,
       cellphone: cellphone,
+      email: email,
       agreementDate: agreementDate,
       age: age,
       sex: sex,
@@ -674,10 +724,11 @@
       signedAt: signedAt
     };
 
-    var messengerShort =
+    var emailSubject = "Signed rental agreement photo";
+    var emailBody =
       "Signed rental agreement (photo) from " +
       renterName +
-      ". (Attach the PNG from your gallery / Downloads / share sheet if it is not already attached.)";
+      ".\n\nOwner receives this email and customer is copied.";
 
     btn.disabled = true;
     showMsg("Building agreement photo…", true);
@@ -705,36 +756,19 @@
       .then(function (blob) {
         var safe = renterName.replace(/[^\w\-]+/g, "_").replace(/_+/g, "_").slice(0, 48) || "agreement";
         var filename = safe + "-rental-agreement.png";
-        var pngFile = new File([blob], filename, { type: "image/png" });
-
-        function afterMessengerUi() {
-          resetAfterSend();
-          btn.disabled = false;
-        }
-
-        if (navigator.share && navigator.canShare && navigator.canShare({ files: [pngFile] })) {
-          navigator
-            .share({
-              files: [pngFile],
-              title: "Rental agreement photo",
-              text: messengerShort
-            })
-            .then(function () {
-              afterMessengerUi();
-              openMessengerPrefill(messengerShort);
-            })
-            .catch(function () {
-              downloadPngBlob(blob, filename);
-              resetAfterSend();
-              btn.disabled = false;
-              openMessengerPrefill(messengerShort);
-            });
-        } else {
-          downloadPngBlob(blob, filename);
-          resetAfterSend();
-          btn.disabled = false;
-          openMessengerPrefill(messengerShort);
-        }
+        showMsg("Sending agreement email to owner and customer copy…", true);
+        return sendAgreementViaFormSubmit(blob, filename, data, emailSubject, emailBody)
+          .then(function () {
+            showMsg("Agreement sent successfully. Owner and customer copy should arrive by email shortly.", true);
+            resetAfterSend();
+            btn.disabled = false;
+          })
+          .catch(function () {
+            downloadPngBlob(blob, filename);
+            btn.disabled = false;
+            showMsg("Auto-send failed. Downloaded PNG and opened fallback email draft. Please tap Send.", false);
+            openEmailDraft(emailSubject, emailBody, email);
+          });
       })
       .catch(function (err) {
         showMsg(
