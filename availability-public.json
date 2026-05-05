@@ -1,13 +1,5 @@
 [
   {
-    "id": "b-1777923836696",
-    "unitId": "nikon-kit",
-    "start": "2026-05-06",
-    "end": "2026-05-07",
-    "status": "approved",
-    "staffBlock": true
-  },
-  {
     "id": "b-1777923851186",
     "unitId": "nikon-kit",
     "start": "2026-05-15",
@@ -46,5 +38,21 @@
     "end": "2026-05-04",
     "status": "approved",
     "staffBlock": true
+  },
+  {
+    "id": "b-1777986074544",
+    "unitId": "nikon-zoom",
+    "start": "2026-05-28",
+    "end": "2026-05-28",
+    "status": "approved",
+    "staffBlock": true
+  },
+  {
+    "id": "b-1777988464047",
+    "unitId": "nikon-kit",
+    "start": "2026-05-06",
+    "end": "2026-05-07",
+    "status": "pending",
+    "staffBlock": false
   }
 ]
