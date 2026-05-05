@@ -34,7 +34,7 @@ window.PRILLAGA_GCASH_NUMBER = "09947552646";
 window.PRILLAGA_GCASH_QR_SRC = "images/gcash-qr.jpg";
 
 /** Business email for booking and agreement submissions. */
-window.PRILLAGA_BUSINESS_EMAIL = "toonmoon242@gmail.com";
+window.PRILLAGA_BUSINESS_EMAIL = "hjsescabarte2021@gmail.com";
 
 /** Trimmed business email, or "" if unset. */
 window.prillagaBusinessEmail = function () {
