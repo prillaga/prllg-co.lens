@@ -86,11 +86,24 @@
     .cal-cell.out { background: transparent; border-color: transparent; color: #555; }
     .cal-cell .num { font-weight: 600; color: #eee; }
     .cal-cell.today { border-color: #d4af37; box-shadow: 0 0 0 1px rgba(212, 175, 55, 0.25) inset; }
-    .cal-cell.approved { background: #2a1818; border-color: #6b3030; color: #e8b4b4; }
-    .cal-cell.approved .num { color: #f0c4c4; }
+    .cal-cell.approved {
+      background: linear-gradient(180deg, rgba(200, 40, 48, 0.42) 0%, rgba(120, 22, 28, 0.92) 100%);
+      border-color: #e84848;
+      color: #fff8f8;
+      box-shadow: inset 0 0 0 1px rgba(255, 120, 120, 0.2);
+    }
+    .cal-cell.approved .num { color: #ffffff; font-weight: 700; }
+    .cal-cell.approved .tag { color: #ffecec; font-weight: 600; }
     .cal-cell.pending { background: #2a2618; border-color: #6b5a30; color: #e8dcb4; }
     .cal-cell.pending .num { color: #f0e8c4; }
-    .cal-cell.both { background: #2a1a18; border-color: #6b4030; }
+    .cal-cell.both {
+      background: linear-gradient(135deg, rgba(190, 36, 44, 0.55) 0%, rgba(90, 55, 22, 0.88) 100%);
+      border-color: #e06040;
+      color: #fff5f0;
+      box-shadow: inset 0 0 0 1px rgba(255, 160, 120, 0.18);
+    }
+    .cal-cell.both .num { color: #ffffff; font-weight: 700; }
+    .cal-cell.both .tag { color: #fff0ea; font-weight: 600; }
     .cal-cell .tag { font-size: 9px; margin-top: 4px; text-align: center; line-height: 1.2; opacity: 0.95; }
     .legend {
       display: flex; flex-wrap: wrap; gap: 16px 24px; margin-top: 18px; font-size: 13px; color: #aaa;
@@ -98,7 +111,7 @@
     .legend span { display: inline-flex; align-items: center; gap: 8px; }
     .sw { width: 14px; height: 14px; border-radius: 4px; border: 1px solid #333; }
     .sw.av { background: #161616; }
-    .sw.ap { background: #2a1818; border-color: #6b3030; }
+    .sw.ap { background: linear-gradient(180deg, #c42e38 0%, #7a181e 100%); border-color: #e84848; }
     .sw.pe { background: #2a2618; border-color: #6b5a30; }
     .note {
       margin-top: 22px; padding: 14px 16px; border-radius: 10px; border: 1px solid #2e2e2e;
@@ -109,6 +122,7 @@
   <link rel="stylesheet" href="site-nav.css">
   <link rel="stylesheet" href="responsive.css">
   <script src="site-nav.js" defer></script>
+  <script src="scroll-reveal.js" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#availability-main">Skip to calendar</a>
@@ -138,14 +152,14 @@
   <main id="availability-main">
     <h1 class="lux-heading">Availability</h1>
     <p style="text-align: center; margin: 0 0 24px 0; color: #9a9a9a; font-size: 14px; line-height: 1.5;">
-      Confirmed bookings block dates in red. Amber shows a request still waiting for staff confirmation.
+      Confirmed bookings (including staff blocks) show in red as <strong>Booked</strong>. Amber is a pending request. The site also loads a published file (<code>availability-public.json</code>) so everyone sees the same blocks after you deploy an export from staff admin.
     </p>
 
     <div class="toolbar">
       <div>
         <label for="unitSelect">Equipment</label>
         <select id="unitSelect" aria-label="Choose unit to view availability">
-          <option value="">Any item — day is busy if any unit has a hold</option>
+          <option value="">Any item — day is booked if any unit has a hold</option>
         </select>
       </div>
       <div class="month-nav" aria-label="Month">
@@ -164,12 +178,12 @@
 
     <div class="legend" aria-hidden="true">
       <span><span class="sw av"></span> Available</span>
-      <span><span class="sw ap"></span> Booked (confirmed)</span>
+      <span><span class="sw ap"></span> Booked (confirmed or blocked)</span>
       <span><span class="sw pe"></span> Pending request</span>
     </div>
 
     <p class="note">
-      This view uses saved calendar data in <strong>your current browser</strong> (same place staff save blocks). Staff: open <a href="admin.html"><code>admin.html</code></a> on this device, unlock with your PIN, then use <strong>Quick block (not available)</strong> to mark red dates in one step. For the latest dates, you can still <a href="index.html#book-now">send a booking request</a> and we will confirm on Messenger.
+      <strong>Customers:</strong> booked dates come from the published <code>availability-public.json</code> on this site (same data for every visitor). <strong>Staff:</strong> open <a href="admin.html"><code>admin.html</code></a>, unlock with your PIN, update the calendar, then use <strong>Download public calendar file</strong> and replace <code>availability-public.json</code> in the project before deploy so customers always see which days are booked. Local browser data still merges for quick testing on one device. Questions? <a href="index.html#book-now">Send a booking request</a> and we will confirm on Messenger.
     </p>
   </main>
 
@@ -189,6 +203,7 @@
   var viewYear = now.getFullYear();
   var viewMonth = now.getMonth();
   var channel = typeof BroadcastChannel !== "undefined" ? new BroadcastChannel(CHANNEL_NAME) : null;
+  var publicBookings = null;
 
   function pad(n) { return n < 10 ? "0" + n : String(n); }
   function ymd(y, m, d) { return y + "-" + pad(m) + "-" + pad(d); }
@@ -201,7 +216,7 @@
     return compareDates(start, dayStr) <= 0 && compareDates(dayStr, end) <= 0;
   }
 
-  function loadBookings() {
+  function loadBookingsLocal() {
     try {
       var raw = localStorage.getItem(STORAGE_KEY);
       var arr = raw ? JSON.parse(raw) : [];
@@ -211,19 +226,71 @@
     }
   }
 
+  function mergePublicAndLocal(remote, local) {
+    var map = {};
+    var i;
+    for (i = 0; i < remote.length; i++) {
+      var r = remote[i];
+      if (!r || !r.id || !r.unitId || !r.start || !r.end) continue;
+      if (r.status !== "approved" && r.status !== "pending") continue;
+      map[String(r.id)] = r;
+    }
+    for (i = 0; i < local.length; i++) {
+      var l = local[i];
+      if (!l || !l.id) continue;
+      map[String(l.id)] = l;
+    }
+    var out = [];
+    for (var k in map) {
+      if (Object.prototype.hasOwnProperty.call(map, k)) out.push(map[k]);
+    }
+    return out;
+  }
+
+  function loadBookingsMerged() {
+    var local = loadBookingsLocal();
+    var remote = publicBookings === null ? [] : publicBookings;
+    return mergePublicAndLocal(remote, local);
+  }
+
+  function fetchPublicBookings(cb) {
+    fetch("./availability-public.json", { cache: "no-store" })
+      .then(function (res) {
+        return res.ok ? res.json() : [];
+      })
+      .then(function (data) {
+        publicBookings = Array.isArray(data) ? data : [];
+        if (cb) cb();
+      })
+      .catch(function () {
+        publicBookings = [];
+        if (cb) cb();
+      });
+  }
+
   function statusForDay(dayStr, unitFilter) {
-    var list = loadBookings();
-    var hasApproved = false;
+    var list = loadBookingsMerged();
+    var hasCustomerApproved = false;
+    var hasStaffApproved = false;
     var hasPending = false;
     for (var i = 0; i < list.length; i++) {
       var b = list[i];
       if (b.status === "rejected") continue;
       if (unitFilter && b.unitId !== unitFilter) continue;
       if (!dayInBookingRange(dayStr, b.start, b.end)) continue;
-      if (b.status === "approved") hasApproved = true;
-      else if (b.status === "pending") hasPending = true;
+      if (b.status === "approved") {
+        if (b.staffBlock) hasStaffApproved = true;
+        else hasCustomerApproved = true;
+      } else if (b.status === "pending") {
+        hasPending = true;
+      }
     }
-    return { hasApproved: hasApproved, hasPending: hasPending };
+    return {
+      hasCustomerApproved: hasCustomerApproved,
+      hasStaffApproved: hasStaffApproved,
+      hasPending: hasPending,
+      hasApproved: hasCustomerApproved || hasStaffApproved
+    };
   }
 
   function fillUnitSelect() {
@@ -263,8 +330,10 @@
       var cell = document.createElement("div");
       cell.className = "cal-cell";
       if (dayStr === todayStr) cell.classList.add("today");
-      if (st.hasApproved && st.hasPending) cell.classList.add("both");
-      else if (st.hasApproved) cell.classList.add("approved");
+      if (st.hasCustomerApproved && st.hasPending) cell.classList.add("both");
+      else if (st.hasStaffApproved && st.hasPending) cell.classList.add("both");
+      else if (st.hasCustomerApproved) cell.classList.add("approved");
+      else if (st.hasStaffApproved) cell.classList.add("approved");
       else if (st.hasPending) cell.classList.add("pending");
 
       var num = document.createElement("span");
@@ -275,7 +344,8 @@
       if (st.hasApproved || st.hasPending) {
         var tag = document.createElement("span");
         tag.className = "tag";
-        if (st.hasApproved && st.hasPending) tag.textContent = "Booked + pending";
+        if (st.hasCustomerApproved && st.hasPending) tag.textContent = "Booked + pending";
+        else if (st.hasStaffApproved && st.hasPending) tag.textContent = "Booked + pending";
         else if (st.hasApproved) tag.textContent = "Booked";
         else tag.textContent = "Pending";
         cell.appendChild(tag);
@@ -311,6 +381,9 @@
 
   fillUnitSelect();
   renderMonth();
+  fetchPublicBookings(function () {
+    renderMonth();
+  });
 })();
 </script>
 </body>
