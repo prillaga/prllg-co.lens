@@ -54,5 +54,13 @@
     "end": "2026-05-07",
     "status": "approved",
     "staffBlock": true
+  },
+  {
+    "id": "b-1778048969294",
+    "unitId": "nikon-kit",
+    "start": "2026-05-10",
+    "end": "2026-05-11",
+    "status": "approved",
+    "staffBlock": false
   }
 ]
