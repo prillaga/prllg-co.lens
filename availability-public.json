@@ -52,7 +52,7 @@
     "unitId": "nikon-kit",
     "start": "2026-05-06",
     "end": "2026-05-07",
-    "status": "pending",
-    "staffBlock": false
+    "status": "approved",
+    "staffBlock": true
   }
 ]
