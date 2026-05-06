@@ -295,98 +295,68 @@ svg {
 }
 
 /* ----- Unit cards (index #units + units.html) ----- */
+#units .units-scroll,
+section#units .units-scroll,
+.units-scroll {
+  display: grid !important;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: 16px !important;
+  justify-content: stretch !important;
+  overflow-x: visible !important;
+  scroll-snap-type: none !important;
+  padding-left: max(0px, env(safe-area-inset-left));
+  padding-right: max(0px, env(safe-area-inset-right));
+}
+
 #units .units-scroll > div,
 section#units .units-scroll > div,
 .units-scroll > div {
-  min-width: 0;
+  width: auto !important;
+  max-width: none !important;
+  min-width: 0 !important;
 }
 
-/* Mobile: single column, full-width cards */
-@media (max-width: 768px) {
+#units .units-scroll img,
+.units-scroll img {
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  display: block;
+}
+
+#units .units-scroll a[href*="book-now"],
+.units-scroll a[href*="book-now"],
+#units .units-scroll a[href*="index.html"],
+.units-scroll a[href*="index.html"] {
+  min-height: 44px;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 22px !important;
+}
+
+#units .units-scroll h3,
+.units-scroll h3 {
+  font-size: clamp(1rem, 4vw, 1.125rem) !important;
+}
+
+/* Mobile: 1-2 columns */
+@media (min-width: 560px) and (max-width: 1024px) {
   #units .units-scroll,
   section#units .units-scroll,
   .units-scroll {
-    flex-wrap: wrap !important;
-    justify-content: center !important;
-    overflow-x: visible !important;
-    scroll-snap-type: none !important;
-    gap: 18px;
-    padding-left: max(0px, env(safe-area-inset-left));
-    padding-right: max(0px, env(safe-area-inset-right));
-  }
-
-  #units .units-scroll > div,
-  section#units .units-scroll > div,
-  .units-scroll > div {
-    flex: 1 1 100% !important;
-    width: 100% !important;
-    max-width: min(520px, 100%) !important;
-    min-width: 0 !important;
-  }
-
-  #units .units-scroll img,
-  .units-scroll img {
-    width: 100% !important;
-    height: auto !important;
-    aspect-ratio: 16 / 10;
-    object-fit: cover;
-    display: block;
-  }
-
-  #units .units-scroll a[href*="book-now"],
-  .units-scroll a[href*="book-now"],
-  #units .units-scroll a[href*="index.html"],
-  .units-scroll a[href*="index.html"] {
-    min-height: 44px;
-    display: inline-flex !important;
-    align-items: center;
-    justify-content: center;
-    padding: 12px 22px !important;
-  }
-
-  #units .units-scroll h3,
-  .units-scroll h3 {
-    font-size: clamp(1rem, 4vw, 1.125rem) !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-/* Tablet: two columns */
-@media (min-width: 769px) and (max-width: 1024px) {
-  #units .units-scroll,
-  section#units .units-scroll,
-  .units-scroll {
-    flex-wrap: wrap !important;
-    justify-content: center !important;
-    overflow-x: visible !important;
-    scroll-snap-type: none !important;
-    gap: 16px;
-  }
-
-  #units .units-scroll > div,
-  section#units .units-scroll > div,
-  .units-scroll > div {
-    flex: 1 1 calc(50% - 12px) !important;
-    width: calc(50% - 12px) !important;
-    max-width: calc(50% - 12px) !important;
-    min-width: 0 !important;
-  }
-
-  #units .units-scroll img,
-  .units-scroll img {
-    width: 100% !important;
-    height: auto !important;
-    aspect-ratio: 16 / 10;
-    object-fit: cover;
-  }
-}
-
-/* Desktop: horizontal row with flexible card width */
+/* Desktop: 3-4 columns */
 @media (min-width: 1025px) {
-  #units .units-scroll > div,
-  .units-scroll > div {
-    width: min(380px, 28vw) !important;
-    min-width: min(300px, 26vw) !important;
-    max-width: min(420px, 94vw) !important;
+  #units .units-scroll,
+  section#units .units-scroll,
+  .units-scroll {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 18px !important;
   }
 }
 

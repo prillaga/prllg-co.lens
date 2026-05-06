@@ -118,6 +118,8 @@
       background: #121212; font-size: 13px; line-height: 1.55; color: #9a9a9a;
     }
     .note a { color: #d4af37; }
+    .owner-only-note { display: none; }
+    .owner-unlocked .owner-only-note { display: inline; }
   </style>
   <link rel="stylesheet" href="site-nav.css">
   <link rel="stylesheet" href="responsive.css">
@@ -183,7 +185,12 @@
     </div>
 
     <p class="note">
-      <strong>Customers:</strong> booked dates come from the published <code>availability-public.json</code> on this site (same data for every visitor). <strong>Staff:</strong> open <a href="admin.html"><code>admin.html</code></a>, unlock with your PIN, update the calendar, then use <strong>Download public calendar file</strong> and replace <code>availability-public.json</code> in the project before deploy so customers always see which days are booked. Local browser data still merges for quick testing on one device. Questions? <a href="index.html#book-now">Send a booking request</a> and we will confirm on Messenger.
+      <span class="owner-only-note">
+        <strong>Customers:</strong> booked dates come from the published <code>availability-public.json</code> on this site (same data for every visitor). <strong>Staff:</strong> open <a href="admin.html"><code>admin.html</code></a>, unlock with your PIN, update the calendar, then use <strong>Download public calendar file</strong> and replace <code>availability-public.json</code> in the project before deploy so customers always see which days are booked. Local browser data still merges for quick testing on one device.
+      </span>
+      <span>
+        Questions? <a href="index.html#book-now">Send a booking request</a> and we will confirm on Messenger.
+      </span>
     </p>
   </main>
 
@@ -194,9 +201,9 @@
 
   var UNITS = [
     { id: "nikon-kit", label: "Nikon DSLR Flipscreen w/ kitlens 15-80mm" },
-    { id: "nikon-zoom", label: "Nikon DSLR Flipscreen w/ Zoom Lens 70-330mm" },
+    { id: "nikon-zoom", label: "Nikon DSLR Flipscreen w/ Zoom Lens 70-300mm" },
     { id: "g6-thumb", label: "G6 THUMB CAMERA" },
-    { id: "zoom-lens", label: "Zoom Lens 70-330mm" },
+    { id: "zoom-lens", label: "Zoom Lens 70-300mm" },
     { id: "dji-gimbal", label: "DJI OSMO MOBILE 3 GIMBAL" }
   ];
 
@@ -205,6 +212,21 @@
   var viewMonth = now.getMonth();
   var channel = typeof BroadcastChannel !== "undefined" ? new BroadcastChannel(CHANNEL_NAME) : null;
   var publicBookings = null;
+
+  var OWNER_PIN = "lens2026";
+  var OWNER_KEY = "prillaga_owner_ok_v1";
+
+  (function initOwnerView() {
+    var unlocked = false;
+    try {
+      unlocked = (new URLSearchParams(window.location.search)).get("ownerPin") === OWNER_PIN;
+      if (!unlocked) unlocked = localStorage.getItem(OWNER_KEY) === "1";
+      if (unlocked) {
+        localStorage.setItem(OWNER_KEY, "1");
+        document.documentElement.classList.add("owner-unlocked");
+      }
+    } catch (e) {}
+  })();
 
   function pad(n) { return n < 10 ? "0" + n : String(n); }
   function ymd(y, m, d) { return y + "-" + pad(m) + "-" + pad(d); }
@@ -386,6 +408,34 @@
     renderMonth();
   });
 })();
+</script>
+<a class="prillaga-messenger-link" href="javascript:void(0)" target="_blank" rel="noopener noreferrer" aria-label="Messenger" style="position: fixed; right: 16px; bottom: 16px; z-index: 999; display: inline-flex; align-items: center; justify-content: center; width: 46px; height: 46px; border-radius: 999px; background: linear-gradient(135deg, rgba(18, 18, 18, 0.96) 0%, rgba(30, 30, 30, 0.96) 100%); border: 1px solid rgba(212, 175, 55, 0.48); color: #f4ebd0; text-decoration: none; line-height: 1; box-shadow: 0 10px 28px rgba(0, 0, 0, 0.42); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);">
+  <span aria-hidden="true" style="width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center;">
+    <svg viewBox="0 0 64 64" width="18" height="18" role="img" aria-hidden="true" focusable="false">
+      <defs>
+        <linearGradient id="msgStrokeGrad" x1="12%" y1="10%" x2="88%" y2="90%">
+          <stop offset="0%" stop-color="#2f78ff"></stop>
+          <stop offset="100%" stop-color="#b22dff"></stop>
+        </linearGradient>
+        <linearGradient id="msgBoltGrad" x1="8%" y1="12%" x2="92%" y2="88%">
+          <stop offset="0%" stop-color="#8fcbff"></stop>
+          <stop offset="100%" stop-color="#b58dff"></stop>
+        </linearGradient>
+      </defs>
+      <path d="M32 6C18.2 6 7 16.3 7 29c0 6.5 2.9 12.3 7.5 16.4V58l11.4-6.3c2 0.6 4 0.9 6.1 0.9 13.8 0 25-10.3 25-23S45.8 6 32 6z" fill="none" stroke="url(#msgStrokeGrad)" stroke-width="5.2" stroke-linejoin="round"></path>
+      <path d="M17.2 36.8l12.4-8.9 8.2 7.3 14.2-12.1-12.2 17.4-8.5-7-14.1 3.3z" fill="url(#msgBoltGrad)"></path>
+    </svg>
+  </span>
+</a>
+<script src="site-config.js"></script>
+<script>
+  (function applyPrillagaMessengerLinkHrefs() {
+    var base = window.prillagaMessengerBaseUrl ? window.prillagaMessengerBaseUrl() : "";
+    if (!base) return;
+    document.querySelectorAll("a.prillaga-messenger-link").forEach(function (a) {
+      a.setAttribute("href", base);
+    });
+  })();
 </script>
 </body>
 </html>
