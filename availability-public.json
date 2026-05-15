@@ -1,38 +1,6 @@
 [
   {
-    "id": "b-1778393451611",
-    "unitId": "nikon-zoom",
-    "start": "2026-04-30",
-    "end": "2026-05-04",
-    "status": "approved",
-    "staffBlock": true
-  },
-  {
-    "id": "b-1778393499870",
-    "unitId": "nikon-zoom",
-    "start": "2026-05-09",
-    "end": "2026-05-11",
-    "status": "approved",
-    "staffBlock": true
-  },
-  {
-    "id": "b-1778393526584",
-    "unitId": "nikon-kit",
-    "start": "2026-05-06",
-    "end": "2026-05-07",
-    "status": "approved",
-    "staffBlock": true
-  },
-  {
-    "id": "b-1778393563754",
-    "unitId": "nikon-zoom",
-    "start": "2026-05-13",
-    "end": "2026-05-14",
-    "status": "approved",
-    "staffBlock": true
-  },
-  {
-    "id": "b-1778393585015",
+    "id": "b-1777923851186",
     "unitId": "nikon-kit",
     "start": "2026-05-15",
     "end": "2026-05-16",
@@ -40,7 +8,7 @@
     "staffBlock": true
   },
   {
-    "id": "b-1778393597439",
+    "id": "b-1777923866295",
     "unitId": "nikon-kit",
     "start": "2026-05-23",
     "end": "2026-05-25",
@@ -48,7 +16,7 @@
     "staffBlock": true
   },
   {
-    "id": "b-1778393605471",
+    "id": "b-1777923957745",
     "unitId": "nikon-kit",
     "start": "2026-05-26",
     "end": "2026-05-26",
@@ -56,11 +24,43 @@
     "staffBlock": true
   },
   {
-    "id": "b-1778393611965",
-    "unitId": "nikon-kit",
-    "start": "2026-05-28",
-    "end": "2026-05-29",
+    "id": "b-1777924513448",
+    "unitId": "nikon-zoom",
+    "start": "2026-05-13",
+    "end": "2026-05-14",
     "status": "approved",
     "staffBlock": true
+  },
+  {
+    "id": "b-1777924609820",
+    "unitId": "nikon-zoom",
+    "start": "2026-05-01",
+    "end": "2026-05-04",
+    "status": "approved",
+    "staffBlock": true
+  },
+  {
+    "id": "b-1777986074544",
+    "unitId": "nikon-zoom",
+    "start": "2026-05-28",
+    "end": "2026-05-28",
+    "status": "approved",
+    "staffBlock": true
+  },
+  {
+    "id": "b-1777988464047",
+    "unitId": "nikon-kit",
+    "start": "2026-05-06",
+    "end": "2026-05-07",
+    "status": "approved",
+    "staffBlock": true
+  },
+  {
+    "id": "b-1778048969294",
+    "unitId": "nikon-kit",
+    "start": "2026-05-10",
+    "end": "2026-05-11",
+    "status": "approved",
+    "staffBlock": false
   }
 ]
