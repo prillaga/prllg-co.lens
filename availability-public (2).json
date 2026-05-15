@@ -1,0 +1,82 @@
+[
+  {
+    "id": "b-1778393451611",
+    "unitId": "nikon-zoom",
+    "start": "2026-04-30",
+    "end": "2026-05-04",
+    "status": "approved",
+    "staffBlock": true
+  },
+  {
+    "id": "b-1778393499870",
+    "unitId": "nikon-zoom",
+    "start": "2026-05-09",
+    "end": "2026-05-11",
+    "status": "approved",
+    "staffBlock": true
+  },
+  {
+    "id": "b-1778393526584",
+    "unitId": "nikon-kit",
+    "start": "2026-05-06",
+    "end": "2026-05-07",
+    "status": "approved",
+    "staffBlock": true
+  },
+  {
+    "id": "b-1778393563754",
+    "unitId": "nikon-zoom",
+    "start": "2026-05-13",
+    "end": "2026-05-14",
+    "status": "approved",
+    "staffBlock": true
+  },
+  {
+    "id": "b-1778393597439",
+    "unitId": "nikon-kit",
+    "start": "2026-05-23",
+    "end": "2026-05-25",
+    "status": "approved",
+    "staffBlock": true
+  },
+  {
+    "id": "b-1778393605471",
+    "unitId": "nikon-kit",
+    "start": "2026-05-26",
+    "end": "2026-05-26",
+    "status": "approved",
+    "staffBlock": true
+  },
+  {
+    "id": "b-1778393611965",
+    "unitId": "nikon-kit",
+    "start": "2026-05-28",
+    "end": "2026-05-29",
+    "status": "approved",
+    "staffBlock": true
+  },
+  {
+    "id": "b-1778860125113",
+    "unitId": "dji-gimbal",
+    "start": "2026-05-15",
+    "end": "2026-05-17",
+    "status": "approved",
+    "staffBlock": true
+  },
+  {
+    "id": "b-1778860151337",
+    "unitId": "nikon-kit",
+    "start": "2026-05-16",
+    "end": "2026-05-16",
+    "status": "approved",
+    "staffBlock": true
+  },
+  {
+    "id": "b-1778860170783",
+    "unitId": "nikon-kit",
+    "start": "2026-05-30",
+    "end": "2026-05-30",
+    "status": "approved",
+    "staffBlock": true
+  }
+]
