@@ -266,8 +266,8 @@
 
       <div class="id-upload-wrap doc-field">
         <label for="idPhoto">Upload a photo of your valid ID</label>
-        <input id="idPhoto" type="file" accept="image/jpeg,image/png,image/webp" capture="environment" required>
-        <p class="hint">Use a clear photo (JPG, PNG, or WebP) so it can be included in the agreement image. HEIC/PDF are not supported here—convert to JPG if needed.</p>
+        <input id="idPhoto" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif" capture="environment" required>
+        <p class="hint">Use a clear photo of your ID (camera or gallery). iPhone photos (HEIC) are converted automatically when possible.</p>
       </div>
 
       <div class="sig-block">
@@ -302,7 +302,7 @@
     </form>
 
     <div class="config-note">
-      <strong>Note:</strong> If automatic sending fails (network/email service issue), a fallback email draft opens so you can still send manually.
+      <strong>Note:</strong> If automatic email fails, your phone may offer <strong>Share</strong> so you can send the agreement PNG in Mail or Gmail with the image attached. A download is also provided.
     </div>
   </main>
 
@@ -454,99 +454,105 @@
         }
       };
       img.onerror = function () {
-        reject(new Error("Could not read ID image. Try another JPG or PNG."));
+        reject(new Error("Could not read ID image. Try JPG, PNG, or take a new photo on your phone."));
       };
       img.src = dataUrl;
     });
   }
 
-  /** Opens default mail app with prefilled subject/body and optional CC. */
-  function openEmailDraft(subject, body, ccEmail) {
-    if (!businessEmail) return;
-    var cc = (ccEmail || "").trim();
-    var mailto =
-      "mailto:" +
-      encodeURIComponent(businessEmail) +
-      "?subject=" +
-      encodeURIComponent(subject || "") +
-      (cc ? "&cc=" + encodeURIComponent(cc) : "") +
-      "&body=" +
-      encodeURIComponent(body || "");
-    window.location.assign(mailto);
+  function isAllowedIdImage(file) {
+    if (!file) return false;
+    if (file.type && file.type.indexOf("image/") === 0) return true;
+    return /\.(jpe?g|png|webp|heic|heif)$/i.test(file.name || "");
+  }
+
+  /** iPhone/Android: share PNG into Mail with attachment (mailto cannot attach files). */
+  function shareAgreementPng(blob, filename, subject, bodyText) {
+    var file = new File([blob], filename, { type: "image/png" });
+    if (!navigator.share || !navigator.canShare) {
+      return Promise.reject(new Error("Share not available."));
+    }
+    if (!navigator.canShare({ files: [file] })) {
+      return Promise.reject(new Error("This device cannot share files."));
+    }
+    return navigator.share({
+      title: subject,
+      text:
+        (bodyText || "") +
+        "\n\nSend to owner: " +
+        businessEmail +
+        "\n(The agreement PNG is attached in this share.)",
+      files: [file]
+    });
   }
 
   function sendAgreementViaFormSubmit(blob, filename, data, subject, bodyText) {
     if (!businessEmail) {
       return Promise.reject(new Error("Business email is missing."));
     }
-    return new Promise(function (resolve, reject) {
-      var iframe = document.createElement("iframe");
-      var iframeName = "formsubmit_target_" + Date.now();
-      iframe.name = iframeName;
-      iframe.style.display = "none";
-      document.body.appendChild(iframe);
 
-      var form = document.createElement("form");
-      form.method = "POST";
-      form.action = "https://formsubmit.co/" + businessEmail;
-      form.enctype = "multipart/form-data";
-      form.target = iframeName;
-      form.style.display = "none";
+    var fd = new FormData();
+    fd.append("_subject", subject || "Signed rental agreement photo");
+    fd.append("_captcha", "false");
+    fd.append(
+      "message",
+      (bodyText || "") +
+        "\n\nA PNG image of the full signed agreement is attached to this email."
+    );
+    if (data.email) fd.append("_cc", data.email);
+    fd.append("customer_name", data.renterName);
+    fd.append("customer_email", data.email);
+    fd.append("cellphone", data.cellphone);
+    fd.append("rented_unit", data.rentedUnit);
+    fd.append("additional_rent_1", data.additionalRent1);
+    fd.append("additional_rent_2", data.additionalRent2);
+    fd.append("rental_date", data.rentalDate);
+    fd.append("return_date", data.returnDate);
+    fd.append("agreement_signed_at", data.signedAt);
+    fd.append("attachment", new File([blob], filename, { type: "image/png" }));
 
-      function addHidden(name, value) {
-        var input = document.createElement("input");
-        input.type = "hidden";
-        input.name = name;
-        input.value = value == null ? "" : String(value);
-        form.appendChild(input);
-      }
-
-      addHidden("_subject", subject || "Signed rental agreement photo");
-      addHidden("_captcha", "false");
-      addHidden("_template", "table");
-      if (data.email) addHidden("_cc", data.email);
-      addHidden("customer_name", data.renterName);
-      addHidden("customer_email", data.email);
-      addHidden("cellphone", data.cellphone);
-      addHidden("rented_unit", data.rentedUnit);
-      addHidden("additional_rent_1", data.additionalRent1);
-      addHidden("additional_rent_2", data.additionalRent2);
-      addHidden("rental_date", data.rentalDate);
-      addHidden("return_date", data.returnDate);
-      addHidden("agreement_signed_at", data.signedAt);
-      addHidden("message", bodyText || "");
-
-      var fileInput = document.createElement("input");
-      fileInput.type = "file";
-      fileInput.name = "attachment";
-      var pngFile = new File([blob], filename, { type: "image/png" });
-      var dt = new DataTransfer();
-      dt.items.add(pngFile);
-      fileInput.files = dt.files;
-      form.appendChild(fileInput);
-
-      document.body.appendChild(form);
-
-      var done = false;
-      var timeoutId = setTimeout(function () {
-        if (done) return;
-        done = true;
-        if (form.parentNode) form.parentNode.removeChild(form);
-        if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
-        reject(new Error("Timed out while sending agreement email."));
-      }, 15000);
-
-      iframe.addEventListener("load", function () {
-        if (done) return;
-        done = true;
-        clearTimeout(timeoutId);
-        if (form.parentNode) form.parentNode.removeChild(form);
-        if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
-        resolve({ success: true });
+    return fetch("https://formsubmit.co/ajax/" + encodeURIComponent(businessEmail), {
+      method: "POST",
+      body: fd,
+      headers: { Accept: "application/json" }
+    }).then(function (res) {
+      return res.text().then(function (text) {
+        var json = null;
+        try {
+          json = text ? JSON.parse(text) : null;
+        } catch (parseErr) {
+          json = null;
+        }
+        if (res.ok && (!json || json.success !== false)) {
+          return json || { success: true };
+        }
+        var errMsg =
+          (json && (json.message || json.error)) ||
+          "Email service rejected the upload (status " + res.status + ").";
+        throw new Error(errMsg);
       });
-
-      form.submit();
     });
+  }
+
+  function handleSendFailure(blob, filename, subject, bodyText) {
+    downloadPngBlob(blob, filename);
+    return shareAgreementPng(blob, filename, subject, bodyText)
+      .then(function () {
+        showMsg(
+          "Automatic email failed. Use the share sheet to send the downloaded PNG to " +
+            businessEmail +
+            " in Mail or Gmail (image attached).",
+          false
+        );
+      })
+      .catch(function () {
+        showMsg(
+          "Automatic email failed. The agreement PNG was downloaded — open Mail or Gmail, attach that file, and send to " +
+            businessEmail +
+            ". (iPhone cannot attach files from a plain email link.)",
+          false
+        );
+      });
   }
 
   function buildAgreementExportNode(data, sigDataUrl, idPngDataUrl) {
@@ -765,12 +771,12 @@
       return;
     }
     if (!idPhoto.files || idPhoto.files.length === 0) {
-      showMsg("Please upload a photo of your valid ID (JPG, PNG, or WebP).", false);
+      showMsg("Please upload a photo of your valid ID (JPG, PNG, WebP, or iPhone HEIC).", false);
       return;
     }
     var idFile = idPhoto.files[0];
-    if (!idFile.type || idFile.type.indexOf("image/") !== 0) {
-      showMsg("ID must be an image file (JPG, PNG, or WebP) for the agreement photo.", false);
+    if (!isAllowedIdImage(idFile)) {
+      showMsg("ID must be a photo (JPG, PNG, WebP, or iPhone HEIC). PDF is not supported.", false);
       return;
     }
     if (!document.getElementById("agreeTerms").checked || !document.getElementById("agreeSign").checked) {
@@ -843,10 +849,8 @@
             btn.disabled = false;
           })
           .catch(function () {
-            downloadPngBlob(blob, filename);
             btn.disabled = false;
-            showMsg("Auto-send failed. Downloaded PNG and opened fallback email draft. Please tap Send.", false);
-            openEmailDraft(emailSubject, emailBody, email);
+            handleSendFailure(blob, filename, emailSubject, emailBody);
           });
       })
       .catch(function (err) {
