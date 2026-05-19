@@ -42,11 +42,11 @@ window.PRILLAGA_BUSINESS_EMAIL = "hjsescabarte2021@gmail.com";
  */
 window.PRILLAGA_WEB3FORMS_ACCESS_KEY = "c8ad8552-1857-4f6f-ba5f-3f259a076538";
 /**
- * Optional Google Apps Script Web App URL (see scripts/agreement-email-relay.gs).
- * If set, agreement emails are sent through your Gmail instead of a third-party relay.
+ * Gmail relay URL for agreement PNG attachments (recommended).
+ * Deploy scripts/agreement-email-relay.gs — see scripts/AGREEMENT-EMAIL-SETUP.md
  */
 window.PRILLAGA_AGREEMENT_SEND_URL = "";
-
+https://script.google.com/macros/s/AKfycbzGizXEaxfv8VeAFwbbgoTco1zQPolP8890HGKvULC2KfYI7V8WiAk-2Mvb49n2zOSy/exec
 /** Trimmed business email, or "" if unset. */
 window.prillagaBusinessEmail = function () {
   var email = typeof window.PRILLAGA_BUSINESS_EMAIL === "string" ? window.PRILLAGA_BUSINESS_EMAIL.trim() : "";
