@@ -36,8 +36,30 @@ window.PRILLAGA_GCASH_QR_SRC = "images/gcash-qr.jpg";
 /** Business email for booking and agreement submissions. */
 window.PRILLAGA_BUSINESS_EMAIL = "hjsescabarte2021@gmail.com";
 
+/**
+ * Web3Forms access key — required for reliable automatic agreement emails with PNG attachments.
+ * Get a free key at https://web3forms.com (use the same inbox as PRILLAGA_BUSINESS_EMAIL).
+ */
+window.PRILLAGA_WEB3FORMS_ACCESS_KEY = "";
+c8ad8552-1857-4f6f-ba5f-3f259a076538
+/**
+ * Optional Google Apps Script Web App URL (see scripts/agreement-email-relay.gs).
+ * If set, agreement emails are sent through your Gmail instead of a third-party relay.
+ */
+window.PRILLAGA_AGREEMENT_SEND_URL = "";
+
 /** Trimmed business email, or "" if unset. */
 window.prillagaBusinessEmail = function () {
   var email = typeof window.PRILLAGA_BUSINESS_EMAIL === "string" ? window.PRILLAGA_BUSINESS_EMAIL.trim() : "";
   return email || "";
+};
+
+window.prillagaWeb3FormsAccessKey = function () {
+  var key = typeof window.PRILLAGA_WEB3FORMS_ACCESS_KEY === "string" ? window.PRILLAGA_WEB3FORMS_ACCESS_KEY.trim() : "";
+  return key || "";
+};
+
+window.prillagaAgreementSendUrl = function () {
+  var url = typeof window.PRILLAGA_AGREEMENT_SEND_URL === "string" ? window.PRILLAGA_AGREEMENT_SEND_URL.trim() : "";
+  return url || "";
 };
