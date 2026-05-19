@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="description" content="Prillaga&amp;Co. Lens — boutique camera rental in Iloilo. Nikon DSLR, lenses, and DJI gimbal.">
+  <meta name="description" content="Prillaga&amp;Co. Lens — boutique camera rental in Iloilo. Nikon and Canon DSLR, lenses, and DJI gimbal.">
   <title>Prillaga&amp;Co. Lens | Rent. Shoot. Create.</title>
   <script src="site-config.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -12,9 +12,6 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html { -webkit-text-size-adjust: 100%; }
-    @media (prefers-reduced-motion: no-preference) {
-      html { scroll-behavior: smooth; }
-    }
     body { margin: 0; background: #0a0a0a; color: #f5f5f5; padding-bottom: 170px; }
     .skip-link {
       position: absolute; left: 12px; top: 12px; z-index: 2000;
@@ -351,8 +348,9 @@
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <link rel="stylesheet" href="site-nav.css">
   <link rel="stylesheet" href="responsive.css">
+  <link rel="stylesheet" href="lenis-motion.css">
   <script src="site-nav.js" defer></script>
-  <script src="scroll-reveal.js" defer></script>
+  <script src="lenis-motion.js" defer></script>
 </head>
 <body>
 <a class="skip-link" href="#book-now">Skip to booking form</a>
@@ -381,7 +379,7 @@
   </nav>
 </header>
 <section id="home" class="home-hero">
-  <video class="home-hero__video" autoplay muted loop playsinline preload="metadata" poster="images/6.png" style="background: #000;">
+  <video class="home-hero__video" autoplay muted loop playsinline preload="metadata" style="background: #000;">
     <source src="images/half-bg.mp4" type="video/mp4">
     Your browser does not support the video tag.
   </video>
@@ -392,9 +390,18 @@
     <p class="home-hero__tagline">
       Rent · Shoot · Create
     </p>
-    <a class="home-hero__cta" href="#book-now">
-      Book Now
-    </a>
+    <div class="home-hero__actions">
+      <a class="home-hero__cta home-hero__cta--primary" href="#book-now">
+        BOOK NOW
+      </a>
+      <a class="home-hero__cta home-hero__cta--secondary" href="#units">
+        <svg class="home-hero__cta-icon" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false">
+          <path d="M4 7h4l2-3h4l2 3h4v12H4V7z"></path>
+          <circle cx="12" cy="13" r="3.25"></circle>
+        </svg>
+        VIEW UNITS
+      </a>
+    </div>
   </div>
 </section>
 <section id="units" style="background: #111111; padding: 70px 20px; color: #f5f5f5; font-family: Arial, sans-serif;">
@@ -428,6 +435,30 @@
       </div>
     </div>
     <div style="width: 400px; min-width: 400px; background: #101010; border: 1px solid #232323; border-radius: 10px; overflow: hidden; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);">
+      <img src="images/nikon-zoom-kit-battery.jpg" alt="Nikon DSLR w/ Zoom Lens + Kitlens + Extra battery" loading="lazy" decoding="async" style="width: 100%; height: 260px; object-fit: cover; display: block;">
+      <div style="padding: 12px 14px 16px 14px; text-align: left;">
+        <h3 style="margin: 0 0 10px 0; color: #f5f5f5; font-family: Avenir, 'Avenir Next', 'Century Gothic', Arial, sans-serif; font-size: 18px; line-height: 1.35;">
+          Nikon DSLR w/ Zoom Lens + Kitlens + Extra battery
+        </h3>
+        <p style="margin: 0 0 10px 0; color: #d4af37; font-size: 14px;">950/day (1-2 days) | 900/day (3 days up)</p>
+        <a href="#book-now" data-preselect-unit="Nikon DSLR w/ Zoom Lens + Kitlens + Extra battery" style="display: inline-block; padding: 9px 20px; background: linear-gradient(135deg, #f3d77b 0%, #d4af37 45%, #b8901f 100%); color: #111; text-decoration: none; font-family: Avenir, 'Avenir Next', 'Century Gothic', Arial, sans-serif; font-weight: 700; border-radius: 999px; letter-spacing: 1px; font-size: 14px;">
+          Inquire Now
+        </a>
+      </div>
+    </div>
+    <div style="width: 400px; min-width: 400px; background: #101010; border: 1px solid #232323; border-radius: 10px; overflow: hidden; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);">
+      <img src="images/canon-1200d.jpg" alt="Canon 1200D DSLR w/ kitlens 18-55mm" loading="lazy" decoding="async" style="width: 100%; height: 260px; object-fit: cover; display: block;">
+      <div style="padding: 12px 14px 16px 14px; text-align: left;">
+        <h3 style="margin: 0 0 10px 0; color: #f5f5f5; font-family: Avenir, 'Avenir Next', 'Century Gothic', Arial, sans-serif; font-size: 18px; line-height: 1.35;">
+          Canon 1200D DSLR w/ kitlens 18-55mm
+        </h3>
+        <p style="margin: 0 0 10px 0; color: #d4af37; font-size: 14px;">550/day | 500/day (3 days up)</p>
+        <a href="#book-now" data-preselect-unit="Canon 1200D DSLR w/ kitlens 18-55mm" style="display: inline-block; padding: 9px 20px; background: linear-gradient(135deg, #f3d77b 0%, #d4af37 45%, #b8901f 100%); color: #111; text-decoration: none; font-family: Avenir, 'Avenir Next', 'Century Gothic', Arial, sans-serif; font-weight: 700; border-radius: 999px; letter-spacing: 1px; font-size: 14px;">
+          Inquire Now
+        </a>
+      </div>
+    </div>
+    <div style="width: 400px; min-width: 400px; background: #101010; border: 1px solid #232323; border-radius: 10px; overflow: hidden; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);">
       <img src="images/G6-thumb-camera.jpg" alt="G6 THUMB CAMERA" loading="lazy" decoding="async" style="width: 100%; height: 260px; object-fit: cover; display: block;">
       <div style="padding: 12px 14px 16px 14px; text-align: left;">
         <h3 style="margin: 0 0 10px 0; color: #f5f5f5; font-family: Avenir, 'Avenir Next', 'Century Gothic', Arial, sans-serif; font-size: 18px; line-height: 1.35;">
@@ -435,6 +466,18 @@
         </h3>
         <p style="margin: 0 0 10px 0; color: #d4af37; font-size: 14px;">200/day | 150/day (3 days up)</p>
         <a href="#book-now" data-preselect-unit="G6 THUMB CAMERA" style="display: inline-block; padding: 9px 20px; background: linear-gradient(135deg, #f3d77b 0%, #d4af37 45%, #b8901f 100%); color: #111; text-decoration: none; font-family: Avenir, 'Avenir Next', 'Century Gothic', Arial, sans-serif; font-weight: 700; border-radius: 999px; letter-spacing: 1px; font-size: 14px;">
+          Inquire Now
+        </a>
+      </div>
+    </div>
+    <div style="width: 400px; min-width: 400px; background: #101010; border: 1px solid #232323; border-radius: 10px; overflow: hidden; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);">
+      <img src="images/kodak-v603.jpg" alt="Kodak EasyShare V603" loading="lazy" decoding="async" style="width: 100%; height: 260px; object-fit: cover; display: block;">
+      <div style="padding: 12px 14px 16px 14px; text-align: left;">
+        <h3 style="margin: 0 0 10px 0; color: #f5f5f5; font-family: Avenir, 'Avenir Next', 'Century Gothic', Arial, sans-serif; font-size: 18px; line-height: 1.35;">
+          Kodak EasyShare V603
+        </h3>
+        <p style="margin: 0 0 10px 0; color: #d4af37; font-size: 14px;">250/day | 200/day (3 days up)</p>
+        <a href="#book-now" data-preselect-unit="Kodak EasyShare V603" style="display: inline-block; padding: 9px 20px; background: linear-gradient(135deg, #f3d77b 0%, #d4af37 45%, #b8901f 100%); color: #111; text-decoration: none; font-family: Avenir, 'Avenir Next', 'Century Gothic', Arial, sans-serif; font-weight: 700; border-radius: 999px; letter-spacing: 1px; font-size: 14px;">
           Inquire Now
         </a>
       </div>
@@ -481,7 +524,10 @@
           <option value="">Any item — booked if any unit has a hold</option>
           <option value="nikon-kit">Nikon DSLR Flipscreen w/ kitlens 15-80mm</option>
           <option value="nikon-zoom">Nikon DSLR Flipscreen w/ Zoom Lens 70-300mm</option>
+          <option value="nikon-zoom-kit-battery">Nikon DSLR w/ Zoom Lens + Kitlens + Extra battery</option>
+          <option value="canon-1200d">Canon 1200D DSLR w/ kitlens 18-55mm</option>
           <option value="g6-thumb">G6 THUMB CAMERA</option>
+          <option value="kodak-v603">Kodak EasyShare V603</option>
           <option value="zoom-lens">Zoom Lens 70-300mm</option>
           <option value="dji-gimbal">DJI OSMO MOBILE 3 GIMBAL</option>
         </select>
@@ -634,7 +680,10 @@
       <option value="">Select Units</option>
       <option value="Nikon DSLR Flipscreen w/ kitlens 15-80mm">Nikon DSLR Flipscreen w/ kitlens 15-80mm (450/day | 400/day 3+ days)</option>
       <option value="Nikon DSLR Flipscreen w/ Zoom Lens 70-300mm">Nikon DSLR Flipscreen w/ Zoom Lens 70-300mm (550/day | 500/day 3+ days)</option>
+      <option value="Nikon DSLR w/ Zoom Lens + Kitlens + Extra battery">Nikon DSLR w/ Zoom Lens + Kitlens + Extra battery (950/day 1-2 days | 900/day 3+ days)</option>
+      <option value="Canon 1200D DSLR w/ kitlens 18-55mm">Canon 1200D DSLR w/ kitlens 18-55mm (550/day | 500/day 3+ days)</option>
       <option value="G6 THUMB CAMERA">G6 THUMB CAMERA (200/day | 150/day 3+ days)</option>
+      <option value="Kodak EasyShare V603">Kodak EasyShare V603 (250/day | 200/day 3+ days)</option>
       <option value="DJI OSMO MOBILE 3 GIMBAL">DJI OSMO MOBILE 3 GIMBAL (300/day | 250/day 3+ days)</option>
       <option value="Zoom Lens 70-300mm">Zoom Lens 70-300mm (300/day | 250/day 3+ days)</option>
     </select>
@@ -675,7 +724,10 @@
   var unitPricingRules = {
     "Nikon DSLR Flipscreen w/ kitlens 15-80mm": { baseRate: 450, longRate: 400, hasLongRate: true },
     "Nikon DSLR Flipscreen w/ Zoom Lens 70-300mm": { baseRate: 550, longRate: 500, hasLongRate: true },
+    "Nikon DSLR w/ Zoom Lens + Kitlens + Extra battery": { baseRate: 950, longRate: 900, hasLongRate: true },
+    "Canon 1200D DSLR w/ kitlens 18-55mm": { baseRate: 550, longRate: 500, hasLongRate: true },
     "G6 THUMB CAMERA": { baseRate: 200, longRate: 150, hasLongRate: true },
+    "Kodak EasyShare V603": { baseRate: 250, longRate: 200, hasLongRate: true },
     "DJI OSMO MOBILE 3 GIMBAL": { baseRate: 300, longRate: 250, hasLongRate: true },
     "Zoom Lens 70-300mm": { baseRate: 300, longRate: 250, hasLongRate: true }
   };
@@ -691,7 +743,10 @@
   var calendarFormUnitToId = {
     "Nikon DSLR Flipscreen w/ kitlens 15-80mm": "nikon-kit",
     "Nikon DSLR Flipscreen w/ Zoom Lens 70-300mm": "nikon-zoom",
+    "Nikon DSLR w/ Zoom Lens + Kitlens + Extra battery": "nikon-zoom-kit-battery",
+    "Canon 1200D DSLR w/ kitlens 18-55mm": "canon-1200d",
     "G6 THUMB CAMERA": "g6-thumb",
+    "Kodak EasyShare V603": "kodak-v603",
     "Zoom Lens 70-300mm": "zoom-lens",
     "DJI OSMO MOBILE 3 GIMBAL": "dji-gimbal"
   };

@@ -11,9 +11,6 @@
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html { -webkit-text-size-adjust: 100%; }
-    @media (prefers-reduced-motion: no-preference) {
-      html { scroll-behavior: smooth; }
-    }
     body { margin: 0; background: #0b0b0b; color: #f5f5f5; padding-bottom: 96px; }
     .skip-link {
       position: absolute; left: 12px; top: 12px; z-index: 2000;
@@ -103,8 +100,9 @@
   </style>
   <link rel="stylesheet" href="site-nav.css">
   <link rel="stylesheet" href="responsive.css">
+  <link rel="stylesheet" href="lenis-motion.css">
   <script src="site-nav.js" defer></script>
-  <script src="scroll-reveal.js" defer></script>
+  <script src="lenis-motion.js" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#payment-main">Skip to content</a>
