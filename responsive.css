@@ -700,12 +700,7 @@ label,
 @media (prefers-reduced-motion: no-preference) and (min-width: 1025px) {
   #units .units-scroll > div,
   .units-scroll > div {
-    transition: box-shadow 0.28s ease, transform 0.28s ease;
-  }
-
-  #units .units-scroll > div:active,
-  .units-scroll > div:active {
-    transform: translateY(1px);
+    transition: box-shadow 0.28s ease;
   }
 }
 
