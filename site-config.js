@@ -40,8 +40,7 @@ window.PRILLAGA_BUSINESS_EMAIL = "hjsescabarte2021@gmail.com";
  * Web3Forms access key — required for reliable automatic agreement emails with PNG attachments.
  * Get a free key at https://web3forms.com (use the same inbox as PRILLAGA_BUSINESS_EMAIL).
  */
-window.PRILLAGA_WEB3FORMS_ACCESS_KEY = "";
-c8ad8552-1857-4f6f-ba5f-3f259a076538
+window.PRILLAGA_WEB3FORMS_ACCESS_KEY = "c8ad8552-1857-4f6f-ba5f-3f259a076538";
 /**
  * Optional Google Apps Script Web App URL (see scripts/agreement-email-relay.gs).
  * If set, agreement emails are sent through your Gmail instead of a third-party relay.

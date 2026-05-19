@@ -106,12 +106,6 @@
     .msg { padding: 14px 16px; border-radius: 10px; font-size: 14px; line-height: 1.5; display: none; margin-top: 14px; }
     .msg.ok { display: block; background: #142018; border: 1px solid #2d5a3a; color: #a8e8c0; }
     .msg.err { display: block; background: #201418; border: 1px solid #5a2d2d; color: #e8a8a8; }
-    .config-note {
-      margin-top: 22px; padding: 14px; border-radius: 10px; border: 1px dashed #444;
-      font-size: 13px; color: #888; line-height: 1.55;
-    }
-    .config-note code { font-size: 12px; background: #1a1a1a; padding: 2px 6px; border-radius: 4px; color: #ccc; }
-    .config-note a { color: #d4af37; }
   </style>
   <link rel="stylesheet" href="site-nav.css">
   <link rel="stylesheet" href="responsive.css">
@@ -301,31 +295,87 @@
       <p id="formMsg" class="msg" role="status"></p>
     </form>
 
-    <div id="agreement-send-config-note" class="config-note">
-      <strong>Owner setup:</strong> Add <code>PRILLAGA_WEB3FORMS_ACCESS_KEY</code> in <code>site-config.js</code> (free at <a href="https://web3forms.com" target="_blank" rel="noopener">web3forms.com</a>) so signed agreements with photos send automatically.
-    </div>
   </main>
 
 <script src="site-config.js"></script>
+<script>
+(function () {
+  if (typeof window.PRILLAGA_BUSINESS_EMAIL !== "string" || !String(window.PRILLAGA_BUSINESS_EMAIL).trim()) {
+    window.PRILLAGA_BUSINESS_EMAIL = "hjsescabarte2021@gmail.com";
+  }
+  if (typeof window.PRILLAGA_WEB3FORMS_ACCESS_KEY !== "string" || !String(window.PRILLAGA_WEB3FORMS_ACCESS_KEY).trim()) {
+    window.PRILLAGA_WEB3FORMS_ACCESS_KEY = "c8ad8552-1857-4f6f-ba5f-3f259a076538";
+  }
+  if (typeof window.prillagaBusinessEmail !== "function") {
+    window.prillagaBusinessEmail = function () {
+      var email = typeof window.PRILLAGA_BUSINESS_EMAIL === "string" ? window.PRILLAGA_BUSINESS_EMAIL.trim() : "";
+      return email || "";
+    };
+  }
+  if (typeof window.prillagaWeb3FormsAccessKey !== "function") {
+    window.prillagaWeb3FormsAccessKey = function () {
+      var key = typeof window.PRILLAGA_WEB3FORMS_ACCESS_KEY === "string" ? window.PRILLAGA_WEB3FORMS_ACCESS_KEY.trim() : "";
+      return key || "";
+    };
+  }
+  if (typeof window.prillagaAgreementSendUrl !== "function") {
+    window.prillagaAgreementSendUrl = function () {
+      var url = typeof window.PRILLAGA_AGREEMENT_SEND_URL === "string" ? window.PRILLAGA_AGREEMENT_SEND_URL.trim() : "";
+      return url || "";
+    };
+  }
+})();
+</script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
 (function () {
-  var businessEmail = window.prillagaBusinessEmail ? window.prillagaBusinessEmail() : "";
-  var web3formsKey = window.prillagaWeb3FormsAccessKey ? window.prillagaWeb3FormsAccessKey() : "";
-  var agreementSendUrl = window.prillagaAgreementSendUrl ? window.prillagaAgreementSendUrl() : "";
-  var emailDisplay = document.getElementById("prillaga-business-email-display");
-  if (emailDisplay) {
-    emailDisplay.textContent = businessEmail || "your-email@example.com";
-  }
-  if (!web3formsKey && !agreementSendUrl) {
-    var configNote = document.getElementById("agreement-send-config-note");
-    if (configNote) configNote.style.display = "block";
-  } else {
-    var configNoteHide = document.getElementById("agreement-send-config-note");
-    if (configNoteHide) configNoteHide.style.display = "none";
+  function getBusinessEmail() {
+    if (window.prillagaBusinessEmail) {
+      try {
+        var fromFn = window.prillagaBusinessEmail();
+        if (fromFn) return fromFn;
+      } catch (err) {}
+    }
+    if (typeof window.PRILLAGA_BUSINESS_EMAIL === "string") {
+      var direct = window.PRILLAGA_BUSINESS_EMAIL.trim();
+      if (direct) return direct;
+    }
+    return "";
   }
 
+  function getWeb3formsKey() {
+    if (window.prillagaWeb3FormsAccessKey) {
+      try {
+        var fromFn = window.prillagaWeb3FormsAccessKey();
+        if (fromFn) return fromFn;
+      } catch (err) {}
+    }
+    if (typeof window.PRILLAGA_WEB3FORMS_ACCESS_KEY === "string") {
+      var direct = window.PRILLAGA_WEB3FORMS_ACCESS_KEY.trim();
+      if (direct) return direct;
+    }
+    return "";
+  }
+
+  function getAgreementSendUrl() {
+    if (window.prillagaAgreementSendUrl) {
+      try {
+        var fromFn = window.prillagaAgreementSendUrl();
+        if (fromFn) return fromFn;
+      } catch (err) {}
+    }
+    if (typeof window.PRILLAGA_AGREEMENT_SEND_URL === "string") {
+      var direct = window.PRILLAGA_AGREEMENT_SEND_URL.trim();
+      if (direct) return direct;
+    }
+    return "";
+  }
+
+  var emailDisplay = document.getElementById("prillaga-business-email-display");
+  if (emailDisplay) {
+    emailDisplay.textContent = getBusinessEmail() || "your-email@example.com";
+  }
   var form = document.getElementById("agreement-form");
   var btn = document.getElementById("btnSubmit");
   var msg = document.getElementById("formMsg");
@@ -540,11 +590,12 @@
   }
 
   function sendAgreementViaWeb3Forms(blob, filename, data, subject, bodyText) {
-    if (!web3formsKey) {
+    var web3Key = getWeb3formsKey();
+    if (!web3Key) {
       return Promise.reject(new Error("Web3Forms is not configured."));
     }
     var fd = new FormData();
-    fd.append("access_key", web3formsKey);
+    fd.append("access_key", web3Key);
     appendAgreementFields(fd, data, subject, bodyText);
     fd.append("attachment", new File([blob], filename, { type: "image/png" }));
     return fetch("https://api.web3forms.com/submit", { method: "POST", body: fd }).then(function (res) {
@@ -556,15 +607,16 @@
   }
 
   function sendAgreementViaAppsScript(blob, filename, data, subject, bodyText) {
-    if (!agreementSendUrl) {
+    var sendUrl = getAgreementSendUrl();
+    if (!sendUrl) {
       return Promise.reject(new Error("Agreement send URL is not configured."));
     }
     return blobToBase64(blob).then(function (fileBase64) {
-      return fetch(agreementSendUrl, {
+      return fetch(sendUrl, {
         method: "POST",
         headers: { "Content-Type": "text/plain;charset=utf-8" },
         body: JSON.stringify({
-          ownerEmail: businessEmail,
+          ownerEmail: getBusinessEmail(),
           customerEmail: data.email || "",
           subject: subject || "Signed rental agreement photo",
           message:
@@ -583,7 +635,8 @@
   }
 
   function postFormSubmitMultipart(blob, filename, data, subject, bodyText) {
-    if (!businessEmail) {
+    var ownerEmail = getBusinessEmail();
+    if (!ownerEmail) {
       return Promise.reject(new Error("Business email is missing."));
     }
     return new Promise(function (resolve, reject) {
@@ -595,7 +648,7 @@
 
       var form = document.createElement("form");
       form.method = "POST";
-      form.action = "https://formsubmit.co/" + businessEmail;
+      form.action = "https://formsubmit.co/" + ownerEmail;
       form.enctype = "multipart/form-data";
       form.target = iframeName;
       form.style.display = "none";
@@ -673,10 +726,10 @@
   }
 
   function sendAgreementEmail(blob, filename, data, subject, bodyText) {
-    if (!businessEmail) {
+    if (!getBusinessEmail()) {
       return Promise.reject(new Error("Business email is missing."));
     }
-    if (!web3formsKey && !agreementSendUrl) {
+    if (!getWeb3formsKey() && !getAgreementSendUrl()) {
       return Promise.reject(
         new Error(
           "Automatic email is not set up. Add PRILLAGA_WEB3FORMS_ACCESS_KEY in site-config.js (free at web3forms.com), then reload."
@@ -685,8 +738,8 @@
     }
 
     var methods = [];
-    if (agreementSendUrl) methods.push(sendAgreementViaAppsScript);
-    if (web3formsKey) methods.push(sendAgreementViaWeb3Forms);
+    if (getAgreementSendUrl()) methods.push(sendAgreementViaAppsScript);
+    if (getWeb3formsKey()) methods.push(sendAgreementViaWeb3Forms);
     methods.push(postFormSubmitMultipart);
 
     return compressAgreementBlob(blob).then(function (smallBlob) {
@@ -866,7 +919,7 @@
     e.preventDefault();
     msg.className = "msg";
 
-    if (!businessEmail) {
+    if (!getBusinessEmail()) {
       showMsg("Business email is missing. Set PRILLAGA_BUSINESS_EMAIL in site-config.js, then reload.", false);
       return;
     }
