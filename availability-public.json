@@ -118,5 +118,21 @@
     "end": "2026-05-28",
     "status": "approved",
     "staffBlock": true
+  },
+  {
+    "id": "b-1779272399498",
+    "unitId": "canon-1200d",
+    "start": "2026-05-30",
+    "end": "2026-05-31",
+    "status": "approved",
+    "staffBlock": true
+  },
+  {
+    "id": "b-1779272470099",
+    "unitId": "canon-1200d",
+    "start": "2026-05-23",
+    "end": "2026-05-25",
+    "status": "approved",
+    "staffBlock": true
   }
 ]
