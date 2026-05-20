@@ -42,6 +42,15 @@ window.PRILLAGA_BUSINESS_EMAIL = "hjsescabarte2021@gmail.com";
  */
 window.PRILLAGA_WEB3FORMS_ACCESS_KEY = "c8ad8552-1857-4f6f-ba5f-3f259a076538";
 
+/**
+ * Google Apps Script web app URL (scripts/agreement-email-relay.gs).
+ * When set with PRILLAGA_DRIVE_FOLDER_ID: Drive PNG + owner details + customer confirmation.
+ */
+window.PRILLAGA_AGREEMENT_SEND_URL = "https://script.google.com/macros/s/AKfycbyzOsnKkoD2xexLJrMdnzQ7imZrmWRIuhkpbJT92DN7l1kaB8S9CAztN2AWRQtiEws0eA/exec";
+
+/** Google Drive folder ID where signed agreement PNGs are stored. */
+window.PRILLAGA_DRIVE_FOLDER_ID = "19FLHDpHtHdmvlKVuo2Q2o6tF820h7kRV";
+
 window.prillagaBusinessEmail = function () {
   var email = typeof window.PRILLAGA_BUSINESS_EMAIL === "string" ? window.PRILLAGA_BUSINESS_EMAIL.trim() : "";
   return email || "";
@@ -50,4 +59,14 @@ window.prillagaBusinessEmail = function () {
 window.prillagaWeb3FormsAccessKey = function () {
   var key = typeof window.PRILLAGA_WEB3FORMS_ACCESS_KEY === "string" ? window.PRILLAGA_WEB3FORMS_ACCESS_KEY.trim() : "";
   return key || "";
+};
+
+window.prillagaAgreementSendUrl = function () {
+  var url = typeof window.PRILLAGA_AGREEMENT_SEND_URL === "string" ? window.PRILLAGA_AGREEMENT_SEND_URL.trim() : "";
+  return url || "";
+};
+
+window.prillagaDriveFolderId = function () {
+  var id = typeof window.PRILLAGA_DRIVE_FOLDER_ID === "string" ? window.PRILLAGA_DRIVE_FOLDER_ID.trim() : "";
+  return id || "";
 };

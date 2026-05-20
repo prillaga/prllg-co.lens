@@ -309,10 +309,25 @@
       return email || "";
     };
   }
+  if (typeof window.PRILLAGA_WEB3FORMS_ACCESS_KEY !== "string" || !String(window.PRILLAGA_WEB3FORMS_ACCESS_KEY).trim()) {
+    window.PRILLAGA_WEB3FORMS_ACCESS_KEY = "c8ad8552-1857-4f6f-ba5f-3f259a076538";
+  }
   if (typeof window.prillagaWeb3FormsAccessKey !== "function") {
     window.prillagaWeb3FormsAccessKey = function () {
       var key = typeof window.PRILLAGA_WEB3FORMS_ACCESS_KEY === "string" ? window.PRILLAGA_WEB3FORMS_ACCESS_KEY.trim() : "";
       return key || "";
+    };
+  }
+  if (typeof window.prillagaAgreementSendUrl !== "function") {
+    window.prillagaAgreementSendUrl = function () {
+      var url = typeof window.PRILLAGA_AGREEMENT_SEND_URL === "string" ? window.PRILLAGA_AGREEMENT_SEND_URL.trim() : "";
+      return url || "";
+    };
+  }
+  if (typeof window.prillagaDriveFolderId !== "function") {
+    window.prillagaDriveFolderId = function () {
+      var id = typeof window.PRILLAGA_DRIVE_FOLDER_ID === "string" ? window.PRILLAGA_DRIVE_FOLDER_ID.trim() : "";
+      return id || "";
     };
   }
 })();
@@ -331,6 +346,34 @@
     if (typeof window.PRILLAGA_BUSINESS_EMAIL === "string") {
       var direct = window.PRILLAGA_BUSINESS_EMAIL.trim();
       if (direct) return direct;
+    }
+    return "";
+  }
+
+  function getAgreementSendUrl() {
+    if (window.prillagaAgreementSendUrl) {
+      try {
+        var u = window.prillagaAgreementSendUrl();
+        if (u) return u;
+      } catch (err) {}
+    }
+    if (typeof window.PRILLAGA_AGREEMENT_SEND_URL === "string") {
+      var directUrl = window.PRILLAGA_AGREEMENT_SEND_URL.trim();
+      if (directUrl) return directUrl;
+    }
+    return "";
+  }
+
+  function getDriveFolderId() {
+    if (window.prillagaDriveFolderId) {
+      try {
+        var fid = window.prillagaDriveFolderId();
+        if (fid) return fid;
+      } catch (err) {}
+    }
+    if (typeof window.PRILLAGA_DRIVE_FOLDER_ID === "string") {
+      var directId = window.PRILLAGA_DRIVE_FOLDER_ID.trim();
+      if (directId) return directId;
     }
     return "";
   }
@@ -570,195 +613,152 @@
     );
   }
 
-  function buildFormSubmitMessage(data, bodyText) {
-    return (
-      (bodyText || "") +
-      "\n\n" +
-      formatAgreementDetails(data) +
-      "\n\nA PNG image of the full signed agreement is attached to this email."
-    );
+  function buildOwnerDetailsMessage(data, bodyText) {
+    return (bodyText || "") + "\n\n" + formatAgreementDetails(data);
   }
 
-  function appendFormSubmitFields(form, data, subject, bodyText) {
-    function addHidden(name, value) {
-      var input = document.createElement("input");
-      input.type = "hidden";
-      input.name = name;
-      input.value = value == null ? "" : String(value);
-      form.appendChild(input);
+  function buildAgreementEmailMessage(data, bodyText, noteAboutAttachment) {
+    var text = buildOwnerDetailsMessage(data, bodyText) + "\n\n";
+    if (noteAboutAttachment) {
+      text += noteAboutAttachment;
+    } else {
+      text += "A PNG image of the full signed agreement is attached to this email.";
     }
-    addHidden("_subject", subject || "Signed rental agreement photo");
-    addHidden("_captcha", "false");
-    addHidden("message", buildFormSubmitMessage(data, bodyText));
-    if (data.email) addHidden("_replyto", data.email);
-    addHidden("customer_name", data.renterName);
-    addHidden("customer_email", data.email);
-    addHidden("cellphone", data.cellphone);
-    addHidden("rented_unit", data.rentedUnit);
-    addHidden("rental_date", data.rentalDate);
-    addHidden("return_date", data.returnDate);
-    addHidden("agreement_signed_at", data.signedAt);
+    return text;
   }
 
-  function buildFormSubmitFormData(data, subject, bodyText, blob, filename) {
+  function blobToBase64(blob) {
+    return new Promise(function (resolve, reject) {
+      var reader = new FileReader();
+      reader.onload = function () {
+        var result = reader.result || "";
+        var comma = String(result).indexOf(",");
+        resolve(comma >= 0 ? String(result).slice(comma + 1) : String(result));
+      };
+      reader.onerror = function () {
+        reject(reader.error || new Error("Could not read agreement image."));
+      };
+      reader.readAsDataURL(blob);
+    });
+  }
+
+  function buildWeb3FormsFormData(data, subject, bodyText, blob, filename, attachPng) {
+    var key = getWeb3formsKey();
+    if (!key) {
+      throw new Error("Web3Forms key missing. Set PRILLAGA_WEB3FORMS_ACCESS_KEY in site-config.js.");
+    }
     var fd = new FormData();
-    fd.append("_subject", subject || "Signed rental agreement photo");
-    fd.append("_captcha", "false");
-    fd.append("message", buildFormSubmitMessage(data, bodyText));
-    if (data.email) fd.append("_replyto", data.email);
-    fd.append("customer_name", data.renterName);
-    fd.append("customer_email", data.email);
+    fd.append("access_key", key);
+    fd.append("name", data.renterName || "Rental customer");
+    fd.append("email", data.email);
+    fd.append(
+      "message",
+      buildAgreementEmailMessage(
+        data,
+        bodyText,
+        attachPng
+          ? null
+          : "Agreement photo could not be attached on this plan — details are below. Customer can send the PNG via Messenger if needed."
+      )
+    );
+    fd.append("subject", subject || "Signed rental agreement photo");
+    fd.append("from_name", "Prillaga & Co. Lens");
+    fd.append("replyto", data.email || "");
+    fd.append("botcheck", "");
     fd.append("cellphone", data.cellphone);
     fd.append("rented_unit", data.rentedUnit);
     fd.append("rental_date", data.rentalDate);
     fd.append("return_date", data.returnDate);
-    fd.append("agreement_signed_at", data.signedAt);
-    fd.append("attachment", new File([blob], filename, { type: "image/png" }));
+    if (attachPng && blob && filename) {
+      fd.append("attachment", new File([blob], filename, { type: "image/png" }));
+    }
     return fd;
   }
 
-  function sendFormSubmitAjax(blob, filename, data, subject, bodyText) {
-    var ownerEmail = getBusinessEmail();
-    if (!ownerEmail) return Promise.reject(new Error("Business email is missing."));
-    return fetch("https://formsubmit.co/ajax/" + ownerEmail, {
-      method: "POST",
-      body: buildFormSubmitFormData(data, subject, bodyText, blob, filename),
-      headers: { Accept: "application/json" }
-    }).then(function (res) {
-      return res.text().then(function (text) {
-        var json = null;
-        try {
-          json = text ? JSON.parse(text) : null;
-        } catch (e) {
-          json = null;
-        }
-        if (res.ok && (!json || json.success !== false)) return { success: true };
-        throw new Error(
-          (json && (json.message || json.error)) ||
-            "FormSubmit could not send (status " + res.status + "). Activate your email at formsubmit.co if this is the first use."
-        );
-      });
-    });
-  }
-
-  function sendFormSubmitMultipart(blob, filename, data, subject, bodyText) {
-    var ownerEmail = getBusinessEmail();
-    if (!ownerEmail) return Promise.reject(new Error("Business email is missing."));
-    return new Promise(function (resolve, reject) {
-      var iframeName = "formsubmit_" + Date.now();
-      var iframe = document.createElement("iframe");
-      iframe.name = iframeName;
-      iframe.setAttribute("title", "formsubmit");
-      iframe.style.cssText = "position:absolute;width:0;height:0;border:0;visibility:hidden;";
-      document.body.appendChild(iframe);
-
-      var form = document.createElement("form");
-      form.method = "POST";
-      form.action = "https://formsubmit.co/" + ownerEmail;
-      form.enctype = "multipart/form-data";
-      form.target = iframeName;
-      form.style.display = "none";
-      appendFormSubmitFields(form, data, subject, bodyText);
-
-      var pngFile = new File([blob], filename, { type: "image/png" });
-      var fileInput = document.createElement("input");
-      fileInput.type = "file";
-      fileInput.name = "attachment";
-      try {
-        var dt = new DataTransfer();
-        dt.items.add(pngFile);
-        fileInput.files = dt.files;
-      } catch (attachErr) {
-        if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
-        reject(new Error("Could not attach agreement image on this device."));
-        return;
-      }
-      form.appendChild(fileInput);
-      document.body.appendChild(form);
-
-      var settled = false;
-      var submitted = false;
-      var submitAt = 0;
-
-      function cleanup() {
-        if (form.parentNode) form.parentNode.removeChild(form);
-        if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
-      }
-
-      var timeoutId = setTimeout(function () {
-        if (settled) return;
-        settled = true;
-        cleanup();
-        reject(new Error("FormSubmit timed out. Check your connection and try again."));
-      }, 55000);
-
-      iframe.addEventListener("load", function () {
-        if (!submitted || settled) return;
-        if (Date.now() - submitAt < 1500) return;
-        settled = true;
-        clearTimeout(timeoutId);
-        cleanup();
-        resolve({ success: true });
-      });
-
-      submitted = true;
-      submitAt = Date.now();
-      form.submit();
-    });
-  }
-
-  /** Used only when FormSubmit is down (522 / timeout). Free text email with full agreement details. */
-  function sendWeb3FormsFallback(data, subject, bodyText) {
-    var key = getWeb3formsKey();
-    if (!key) {
-      return Promise.reject(
-        new Error("FormSubmit is down and no backup key is set. Add PRILLAGA_WEB3FORMS_ACCESS_KEY in site-config.js.")
-      );
-    }
-    var fd = new FormData();
-    fd.append("access_key", key);
-    fd.append("subject", subject || "Signed rental agreement photo");
-    fd.append("from_name", "Prillaga & Co. Lens");
-    fd.append("email", data.email);
-    fd.append("replyto", data.email || "");
-    fd.append("botcheck", "");
-    fd.append(
-      "message",
-      buildFormSubmitMessage(data, bodyText) +
-        "\n\n[FormSubmit was unavailable — PNG not attached. Customer may Share via Messenger or resubmit when formsubmit.co is back.]"
-    );
-    fd.append("customer_name", data.renterName);
-    fd.append("cellphone", data.cellphone);
-    fd.append("rented_unit", data.rentedUnit);
+  function postWeb3Forms(fd) {
     return fetch("https://api.web3forms.com/submit", { method: "POST", body: fd }).then(function (res) {
       return res.json().then(function (json) {
-        if (res.ok && json && json.success) return { success: true, fallback: true };
-        throw new Error((json && json.message) || "Backup email service failed.");
+        if (res.ok && json && json.success) return json;
+        throw new Error((json && json.message) || "Web3Forms could not send (status " + res.status + ").");
       });
     });
   }
 
-  function sendAgreementViaFormSubmit(blob, filename, data, subject, bodyText) {
-    if (!getBusinessEmail()) {
-      return Promise.reject(new Error("Business email is missing. Set PRILLAGA_BUSINESS_EMAIL in site-config.js, then reload."));
+  /** Owner details + Drive PNG + customer confirmation (Google Apps Script). */
+  function sendAgreementViaAppsScript(blob, filename, data, subject, bodyText) {
+    var relayUrl = getAgreementSendUrl();
+    var folderId = getDriveFolderId();
+    if (!relayUrl) {
+      return Promise.reject(
+        new Error("Add PRILLAGA_AGREEMENT_SEND_URL in site-config.js (see scripts/AGREEMENT-EMAIL-SETUP.md).")
+      );
+    }
+    if (!folderId) {
+      return Promise.reject(
+        new Error("Add PRILLAGA_DRIVE_FOLDER_ID in site-config.js (Google Drive folder for agreement PNGs).")
+      );
+    }
+    var ownerEmail = getBusinessEmail();
+    if (!ownerEmail) {
+      return Promise.reject(new Error("Business email is not configured."));
     }
     return compressAgreementBlob(blob).then(function (smallBlob) {
-      return sendFormSubmitAjax(smallBlob, filename, data, subject, bodyText)
-        .then(function (r) {
-          return { success: true, fallback: false };
+      return blobToBase64(smallBlob).then(function (fileBase64) {
+        return fetch(relayUrl, {
+          method: "POST",
+          redirect: "follow",
+          headers: { "Content-Type": "text/plain;charset=utf-8" },
+          body: JSON.stringify({
+            ownerEmail: ownerEmail,
+            customerEmail: data.email || "",
+            customerName: data.renterName || "",
+            subject: subject || "Signed rental agreement",
+            message: buildOwnerDetailsMessage(data, bodyText),
+            fileName: filename,
+            fileBase64: fileBase64,
+            driveFolderId: folderId
+          })
+        }).then(function (res) {
+          return res.json().then(function (json) {
+            if (res.ok && json && json.success) {
+              return { success: true, via: "apps-script", driveUrl: json.driveUrl || "" };
+            }
+            throw new Error((json && json.message) || "Agreement relay could not complete (status " + res.status + ").");
+          });
+        });
+      });
+    });
+  }
+
+  function canUseAgreementRelay() {
+    return !!(getAgreementSendUrl() && getDriveFolderId());
+  }
+
+  /** Primary: Apps Script (Drive + owner + customer). Fallback: Web3Forms owner details only. */
+  function sendAgreementSubmission(blob, filename, data, subject, bodyText) {
+    if (canUseAgreementRelay()) {
+      return sendAgreementViaAppsScript(blob, filename, data, subject, bodyText);
+    }
+    return sendAgreementViaWeb3Forms(blob, filename, data, subject, bodyText).then(function (result) {
+      result.via = "web3forms";
+      result.partial = true;
+      return result;
+    });
+  }
+
+  /** Sends agreement via Web3Forms only (https://api.web3forms.com/submit). */
+  function sendAgreementViaWeb3Forms(blob, filename, data, subject, bodyText) {
+    if (!getWeb3formsKey()) {
+      return Promise.reject(new Error("Add PRILLAGA_WEB3FORMS_ACCESS_KEY in site-config.js (web3forms.com)."));
+    }
+    return compressAgreementBlob(blob).then(function (smallBlob) {
+      return postWeb3Forms(buildWeb3FormsFormData(data, subject, bodyText, smallBlob, filename, true))
+        .then(function () {
+          return { success: true, withPhoto: true };
         })
         .catch(function () {
-          return sendFormSubmitMultipart(smallBlob, filename, data, subject, bodyText).then(function () {
-            return { success: true, fallback: false };
-          });
-        })
-        .catch(function (fsErr) {
-          return sendWeb3FormsFallback(data, subject, bodyText).catch(function () {
-            var hint =
-              fsErr && fsErr.message
-                ? fsErr.message
-                : "FormSubmit is down (formsubmit.co shows error 522). Try again later.";
-            throw new Error(hint);
+          return postWeb3Forms(buildWeb3FormsFormData(data, subject, bodyText, null, null, false)).then(function () {
+            return { success: true, withPhoto: false };
           });
         });
     });
@@ -1084,19 +1084,29 @@
       .then(function (blob) {
         var safe = renterName.replace(/[^\w\-]+/g, "_").replace(/_+/g, "_").slice(0, 48) || "agreement";
         var filename = safe + "-rental-agreement.png";
-        showMsg("Sending agreement email to owner…", true);
-        return sendAgreementViaFormSubmit(blob, filename, data, emailSubject, emailBody)
+        showMsg(
+          canUseAgreementRelay()
+            ? "Saving agreement to Drive and sending emails…"
+            : "Sending agreement details to owner (Web3Forms backup)…",
+          true
+        );
+        return sendAgreementSubmission(blob, filename, data, emailSubject, emailBody)
           .then(function (result) {
-            if (result && result.fallback) {
+            if (result && result.via === "apps-script") {
               showMsg(
-                "FormSubmit is down — agreement details were sent via backup email to " +
-                  getBusinessEmail() +
-                  " (no PNG attachment until FormSubmit works again). Check spam.",
+                "Done. Owner received form details, PNG saved to Google Drive" +
+                  (data.email ? ", and " + data.email + " received a confirmation email." : ".") +
+                  " Check spam if needed.",
+                true
+              );
+            } else if (result && result.withPhoto) {
+              showMsg(
+                "Owner notified via Web3Forms (with photo). Set PRILLAGA_AGREEMENT_SEND_URL and PRILLAGA_DRIVE_FOLDER_ID for Drive storage and customer confirmation.",
                 true
               );
             } else {
               showMsg(
-                "Agreement sent successfully. Check your inbox (and spam) at " + getBusinessEmail() + ".",
+                "Owner notified via Web3Forms (text only). Add Apps Script URL + Drive folder ID in site-config.js for full setup (see scripts/AGREEMENT-EMAIL-SETUP.md).",
                 true
               );
             }
