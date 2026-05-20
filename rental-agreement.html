@@ -309,6 +309,12 @@
       return email || "";
     };
   }
+  if (typeof window.prillagaWeb3FormsAccessKey !== "function") {
+    window.prillagaWeb3FormsAccessKey = function () {
+      var key = typeof window.PRILLAGA_WEB3FORMS_ACCESS_KEY === "string" ? window.PRILLAGA_WEB3FORMS_ACCESS_KEY.trim() : "";
+      return key || "";
+    };
+  }
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
@@ -325,6 +331,20 @@
     if (typeof window.PRILLAGA_BUSINESS_EMAIL === "string") {
       var direct = window.PRILLAGA_BUSINESS_EMAIL.trim();
       if (direct) return direct;
+    }
+    return "";
+  }
+
+  function getWeb3formsKey() {
+    if (window.prillagaWeb3FormsAccessKey) {
+      try {
+        var k = window.prillagaWeb3FormsAccessKey();
+        if (k) return k;
+      } catch (err) {}
+    }
+    if (typeof window.PRILLAGA_WEB3FORMS_ACCESS_KEY === "string") {
+      var d = window.PRILLAGA_WEB3FORMS_ACCESS_KEY.trim();
+      if (d) return d;
     }
     return "";
   }
@@ -513,6 +533,52 @@
     });
   }
 
+  function formatAgreementDetails(data) {
+    return (
+      "Name: " +
+      data.renterName +
+      "\nAddress: " +
+      data.address +
+      "\nCellphone: " +
+      data.cellphone +
+      "\nEmail: " +
+      data.email +
+      "\nAgreement date: " +
+      data.agreementDate +
+      "\nAge / Sex: " +
+      data.age +
+      " / " +
+      data.sex +
+      "\nRental: " +
+      data.rentalDate +
+      " → " +
+      data.returnDate +
+      "\nUnit: " +
+      data.rentedUnit +
+      "\nAdditional rent: " +
+      data.additionalRent1 +
+      ", " +
+      data.additionalRent2 +
+      "\nContacts: " +
+      data.fb1 +
+      "; " +
+      data.fb2 +
+      "; " +
+      data.fb3 +
+      "\nSigned at: " +
+      data.signedAt
+    );
+  }
+
+  function buildFormSubmitMessage(data, bodyText) {
+    return (
+      (bodyText || "") +
+      "\n\n" +
+      formatAgreementDetails(data) +
+      "\n\nA PNG image of the full signed agreement is attached to this email."
+    );
+  }
+
   function appendFormSubmitFields(form, data, subject, bodyText) {
     function addHidden(name, value) {
       var input = document.createElement("input");
@@ -523,20 +589,12 @@
     }
     addHidden("_subject", subject || "Signed rental agreement photo");
     addHidden("_captcha", "false");
-    addHidden(
-      "message",
-      (bodyText || "") +
-        "\n\nCustomer email: " +
-        (data.email || "(not provided)") +
-        "\n\nA PNG image of the full signed agreement is attached to this email."
-    );
+    addHidden("message", buildFormSubmitMessage(data, bodyText));
     if (data.email) addHidden("_replyto", data.email);
     addHidden("customer_name", data.renterName);
     addHidden("customer_email", data.email);
     addHidden("cellphone", data.cellphone);
     addHidden("rented_unit", data.rentedUnit);
-    addHidden("additional_rent_1", data.additionalRent1);
-    addHidden("additional_rent_2", data.additionalRent2);
     addHidden("rental_date", data.rentalDate);
     addHidden("return_date", data.returnDate);
     addHidden("agreement_signed_at", data.signedAt);
@@ -546,20 +604,12 @@
     var fd = new FormData();
     fd.append("_subject", subject || "Signed rental agreement photo");
     fd.append("_captcha", "false");
-    fd.append(
-      "message",
-      (bodyText || "") +
-        "\n\nCustomer email: " +
-        (data.email || "(not provided)") +
-        "\n\nA PNG image of the full signed agreement is attached to this email."
-    );
+    fd.append("message", buildFormSubmitMessage(data, bodyText));
     if (data.email) fd.append("_replyto", data.email);
     fd.append("customer_name", data.renterName);
     fd.append("customer_email", data.email);
     fd.append("cellphone", data.cellphone);
     fd.append("rented_unit", data.rentedUnit);
-    fd.append("additional_rent_1", data.additionalRent1);
-    fd.append("additional_rent_2", data.additionalRent2);
     fd.append("rental_date", data.rentalDate);
     fd.append("return_date", data.returnDate);
     fd.append("agreement_signed_at", data.signedAt);
@@ -567,12 +617,33 @@
     return fd;
   }
 
-  /** Original FormSubmit: multipart POST (works with file attachments). */
+  function sendFormSubmitAjax(blob, filename, data, subject, bodyText) {
+    var ownerEmail = getBusinessEmail();
+    if (!ownerEmail) return Promise.reject(new Error("Business email is missing."));
+    return fetch("https://formsubmit.co/ajax/" + ownerEmail, {
+      method: "POST",
+      body: buildFormSubmitFormData(data, subject, bodyText, blob, filename),
+      headers: { Accept: "application/json" }
+    }).then(function (res) {
+      return res.text().then(function (text) {
+        var json = null;
+        try {
+          json = text ? JSON.parse(text) : null;
+        } catch (e) {
+          json = null;
+        }
+        if (res.ok && (!json || json.success !== false)) return { success: true };
+        throw new Error(
+          (json && (json.message || json.error)) ||
+            "FormSubmit could not send (status " + res.status + "). Activate your email at formsubmit.co if this is the first use."
+        );
+      });
+    });
+  }
+
   function sendFormSubmitMultipart(blob, filename, data, subject, bodyText) {
     var ownerEmail = getBusinessEmail();
-    if (!ownerEmail) {
-      return Promise.reject(new Error("Business email is missing."));
-    }
+    if (!ownerEmail) return Promise.reject(new Error("Business email is missing."));
     return new Promise(function (resolve, reject) {
       var iframeName = "formsubmit_" + Date.now();
       var iframe = document.createElement("iframe");
@@ -614,29 +685,20 @@
         if (iframe.parentNode) iframe.parentNode.removeChild(iframe);
       }
 
-      function finishOk() {
-        if (settled) return;
-        settled = true;
-        cleanup();
-        resolve({ success: true });
-      }
-
-      function finishErr(errMsg) {
-        if (settled) return;
-        settled = true;
-        cleanup();
-        reject(new Error(errMsg));
-      }
-
       var timeoutId = setTimeout(function () {
-        finishErr("Timed out while sending. Check your connection and try again.");
+        if (settled) return;
+        settled = true;
+        cleanup();
+        reject(new Error("FormSubmit timed out. Check your connection and try again."));
       }, 55000);
 
       iframe.addEventListener("load", function () {
-        if (!submitted) return;
+        if (!submitted || settled) return;
         if (Date.now() - submitAt < 1500) return;
+        settled = true;
         clearTimeout(timeoutId);
-        finishOk();
+        cleanup();
+        resolve({ success: true });
       });
 
       submitted = true;
@@ -645,49 +707,71 @@
     });
   }
 
-  /** FormSubmit AJAX — reliable on iPhone Safari (no page redirect). */
-  function sendFormSubmitAjax(blob, filename, data, subject, bodyText) {
-    var ownerEmail = getBusinessEmail();
-    if (!ownerEmail) {
-      return Promise.reject(new Error("Business email is missing."));
+  /** Used only when FormSubmit is down (522 / timeout). Free text email with full agreement details. */
+  function sendWeb3FormsFallback(data, subject, bodyText) {
+    var key = getWeb3formsKey();
+    if (!key) {
+      return Promise.reject(
+        new Error("FormSubmit is down and no backup key is set. Add PRILLAGA_WEB3FORMS_ACCESS_KEY in site-config.js.")
+      );
     }
-    var fd = buildFormSubmitFormData(data, subject, bodyText, blob, filename);
-    return fetch("https://formsubmit.co/ajax/" + ownerEmail, {
-      method: "POST",
-      body: fd,
-      headers: { Accept: "application/json" }
-    }).then(function (res) {
-      return res.text().then(function (text) {
-        var json = null;
-        try {
-          json = text ? JSON.parse(text) : null;
-        } catch (parseErr) {
-          json = null;
-        }
-        if (res.ok && (!json || json.success !== false)) {
-          return { success: true };
-        }
-        var errMsg =
-          (json && (json.message || json.error)) ||
-          "FormSubmit rejected the upload (status " + res.status + ").";
-        throw new Error(errMsg);
+    var fd = new FormData();
+    fd.append("access_key", key);
+    fd.append("subject", subject || "Signed rental agreement photo");
+    fd.append("from_name", "Prillaga & Co. Lens");
+    fd.append("email", data.email);
+    fd.append("replyto", data.email || "");
+    fd.append("botcheck", "");
+    fd.append(
+      "message",
+      buildFormSubmitMessage(data, bodyText) +
+        "\n\n[FormSubmit was unavailable — PNG not attached. Customer may Share via Messenger or resubmit when formsubmit.co is back.]"
+    );
+    fd.append("customer_name", data.renterName);
+    fd.append("cellphone", data.cellphone);
+    fd.append("rented_unit", data.rentedUnit);
+    return fetch("https://api.web3forms.com/submit", { method: "POST", body: fd }).then(function (res) {
+      return res.json().then(function (json) {
+        if (res.ok && json && json.success) return { success: true, fallback: true };
+        throw new Error((json && json.message) || "Backup email service failed.");
       });
     });
   }
 
-  /** iPhone fallback: Share sheet with PNG attached (not mailto). */
+  function sendAgreementViaFormSubmit(blob, filename, data, subject, bodyText) {
+    if (!getBusinessEmail()) {
+      return Promise.reject(new Error("Business email is missing. Set PRILLAGA_BUSINESS_EMAIL in site-config.js, then reload."));
+    }
+    return compressAgreementBlob(blob).then(function (smallBlob) {
+      return sendFormSubmitAjax(smallBlob, filename, data, subject, bodyText)
+        .then(function (r) {
+          return { success: true, fallback: false };
+        })
+        .catch(function () {
+          return sendFormSubmitMultipart(smallBlob, filename, data, subject, bodyText).then(function () {
+            return { success: true, fallback: false };
+          });
+        })
+        .catch(function (fsErr) {
+          return sendWeb3FormsFallback(data, subject, bodyText).catch(function () {
+            var hint =
+              fsErr && fsErr.message
+                ? fsErr.message
+                : "FormSubmit is down (formsubmit.co shows error 522). Try again later.";
+            throw new Error(hint);
+          });
+        });
+    });
+  }
+
   function shareAgreementOnPhone(blob, filename, subject, bodyText) {
     var file = new File([blob], filename, { type: "image/png" });
     if (!navigator.share || !navigator.canShare || !navigator.canShare({ files: [file] })) {
-      return Promise.reject(new Error("Share not available on this device."));
+      return Promise.reject(new Error("Share not available."));
     }
     return navigator.share({
       title: subject,
-      text:
-        (bodyText || "") +
-        "\n\nSend to: " +
-        getBusinessEmail() +
-        "\n(Agreement PNG is attached.)",
+      text: (bodyText || "") + "\n\nSend to: " + getBusinessEmail(),
       files: [file]
     });
   }
@@ -702,17 +786,6 @@
     a.click();
     document.body.removeChild(a);
     URL.revokeObjectURL(url);
-  }
-
-  function sendAgreementViaFormSubmit(blob, filename, data, subject, bodyText) {
-    if (!getBusinessEmail()) {
-      return Promise.reject(new Error("Business email is missing. Set PRILLAGA_BUSINESS_EMAIL in site-config.js, then reload."));
-    }
-    return compressAgreementBlob(blob).then(function (smallBlob) {
-      return sendFormSubmitMultipart(smallBlob, filename, data, subject, bodyText).catch(function () {
-        return sendFormSubmitAjax(smallBlob, filename, data, subject, bodyText);
-      });
-    });
   }
 
   function handleSendFailure(blob, filename, subject, bodyText, err) {
@@ -1013,11 +1086,20 @@
         var filename = safe + "-rental-agreement.png";
         showMsg("Sending agreement email to owner…", true);
         return sendAgreementViaFormSubmit(blob, filename, data, emailSubject, emailBody)
-          .then(function () {
-            showMsg(
-              "Agreement sent successfully. Check your inbox (and spam) at " + getBusinessEmail() + ".",
-              true
-            );
+          .then(function (result) {
+            if (result && result.fallback) {
+              showMsg(
+                "FormSubmit is down — agreement details were sent via backup email to " +
+                  getBusinessEmail() +
+                  " (no PNG attachment until FormSubmit works again). Check spam.",
+                true
+              );
+            } else {
+              showMsg(
+                "Agreement sent successfully. Check your inbox (and spam) at " + getBusinessEmail() + ".",
+                true
+              );
+            }
             resetAfterSend();
             btn.disabled = false;
           })

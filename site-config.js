@@ -33,21 +33,15 @@ window.PRILLAGA_GCASH_NUMBER = "09947552646";
  */
 window.PRILLAGA_GCASH_QR_SRC = "images/gcash-qr.jpg";
 
-/** Business email for booking and agreement submissions. */
+/** Business email for booking and agreement submissions (activate once at https://formsubmit.co). */
 window.PRILLAGA_BUSINESS_EMAIL = "hjsescabarte2021@gmail.com";
 
 /**
- * Web3Forms access key — required for reliable automatic agreement emails with PNG attachments.
- * Get a free key at https://web3forms.com (use the same inbox as PRILLAGA_BUSINESS_EMAIL).
+ * Backup when FormSubmit is down (e.g. error 522). Free at https://web3forms.com — same inbox as above.
+ * Sends agreement details by email (PNG attachment requires FormSubmit when it is online).
  */
 window.PRILLAGA_WEB3FORMS_ACCESS_KEY = "c8ad8552-1857-4f6f-ba5f-3f259a076538";
-/**
- * Gmail relay URL for agreement PNG attachments (recommended).
- * Deploy scripts/agreement-email-relay.gs — see scripts/AGREEMENT-EMAIL-SETUP.md
- */
-window.PRILLAGA_AGREEMENT_SEND_URL = "";
-https://script.google.com/macros/s/AKfycbzGizXEaxfv8VeAFwbbgoTco1zQPolP8890HGKvULC2KfYI7V8WiAk-2Mvb49n2zOSy/exec
-/** Trimmed business email, or "" if unset. */
+
 window.prillagaBusinessEmail = function () {
   var email = typeof window.PRILLAGA_BUSINESS_EMAIL === "string" ? window.PRILLAGA_BUSINESS_EMAIL.trim() : "";
   return email || "";
@@ -56,9 +50,4 @@ window.prillagaBusinessEmail = function () {
 window.prillagaWeb3FormsAccessKey = function () {
   var key = typeof window.PRILLAGA_WEB3FORMS_ACCESS_KEY === "string" ? window.PRILLAGA_WEB3FORMS_ACCESS_KEY.trim() : "";
   return key || "";
-};
-
-window.prillagaAgreementSendUrl = function () {
-  var url = typeof window.PRILLAGA_AGREEMENT_SEND_URL === "string" ? window.PRILLAGA_AGREEMENT_SEND_URL.trim() : "";
-  return url || "";
 };
