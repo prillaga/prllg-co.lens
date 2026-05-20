@@ -33,12 +33,12 @@ window.PRILLAGA_GCASH_NUMBER = "09947552646";
  */
 window.PRILLAGA_GCASH_QR_SRC = "images/gcash-qr.jpg";
 
-/** Business email for booking and agreement submissions (activate once at https://formsubmit.co). */
+/** Business email (display / reply-to). Web3Forms delivers to the inbox tied to your access key. */
 window.PRILLAGA_BUSINESS_EMAIL = "hjsescabarte2021@gmail.com";
 
 /**
- * Backup when FormSubmit is down (e.g. error 522). Free at https://web3forms.com — same inbox as above.
- * Sends agreement details by email (PNG attachment requires FormSubmit when it is online).
+ * Web3Forms access key — register at https://web3forms.com with hjsescabarte2021@gmail.com.
+ * Rental agreement form posts directly to https://api.web3forms.com/submit
  */
 window.PRILLAGA_WEB3FORMS_ACCESS_KEY = "c8ad8552-1857-4f6f-ba5f-3f259a076538";
 
