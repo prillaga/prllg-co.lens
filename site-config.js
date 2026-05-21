@@ -33,40 +33,29 @@ window.PRILLAGA_GCASH_NUMBER = "09947552646";
  */
 window.PRILLAGA_GCASH_QR_SRC = "images/gcash-qr.jpg";
 
-/** Business email (display / reply-to). Web3Forms delivers to the inbox tied to your access key. */
+/** Business email (owner inbox for agreement notifications). */
 window.PRILLAGA_BUSINESS_EMAIL = "hjsescabarte2021@gmail.com";
 
 /**
- * Web3Forms access key — register at https://web3forms.com with hjsescabarte2021@gmail.com.
- * Rental agreement form posts directly to https://api.web3forms.com/submit
+ * Resend.com — rental agreement emails (see scripts/RESEND-SETUP.md).
+ * Create a send-only API key at https://resend.com/api-keys
  */
-window.PRILLAGA_WEB3FORMS_ACCESS_KEY = "c8ad8552-1857-4f6f-ba5f-3f259a076538";
+window.PRILLAGA_RESEND_API_KEY = "re_Nmh1ws34_7JXUvqnPo5UQTvFRPuyZJMHH";
 
-/**
- * Google Apps Script web app URL (scripts/agreement-email-relay.gs).
- * When set with PRILLAGA_DRIVE_FOLDER_ID: Drive PNG + owner details + customer confirmation.
- */
-window.PRILLAGA_AGREEMENT_SEND_URL = "https://script.google.com/macros/s/AKfycbyzOsnKkoD2xexLJrMdnzQ7imZrmWRIuhkpbJT92DN7l1kaB8S9CAztN2AWRQtiEws0eA/exec";
-
-/** Google Drive folder ID where signed agreement PNGs are stored. */
-window.PRILLAGA_DRIVE_FOLDER_ID = "19FLHDpHtHdmvlKVuo2Q2o6tF820h7kRV";
+/** From address verified in Resend, e.g. "Prillaga & Co. Lens <onboarding@resend.dev>" */
+window.PRILLAGA_RESEND_FROM = "Prillaga & Co. Lens <onboarding@resend.dev>";
 
 window.prillagaBusinessEmail = function () {
   var email = typeof window.PRILLAGA_BUSINESS_EMAIL === "string" ? window.PRILLAGA_BUSINESS_EMAIL.trim() : "";
   return email || "";
 };
 
-window.prillagaWeb3FormsAccessKey = function () {
-  var key = typeof window.PRILLAGA_WEB3FORMS_ACCESS_KEY === "string" ? window.PRILLAGA_WEB3FORMS_ACCESS_KEY.trim() : "";
+window.prillagaResendApiKey = function () {
+  var key = typeof window.PRILLAGA_RESEND_API_KEY === "string" ? window.PRILLAGA_RESEND_API_KEY.trim() : "";
   return key || "";
 };
 
-window.prillagaAgreementSendUrl = function () {
-  var url = typeof window.PRILLAGA_AGREEMENT_SEND_URL === "string" ? window.PRILLAGA_AGREEMENT_SEND_URL.trim() : "";
-  return url || "";
-};
-
-window.prillagaDriveFolderId = function () {
-  var id = typeof window.PRILLAGA_DRIVE_FOLDER_ID === "string" ? window.PRILLAGA_DRIVE_FOLDER_ID.trim() : "";
-  return id || "";
+window.prillagaResendFrom = function () {
+  var from = typeof window.PRILLAGA_RESEND_FROM === "string" ? window.PRILLAGA_RESEND_FROM.trim() : "";
+  return from || "";
 };
