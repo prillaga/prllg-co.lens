@@ -309,6 +309,14 @@
       return email || "";
     };
   }
+  if (typeof window.prillagaFormSubmitEndpoint !== "function") {
+    window.prillagaFormSubmitEndpoint = function () {
+      var endpoint =
+        typeof window.PRILLAGA_FORMSUBMIT_ENDPOINT === "string" ? window.PRILLAGA_FORMSUBMIT_ENDPOINT.trim() : "";
+      if (endpoint) return endpoint;
+      return window.prillagaBusinessEmail();
+    };
+  }
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
@@ -330,8 +338,22 @@
     return "";
   }
 
+  function getFormSubmitEndpoint() {
+    if (window.prillagaFormSubmitEndpoint) {
+      try {
+        var ep = window.prillagaFormSubmitEndpoint();
+        if (ep) return ep;
+      } catch (err) {}
+    }
+    if (typeof window.PRILLAGA_FORMSUBMIT_ENDPOINT === "string") {
+      var directEp = window.PRILLAGA_FORMSUBMIT_ENDPOINT.trim();
+      if (directEp) return directEp;
+    }
+    return getBusinessEmail();
+  }
+
   function canUseFormSubmit() {
-    return !!getBusinessEmail();
+    return !!getFormSubmitEndpoint();
   }
 
   var emailDisplay = document.getElementById("prillaga-business-email-display");
@@ -668,16 +690,29 @@
     return json && (json.success === true || json.success === "true");
   }
 
-  function postFormSubmit(inbox, formData) {
-    return fetch("https://formsubmit.co/ajax/" + encodeURIComponent(inbox), {
+  function formSubmitNeedsActivation(json) {
+    var msg = json && json.message ? String(json.message) : "";
+    return /activation/i.test(msg);
+  }
+
+  function postFormSubmit(formData) {
+    var endpoint = getFormSubmitEndpoint();
+    return fetch("https://formsubmit.co/ajax/" + encodeURIComponent(endpoint), {
       method: "POST",
       headers: { Accept: "application/json" },
       body: formData
     }).then(function (res) {
       return res.json().then(function (json) {
+        if (formSubmitNeedsActivation(json)) {
+          throw new Error(
+            "FormSubmit needs activation. Open Gmail for " +
+              getBusinessEmail() +
+              ", find the email titled “Activate Form” from FormSubmit, and click the link. After that, copy the long ID from that email into PRILLAGA_FORMSUBMIT_ENDPOINT in site-config.js (see scripts/FORMSUBMIT-SETUP.md)."
+          );
+        }
         if (res.ok && formSubmitSucceeded(json)) return json;
         throw new Error(
-          (json && json.message) || "FormSubmit could not send (status " + res.status + "). Try again or check formsubmit.co status."
+          (json && json.message) || "FormSubmit could not send (status " + res.status + ")."
         );
       });
     });
@@ -690,6 +725,12 @@
     fd.append("message", buildOwnerDetailsMessage(data, bodyText));
     fd.append("_subject", subject || "Signed rental agreement");
     fd.append("_captcha", "false");
+    if (typeof window.location !== "undefined" && window.location.href) {
+      fd.append("_url", window.location.href.split("#")[0]);
+    }
+    if (data.email) {
+      fd.append("_cc", data.email);
+    }
     if (fileObj) {
       fd.append("file", fileObj, fileObj.name);
       fd.append("attachment", fileObj, fileObj.name);
@@ -699,50 +740,27 @@
     return fd;
   }
 
-  function buildCustomerConfirmationFormData(data) {
-    var greeting = data.renterName ? "Hi " + data.renterName + ",\n\n" : "Hi,\n\n";
-    var fd = new FormData();
-    fd.append("name", "Prillaga & Co. Lens");
-    fd.append("email", getBusinessEmail());
-    fd.append(
-      "message",
-      greeting +
-        "Thank you for submitting your signed rental agreement with Prillaga & Co. Lens. We have received it successfully.\n\n" +
-        "If you have questions, reply to this email or message us on Facebook.\n\n" +
-        "— Prillaga & Co. Lens"
-    );
-    fd.append("_subject", "Rental agreement received — Prillaga & Co. Lens");
-    fd.append("_captcha", "false");
-    return fd;
-  }
-
-  /** Owner (details + PNG/JPEG file) and customer (confirmation) via FormSubmit. */
+  /** One FormSubmit to owner inbox (PNG/JPEG + details). Customer CC'd if email provided. */
   function sendAgreementViaFormSubmit(blob, filename, data, subject, bodyText) {
-    var ownerEmail = getBusinessEmail();
-    if (!ownerEmail) {
+    if (!getFormSubmitEndpoint()) {
       return Promise.reject(new Error("Set PRILLAGA_BUSINESS_EMAIL in site-config.js."));
     }
     var baseName = (filename || "agreement").replace(/\.(png|jpe?g)$/i, "");
     return prepareFormSubmitAttachment(blob, baseName).then(function (att) {
       var withPhoto = false;
       var photoFormat = "";
-      function sendCustomer() {
-        if (!data.email) {
-          return Promise.resolve({ success: true, via: "formsubmit", withPhoto: withPhoto, photoFormat: photoFormat });
-        }
-        return postFormSubmit(data.email, buildCustomerConfirmationFormData(data)).then(function () {
-          return { success: true, via: "formsubmit", withPhoto: withPhoto, photoFormat: photoFormat };
-        });
-      }
-      return postFormSubmit(ownerEmail, buildOwnerFormData(data, subject, bodyText, att.file))
+      return postFormSubmit(buildOwnerFormData(data, subject, bodyText, att.file))
         .then(function () {
           withPhoto = true;
           photoFormat = att.format;
-          return sendCustomer();
+          return { success: true, via: "formsubmit", withPhoto: withPhoto, photoFormat: photoFormat };
         })
-        .catch(function () {
-          return postFormSubmit(ownerEmail, buildOwnerFormData(data, subject, bodyText, null)).then(function () {
-            return sendCustomer();
+        .catch(function (firstErr) {
+          if (firstErr && firstErr.message && /activation/i.test(firstErr.message)) {
+            throw firstErr;
+          }
+          return postFormSubmit(buildOwnerFormData(data, subject, bodyText, null)).then(function () {
+            return { success: true, via: "formsubmit", withPhoto: false, photoFormat: "" };
           });
         });
     });
@@ -778,7 +796,15 @@
 
   function handleSendFailure(blob, filename, subject, bodyText, err) {
     var reason = err && err.message ? err.message : "Email could not be sent.";
+    var isActivation = /activation/i.test(reason);
     downloadPngBlob(blob, filename);
+    if (isActivation) {
+      showMsg(
+        reason + " Your agreement PNG was downloaded as a backup. After you activate, submit again from the website.",
+        false
+      );
+      return Promise.resolve();
+    }
     return shareAgreementOnPhone(blob, filename, subject, bodyText)
       .then(function () {
         showMsg(
@@ -1089,7 +1115,7 @@
                   " received details with " +
                   (result.photoFormat === "jpeg" ? "JPEG" : "PNG") +
                   " agreement attached" +
-                  (data.email ? "; " + data.email + " received a confirmation email." : ".") +
+                  (data.email ? "; " + data.email + " was CC'd on the email." : ".") +
                   " Check spam — open the attachment at the bottom of the FormSubmit email.",
                 true
               );

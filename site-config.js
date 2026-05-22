@@ -33,13 +33,24 @@ window.PRILLAGA_GCASH_NUMBER = "09947552646";
  */
 window.PRILLAGA_GCASH_QR_SRC = "images/gcash-qr.jpg";
 
-/**
- * FormSubmit inbox — rental agreement emails (activate once at https://formsubmit.co).
- * Owner receives form details + PNG; customer receives confirmation if email is on the form.
- */
+/** Owner inbox (display + reply-to). */
 window.PRILLAGA_BUSINESS_EMAIL = "hjsescabarte2021@gmail.com";
+
+/**
+ * FormSubmit endpoint: your Gmail OR the hash from the "Activate Form" email.
+ * After activation, replace with the hash string (not @gmail.com) so AJAX + attachments work.
+ * Example: "c8ad8552-1857-4f6f-ba5f-3f259a076538"
+ */
+window.PRILLAGA_FORMSUBMIT_ENDPOINT = "243e4ab576936c3f12f624ccd78c3dee";
 
 window.prillagaBusinessEmail = function () {
   var email = typeof window.PRILLAGA_BUSINESS_EMAIL === "string" ? window.PRILLAGA_BUSINESS_EMAIL.trim() : "";
   return email || "";
+};
+
+window.prillagaFormSubmitEndpoint = function () {
+  var endpoint =
+    typeof window.PRILLAGA_FORMSUBMIT_ENDPOINT === "string" ? window.PRILLAGA_FORMSUBMIT_ENDPOINT.trim() : "";
+  if (endpoint) return endpoint;
+  return window.prillagaBusinessEmail();
 };
