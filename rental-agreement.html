@@ -261,7 +261,7 @@
       <div class="id-upload-wrap doc-field">
         <label for="idPhoto">Upload a photo of your valid ID</label>
         <input id="idPhoto" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif" capture="environment" required>
-        <p class="hint">Use a clear photo of your ID (camera or gallery). iPhone photos (HEIC) are converted automatically when possible.</p>
+        <p class="hint">Use a clear photo of your ID (PNG, JPG, or iPhone HEIC). HEIC is converted to high-quality PNG for your agreement.</p>
       </div>
 
       <div class="sig-block">
@@ -312,6 +312,7 @@
 })();
 </script>
 <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
 (function () {
@@ -458,23 +459,67 @@
     });
   }
 
-  /** Decode any browser-supported image data URL and re-encode as PNG for embedding in the agreement export. */
+  function readBlobAsDataURL(blob) {
+    return new Promise(function (resolve, reject) {
+      var fr = new FileReader();
+      fr.onload = function () {
+        resolve(fr.result);
+      };
+      fr.onerror = reject;
+      fr.readAsDataURL(blob);
+    });
+  }
+
+  function isHeicFile(file) {
+    if (!file) return false;
+    if (/heic|heif/i.test(file.type || "")) return true;
+    return /\.heic$/i.test(file.name || "") || /\.heif$/i.test(file.name || "");
+  }
+
+  /** iPhone HEIC → PNG; other images read as-is. */
+  function fileToDisplayableDataUrl(file) {
+    if (isHeicFile(file) && window.heic2any) {
+      return heic2any({ blob: file, toType: "image/png", quality: 0.92 })
+        .then(function (result) {
+          var out = Array.isArray(result) ? result[0] : result;
+          return readBlobAsDataURL(out);
+        })
+        .catch(function () {
+          return readFileAsDataURL(file);
+        });
+    }
+    return readFileAsDataURL(file);
+  }
+
+  /** Decode image and re-encode as high-quality PNG for the agreement export. */
   function imageDataUrlToPng(dataUrl) {
     return new Promise(function (resolve, reject) {
       var img = new Image();
       img.onload = function () {
         try {
+          var w = img.naturalWidth;
+          var h = img.naturalHeight;
+          var maxSide = 3200;
+          if (w > maxSide || h > maxSide) {
+            var ratio = Math.min(maxSide / w, maxSide / h);
+            w = Math.max(1, Math.round(w * ratio));
+            h = Math.max(1, Math.round(h * ratio));
+          }
           var c = document.createElement("canvas");
-          c.width = img.naturalWidth;
-          c.height = img.naturalHeight;
-          c.getContext("2d").drawImage(img, 0, 0);
+          c.width = w;
+          c.height = h;
+          c.getContext("2d").drawImage(img, 0, 0, w, h);
           resolve(c.toDataURL("image/png"));
         } catch (e) {
           reject(e);
         }
       };
       img.onerror = function () {
-        reject(new Error("Could not read ID image. Try JPG, PNG, or take a new photo on your phone."));
+        reject(
+          new Error(
+            "Could not read ID image. Use PNG or JPG, or re-save iPhone HEIC as Most Compatible (JPG) in Photos."
+          )
+        );
       };
       img.src = dataUrl;
     });
@@ -486,8 +531,50 @@
     return /\.(jpe?g|png|webp|heic|heif)$/i.test(file.name || "");
   }
 
-  function compressAgreementBlob(blob, maxBytes) {
-    maxBytes = maxBytes || 950000;
+  function blobToFile(blob, filename, mime) {
+    return new File([blob], filename, { type: mime || blob.type || "image/png" });
+  }
+
+  function blobToJpeg(blob, quality, maxBytes) {
+    quality = quality == null ? 0.92 : quality;
+    return new Promise(function (resolve, reject) {
+      var url = URL.createObjectURL(blob);
+      var img = new Image();
+      img.onload = function () {
+        URL.revokeObjectURL(url);
+        var w = img.naturalWidth;
+        var h = img.naturalHeight;
+        if (maxBytes && blob.size > maxBytes) {
+          var scale = Math.sqrt(maxBytes / blob.size);
+          scale = Math.min(1, Math.max(0.65, scale));
+          w = Math.max(1, Math.round(w * scale));
+          h = Math.max(1, Math.round(h * scale));
+        }
+        var canvas = document.createElement("canvas");
+        canvas.width = w;
+        canvas.height = h;
+        canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+        canvas.toBlob(
+          function (jpeg) {
+            if (!jpeg) reject(new Error("Could not prepare JPEG attachment."));
+            else resolve(jpeg);
+          },
+          "image/jpeg",
+          quality
+        );
+      };
+      img.onerror = function () {
+        URL.revokeObjectURL(url);
+        reject(new Error("Could not prepare JPEG attachment."));
+      };
+      img.src = url;
+    });
+  }
+
+  function compressAgreementBlob(blob, maxBytes, mime, quality) {
+    maxBytes = maxBytes || 4000000;
+    mime = mime || "image/png";
+    quality = quality == null ? 0.95 : quality;
     if (!blob || blob.size <= maxBytes) return Promise.resolve(blob);
     return new Promise(function (resolve, reject) {
       var url = URL.createObjectURL(blob);
@@ -495,7 +582,7 @@
       img.onload = function () {
         URL.revokeObjectURL(url);
         var scale = Math.sqrt(maxBytes / blob.size);
-        scale = Math.min(1, Math.max(0.5, scale));
+        scale = Math.min(1, Math.max(0.65, scale));
         var canvas = document.createElement("canvas");
         canvas.width = Math.max(1, Math.round(img.naturalWidth * scale));
         canvas.height = Math.max(1, Math.round(img.naturalHeight * scale));
@@ -505,8 +592,8 @@
             if (!smaller) reject(new Error("Could not compress agreement image."));
             else resolve(smaller.size <= blob.size ? smaller : blob);
           },
-          "image/png",
-          0.85
+          mime,
+          quality
         );
       };
       img.onerror = function () {
@@ -514,6 +601,25 @@
         reject(new Error("Could not compress agreement image."));
       };
       img.src = url;
+    });
+  }
+
+  /** PNG first (quality); JPEG if still over FormSubmit-friendly size (~4 MB). */
+  function prepareFormSubmitAttachment(blob, baseName) {
+    var maxBytes = 4000000;
+    return compressAgreementBlob(blob, maxBytes, "image/png", 0.95).then(function (pngBlob) {
+      if (pngBlob.size <= maxBytes) {
+        return {
+          file: blobToFile(pngBlob, baseName + ".png", "image/png"),
+          format: "png"
+        };
+      }
+      return blobToJpeg(pngBlob, 0.92, maxBytes).then(function (jpegBlob) {
+        return {
+          file: blobToFile(jpegBlob, baseName + ".jpg", "image/jpeg"),
+          format: "jpeg"
+        };
+      });
     });
   }
 
@@ -571,22 +677,24 @@
       return res.json().then(function (json) {
         if (res.ok && formSubmitSucceeded(json)) return json;
         throw new Error(
-          (json && json.message) || "FormSubmit could not send (status " + res.status + "). Activate at formsubmit.co if this is the first send."
+          (json && json.message) || "FormSubmit could not send (status " + res.status + "). Try again or check formsubmit.co status."
         );
       });
     });
   }
 
-  function buildOwnerFormData(data, subject, bodyText, blob, filename) {
+  function buildOwnerFormData(data, subject, bodyText, fileObj) {
     var fd = new FormData();
     fd.append("name", data.renterName || "Rental customer");
     fd.append("email", data.email || "guest@formsubmit.co");
     fd.append("message", buildOwnerDetailsMessage(data, bodyText));
     fd.append("_subject", subject || "Signed rental agreement");
-    fd.append("_template", "table");
     fd.append("_captcha", "false");
-    if (blob && filename) {
-      fd.append("attachment", blob, filename);
+    if (fileObj) {
+      fd.append("file", fileObj, fileObj.name);
+      fd.append("attachment", fileObj, fileObj.name);
+    } else {
+      fd.append("_template", "table");
     }
     return fd;
   }
@@ -608,27 +716,33 @@
     return fd;
   }
 
-  /** Owner (details + PNG) and customer (confirmation) via FormSubmit. */
+  /** Owner (details + PNG/JPEG file) and customer (confirmation) via FormSubmit. */
   function sendAgreementViaFormSubmit(blob, filename, data, subject, bodyText) {
     var ownerEmail = getBusinessEmail();
     if (!ownerEmail) {
       return Promise.reject(new Error("Set PRILLAGA_BUSINESS_EMAIL in site-config.js."));
     }
-    return compressAgreementBlob(blob).then(function (smallBlob) {
+    var baseName = (filename || "agreement").replace(/\.(png|jpe?g)$/i, "");
+    return prepareFormSubmitAttachment(blob, baseName).then(function (att) {
       var withPhoto = false;
-      return postFormSubmit(ownerEmail, buildOwnerFormData(data, subject, bodyText, smallBlob, filename))
+      var photoFormat = "";
+      function sendCustomer() {
+        if (!data.email) {
+          return Promise.resolve({ success: true, via: "formsubmit", withPhoto: withPhoto, photoFormat: photoFormat });
+        }
+        return postFormSubmit(data.email, buildCustomerConfirmationFormData(data)).then(function () {
+          return { success: true, via: "formsubmit", withPhoto: withPhoto, photoFormat: photoFormat };
+        });
+      }
+      return postFormSubmit(ownerEmail, buildOwnerFormData(data, subject, bodyText, att.file))
         .then(function () {
           withPhoto = true;
+          photoFormat = att.format;
+          return sendCustomer();
         })
         .catch(function () {
-          return postFormSubmit(ownerEmail, buildOwnerFormData(data, subject, bodyText, null, null));
-        })
-        .then(function () {
-          if (!data.email) {
-            return { success: true, via: "formsubmit", withPhoto: withPhoto };
-          }
-          return postFormSubmit(data.email, buildCustomerConfirmationFormData(data)).then(function () {
-            return { success: true, via: "formsubmit", withPhoto: withPhoto };
+          return postFormSubmit(ownerEmail, buildOwnerFormData(data, subject, bodyText, null)).then(function () {
+            return sendCustomer();
           });
         });
     });
@@ -812,7 +926,7 @@
     return waitForImages(root)
       .then(function () {
         return html2canvas(root, {
-          scale: 1.5,
+          scale: 2,
           useCORS: true,
           allowTaint: true,
           backgroundColor: "#ffffff",
@@ -829,7 +943,7 @@
               else resolve(blob);
             },
             "image/png",
-            0.92
+            1
           );
         });
       });
@@ -937,7 +1051,7 @@
     btn.disabled = true;
     showMsg("Building agreement photo…", true);
 
-    Promise.all([readFileAsDataURL(idFile).then(imageDataUrlToPng), Promise.resolve(canvas.toDataURL("image/png"))])
+    Promise.all([fileToDisplayableDataUrl(idFile).then(imageDataUrlToPng), Promise.resolve(canvas.toDataURL("image/png"))])
       .then(function (results) {
         var idPngDataUrl = results[0];
         var sigDataUrl = results[1];
@@ -972,16 +1086,18 @@
               showMsg(
                 "Done. " +
                   getBusinessEmail() +
-                  " received details with PNG attached" +
+                  " received details with " +
+                  (result.photoFormat === "jpeg" ? "JPEG" : "PNG") +
+                  " agreement attached" +
                   (data.email ? "; " + data.email + " received a confirmation email." : ".") +
-                  " Check spam. First time? Activate FormSubmit from the link in your inbox.",
+                  " Check spam — open the attachment at the bottom of the FormSubmit email.",
                 true
               );
             } else {
               showMsg(
                 "Done. " +
                   getBusinessEmail() +
-                  " received agreement details (text only — PNG may not have attached)." +
+                  " received agreement details (text only — file may not have attached)." +
                   (data.email ? " " + data.email + " received a confirmation." : "") +
                   " Check spam.",
                 true
