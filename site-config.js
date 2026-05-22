@@ -33,29 +33,13 @@ window.PRILLAGA_GCASH_NUMBER = "09947552646";
  */
 window.PRILLAGA_GCASH_QR_SRC = "images/gcash-qr.jpg";
 
-/** Business email (owner inbox for agreement notifications). */
-window.PRILLAGA_BUSINESS_EMAIL = "hjsescabarte2021@gmail.com";
-
 /**
- * Resend.com — rental agreement emails (see scripts/RESEND-SETUP.md).
- * Create a send-only API key at https://resend.com/api-keys
+ * FormSubmit inbox — rental agreement emails (activate once at https://formsubmit.co).
+ * Owner receives form details + PNG; customer receives confirmation if email is on the form.
  */
-window.PRILLAGA_RESEND_API_KEY = "re_Nmh1ws34_7JXUvqnPo5UQTvFRPuyZJMHH";
-
-/** From address verified in Resend, e.g. "Prillaga & Co. Lens <onboarding@resend.dev>" */
-window.PRILLAGA_RESEND_FROM = "Prillaga & Co. Lens <onboarding@resend.dev>";
+window.PRILLAGA_BUSINESS_EMAIL = "hjsescabarte2021@gmail.com";
 
 window.prillagaBusinessEmail = function () {
   var email = typeof window.PRILLAGA_BUSINESS_EMAIL === "string" ? window.PRILLAGA_BUSINESS_EMAIL.trim() : "";
   return email || "";
-};
-
-window.prillagaResendApiKey = function () {
-  var key = typeof window.PRILLAGA_RESEND_API_KEY === "string" ? window.PRILLAGA_RESEND_API_KEY.trim() : "";
-  return key || "";
-};
-
-window.prillagaResendFrom = function () {
-  var from = typeof window.PRILLAGA_RESEND_FROM === "string" ? window.PRILLAGA_RESEND_FROM.trim() : "";
-  return from || "";
 };
