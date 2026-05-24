@@ -626,6 +626,21 @@
     });
   }
 
+  function dataUrlToBlob(dataUrl) {
+    return fetch(dataUrl).then(function (res) {
+      return res.blob();
+    });
+  }
+
+  function prepareImageAttachmentFromDataUrl(dataUrl, baseName, maxBytes) {
+    maxBytes = maxBytes || 2500000;
+    return dataUrlToBlob(dataUrl).then(function (blob) {
+      return compressAgreementBlob(blob, maxBytes, "image/png", 0.95).then(function (pngBlob) {
+        return blobToFile(pngBlob, baseName + ".png", "image/png");
+      });
+    });
+  }
+
   /** PNG first (quality); JPEG if still over FormSubmit-friendly size (~4 MB). */
   function prepareFormSubmitAttachment(blob, baseName) {
     var maxBytes = 4000000;
@@ -718,11 +733,18 @@
     });
   }
 
-  function buildOwnerFormData(data, subject, bodyText, fileObj) {
+  function buildOwnerFormData(data, subject, bodyText, attachments) {
     var fd = new FormData();
     fd.append("name", data.renterName || "Rental customer");
     fd.append("email", data.email || "guest@formsubmit.co");
-    fd.append("message", buildOwnerDetailsMessage(data, bodyText));
+    fd.append(
+      "message",
+      buildOwnerDetailsMessage(data, bodyText) +
+        "\n\nEmail attachments:\n" +
+        "1) Full signed agreement (all details)\n" +
+        "2) id_photo — valid ID image only\n" +
+        "3) signature — drawn signature only"
+    );
     fd.append("_subject", subject || "Signed rental agreement");
     fd.append("_captcha", "false");
     if (typeof window.location !== "undefined" && window.location.href) {
@@ -731,43 +753,55 @@
     if (data.email) {
       fd.append("_cc", data.email);
     }
-    if (fileObj) {
-      fd.append("file", fileObj, fileObj.name);
-      fd.append("attachment", fileObj, fileObj.name);
-    } else {
+    attachments = attachments || {};
+    if (attachments.agreement) {
+      fd.append("file", attachments.agreement, attachments.agreement.name);
+      fd.append("agreement", attachments.agreement, attachments.agreement.name);
+    }
+    if (attachments.idPhoto) {
+      fd.append("id_photo", attachments.idPhoto, attachments.idPhoto.name);
+    }
+    if (attachments.signature) {
+      fd.append("signature", attachments.signature, attachments.signature.name);
+    }
+    if (!attachments.agreement && !attachments.idPhoto && !attachments.signature) {
       fd.append("_template", "table");
     }
     return fd;
   }
 
-  /** One FormSubmit to owner inbox (PNG/JPEG + details). Customer CC'd if email provided. */
-  function sendAgreementViaFormSubmit(blob, filename, data, subject, bodyText) {
+  /** FormSubmit: full agreement + separate ID photo + separate signature PNG. */
+  function sendAgreementViaFormSubmit(blob, filename, data, subject, bodyText, idDataUrl, sigDataUrl) {
     if (!getFormSubmitEndpoint()) {
       return Promise.reject(new Error("Set PRILLAGA_BUSINESS_EMAIL in site-config.js."));
     }
     var baseName = (filename || "agreement").replace(/\.(png|jpe?g)$/i, "");
-    return prepareFormSubmitAttachment(blob, baseName).then(function (att) {
-      var withPhoto = false;
-      var photoFormat = "";
-      return postFormSubmit(buildOwnerFormData(data, subject, bodyText, att.file))
-        .then(function () {
-          withPhoto = true;
-          photoFormat = att.format;
-          return { success: true, via: "formsubmit", withPhoto: withPhoto, photoFormat: photoFormat };
-        })
-        .catch(function (firstErr) {
-          if (firstErr && firstErr.message && /activation/i.test(firstErr.message)) {
-            throw firstErr;
-          }
-          return postFormSubmit(buildOwnerFormData(data, subject, bodyText, null)).then(function () {
-            return { success: true, via: "formsubmit", withPhoto: false, photoFormat: "" };
-          });
-        });
+    return Promise.all([
+      prepareFormSubmitAttachment(blob, baseName),
+      prepareImageAttachmentFromDataUrl(idDataUrl, baseName + "-id"),
+      prepareImageAttachmentFromDataUrl(sigDataUrl, baseName + "-signature")
+    ]).then(function (parts) {
+      var att = parts[0];
+      var attachments = {
+        agreement: att.file,
+        idPhoto: parts[1],
+        signature: parts[2]
+      };
+      return postFormSubmit(buildOwnerFormData(data, subject, bodyText, attachments)).then(function () {
+        return { success: true, via: "formsubmit", withPhoto: true, photoFormat: att.format };
+      });
+    }).catch(function (firstErr) {
+      if (firstErr && firstErr.message && /activation/i.test(firstErr.message)) {
+        throw firstErr;
+      }
+      return postFormSubmit(buildOwnerFormData(data, subject, bodyText, null)).then(function () {
+        return { success: true, via: "formsubmit", withPhoto: false, photoFormat: "" };
+      });
     });
   }
 
-  function sendAgreementSubmission(blob, filename, data, subject, bodyText) {
-    return sendAgreementViaFormSubmit(blob, filename, data, subject, bodyText);
+  function sendAgreementSubmission(blob, filename, data, subject, bodyText, idDataUrl, sigDataUrl) {
+    return sendAgreementViaFormSubmit(blob, filename, data, subject, bodyText, idDataUrl, sigDataUrl);
   }
 
   function shareAgreementOnPhone(blob, filename, subject, bodyText) {
@@ -1088,7 +1122,7 @@
             if (exportRoot.parentNode) {
               document.body.removeChild(exportRoot);
             }
-            return blob;
+            return { blob: blob, idPngDataUrl: idPngDataUrl, sigDataUrl: sigDataUrl };
           })
           .catch(function (err) {
             if (exportRoot.parentNode) {
@@ -1097,7 +1131,10 @@
             throw err;
           });
       })
-      .then(function (blob) {
+      .then(function (pack) {
+        var blob = pack.blob;
+        var idPngDataUrl = pack.idPngDataUrl;
+        var sigDataUrl = pack.sigDataUrl;
         var safe = renterName.replace(/[^\w\-]+/g, "_").replace(/_+/g, "_").slice(0, 48) || "agreement";
         var filename = safe + "-rental-agreement.png";
         if (!canUseFormSubmit()) {
@@ -1106,17 +1143,17 @@
           return;
         }
         showMsg("Sending agreement via FormSubmit…", true);
-        return sendAgreementSubmission(blob, filename, data, emailSubject, emailBody)
+        return sendAgreementSubmission(blob, filename, data, emailSubject, emailBody, idPngDataUrl, sigDataUrl)
           .then(function (result) {
             if (result && result.withPhoto) {
               showMsg(
                 "Done. " +
                   getBusinessEmail() +
-                  " received details with " +
+                  " received 3 images: full agreement, ID photo, and signature (" +
                   (result.photoFormat === "jpeg" ? "JPEG" : "PNG") +
-                  " agreement attached" +
-                  (data.email ? "; " + data.email + " was CC'd on the email." : ".") +
-                  " Check spam — open the attachment at the bottom of the FormSubmit email.",
+                  " for the full page)" +
+                  (data.email ? "; " + data.email + " was CC'd." : ".") +
+                  " Check spam — scroll to attachments in the FormSubmit email.",
                 true
               );
             } else {
