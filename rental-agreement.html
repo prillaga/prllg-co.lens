@@ -356,6 +356,25 @@
     return !!getFormSubmitEndpoint();
   }
 
+  function isOpenedAsLocalFile() {
+    try {
+      return window.location.protocol === "file:";
+    } catch (err) {
+      return false;
+    }
+  }
+
+  function getLiveAgreementPageUrl() {
+    var base =
+      typeof window.PRILLAGA_LIVE_SITE_URL === "string" ? window.PRILLAGA_LIVE_SITE_URL.trim().replace(/\/$/, "") : "";
+    if (!base) base = "https://prllg-co-lens.vercel.app";
+    return base + "/rental-agreement.html";
+  }
+
+  function isFormSubmitWebServerError(message) {
+    return /web server|HTML files/i.test(message || "");
+  }
+
   var emailDisplay = document.getElementById("prillaga-business-email-display");
   if (emailDisplay) {
     emailDisplay.textContent = getBusinessEmail() || "your-email@example.com";
@@ -363,6 +382,13 @@
   var form = document.getElementById("agreement-form");
   var btn = document.getElementById("btnSubmit");
   var msg = document.getElementById("formMsg");
+  if (isOpenedAsLocalFile()) {
+    showMsg(
+      "Email will not work from a saved file on your phone. Open this link in Safari or Chrome instead: " +
+        getLiveAgreementPageUrl(),
+      false
+    );
+  }
   var canvas = document.getElementById("sigCanvas");
   var ctx = canvas.getContext("2d");
   var hasDrawn = false;
@@ -725,6 +751,11 @@
               ", find the email titled “Activate Form” from FormSubmit, and click the link. After that, copy the long ID from that email into PRILLAGA_FORMSUBMIT_ENDPOINT in site-config.js (see scripts/FORMSUBMIT-SETUP.md)."
           );
         }
+        if (json && isFormSubmitWebServerError(json.message)) {
+          throw new Error(
+            "Open the agreement on the live website (not as a downloaded file): " + getLiveAgreementPageUrl()
+          );
+        }
         if (res.ok && formSubmitSucceeded(json)) return json;
         throw new Error(
           (json && json.message) || "FormSubmit could not send (status " + res.status + ")."
@@ -831,6 +862,17 @@
   function handleSendFailure(blob, filename, subject, bodyText, err) {
     var reason = err && err.message ? err.message : "Email could not be sent.";
     var isActivation = /activation/i.test(reason);
+    var isLocalFile = isOpenedAsLocalFile() || isFormSubmitWebServerError(reason);
+    if (isLocalFile) {
+      downloadPngBlob(blob, filename);
+      showMsg(
+        "This page was opened as a file on your device — email cannot send that way. Open in the browser: " +
+          getLiveAgreementPageUrl() +
+          " (Your agreement PNG was saved on this device as backup.)",
+        false
+      );
+      return Promise.resolve();
+    }
     downloadPngBlob(blob, filename);
     if (isActivation) {
       showMsg(
@@ -1022,6 +1064,13 @@
 
     if (!getBusinessEmail()) {
       showMsg("Business email is missing. Set PRILLAGA_BUSINESS_EMAIL in site-config.js, then reload.", false);
+      return;
+    }
+    if (isOpenedAsLocalFile()) {
+      showMsg(
+        "Cannot send email from a saved file. Open the live form in your browser: " + getLiveAgreementPageUrl(),
+        false
+      );
       return;
     }
 

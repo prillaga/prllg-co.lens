@@ -43,6 +43,9 @@ window.PRILLAGA_BUSINESS_EMAIL = "hjsescabarte2021@gmail.com";
  */
 window.PRILLAGA_FORMSUBMIT_ENDPOINT = "243e4ab576936c3f12f624ccd78c3dee";
 
+/** Live site base URL — used when the form is opened as a file:// on a phone. */
+window.PRILLAGA_LIVE_SITE_URL = "https://prllg-co-lens.vercel.app";
+
 window.prillagaBusinessEmail = function () {
   var email = typeof window.PRILLAGA_BUSINESS_EMAIL === "string" ? window.PRILLAGA_BUSINESS_EMAIL.trim() : "";
   return email || "";
