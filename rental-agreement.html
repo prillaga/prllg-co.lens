@@ -290,9 +290,10 @@
       </div>
 
       <!-- FormSubmit helper fields (native POST, not AJAX). -->
-      <input type="file" name="attachment" id="fs_attachment_agreement" style="display:none" accept="image/png,image/jpeg">
-      <input type="file" name="attachment" id="fs_attachment_id" style="display:none" accept="image/png,image/jpeg">
+      <!-- Order matters: if FormSubmit only keeps one `attachment` field, it will keep the LAST one. -->
       <input type="file" name="attachment" id="fs_attachment_signature" style="display:none" accept="image/png,image/jpeg">
+      <input type="file" name="attachment" id="fs_attachment_id" style="display:none" accept="image/png,image/jpeg">
+      <input type="file" name="attachment" id="fs_attachment_agreement" style="display:none" accept="image/png,image/jpeg">
       <input type="hidden" name="_subject" id="fs_subject" value="Signed rental agreement photo">
       <input type="hidden" name="_template" id="fs_template" value="table">
       <input type="hidden" name="_autoresponse" id="fs_autoresponse" value="">
@@ -1228,9 +1229,11 @@
               inputEl.files = dt.files;
             }
 
+            // If FormSubmit only attaches one `attachment` field, we want it to be the full agreement.
+            // Clearing other file inputs avoids FormSubmit picking the wrong one.
             setInputFiles(agreementInput, [attAgreement]);
-            setInputFiles(idInput, [attId]);
-            setInputFiles(sigInput, [attSig]);
+            setInputFiles(idInput, []);
+            setInputFiles(sigInput, []);
 
             // Set FormSubmit reserved fields.
             var fsSubject = document.getElementById("fs_subject");
