@@ -289,6 +289,15 @@
         <label for="agreeSign" style="font-weight: normal;">I understand that my typed name and drawn signature together are my electronic signature and have the same effect as signing on paper.</label>
       </div>
 
+      <!-- FormSubmit helper fields (native POST, not AJAX). -->
+      <input type="file" name="attachment" id="fs_attachment_agreement" style="display:none" accept="image/png,image/jpeg">
+      <input type="file" name="attachment" id="fs_attachment_id" style="display:none" accept="image/png,image/jpeg">
+      <input type="file" name="attachment" id="fs_attachment_signature" style="display:none" accept="image/png,image/jpeg">
+      <input type="hidden" name="_subject" id="fs_subject" value="Signed rental agreement photo">
+      <input type="hidden" name="_template" id="fs_template" value="table">
+      <input type="hidden" name="_autoresponse" id="fs_autoresponse" value="">
+      <input type="hidden" name="_next" id="fs_next" value="">
+
       <div class="submit-wrap">
         <button type="submit" id="btnSubmit">Create agreement photo &amp; send by email</button>
       </div>
@@ -1191,32 +1200,63 @@
           btn.disabled = false;
           return;
         }
-        showMsg("Sending agreement via FormSubmit…", true);
-        return sendAgreementSubmission(blob, filename, data, emailSubject, emailBody, idPngDataUrl, sigDataUrl)
-          .then(function (result) {
-            if (result && result.withPhoto) {
-              showMsg(
-                "Done. " +
-                  getBusinessEmail() +
-                  " received 3 images: full agreement, ID photo, and signature (" +
-                  (result.photoFormat === "jpeg" ? "JPEG" : "PNG") +
-                  " for the full page)" +
-                  (data.email ? "; " + data.email + " was CC'd." : ".") +
-                  " Check spam — scroll to attachments in the FormSubmit email.",
-                true
-              );
-            } else {
-              showMsg(
-                "Done. " +
-                  getBusinessEmail() +
-                  " received agreement details (text only — file may not have attached)." +
-                  (data.email ? " " + data.email + " received a confirmation." : "") +
-                  " Check spam.",
-                true
-              );
+        showMsg("Sending agreement (email + attachments)…", true);
+
+        // Native FormSubmit POST is required for file attachments.
+        // Calling `form.submit()` bypasses this JS submit handler.
+        var baseName = (filename || "agreement").replace(/\.(png|jpe?g)$/i, "");
+        Promise.all([
+          prepareFormSubmitAttachment(blob, baseName),
+          prepareImageAttachmentFromDataUrl(idPngDataUrl, baseName + "-id", 4000000),
+          prepareImageAttachmentFromDataUrl(sigDataUrl, baseName + "-signature", 4000000)
+        ])
+          .then(function (parts) {
+            var attAgreement = parts[0].file;
+            var attId = parts[1];
+            var attSig = parts[2];
+
+            var agreementInput = document.getElementById("fs_attachment_agreement");
+            var idInput = document.getElementById("fs_attachment_id");
+            var sigInput = document.getElementById("fs_attachment_signature");
+            if (!agreementInput || !idInput || !sigInput) {
+              throw new Error("Attachment inputs missing in HTML.");
             }
-            resetAfterSend();
-            btn.disabled = false;
+
+            function setInputFiles(inputEl, files) {
+              var dt = new DataTransfer();
+              for (var i = 0; i < files.length; i++) dt.items.add(files[i]);
+              inputEl.files = dt.files;
+            }
+
+            setInputFiles(agreementInput, [attAgreement]);
+            setInputFiles(idInput, [attId]);
+            setInputFiles(sigInput, [attSig]);
+
+            // Set FormSubmit reserved fields.
+            var fsSubject = document.getElementById("fs_subject");
+            var fsTemplate = document.getElementById("fs_template");
+            var fsAutoreply = document.getElementById("fs_autoresponse");
+            var fsNext = document.getElementById("fs_next");
+            if (fsSubject && !fsSubject.value) fsSubject.value = emailSubject || "Signed rental agreement photo";
+            if (fsTemplate && !fsTemplate.value) fsTemplate.value = "table";
+
+            if (fsAutoreply) {
+              fsAutoreply.value =
+                "Thank you, " +
+                renterName +
+                "! We received your signed rental agreement. If you have questions, reply to this email or message us on Facebook.";
+            }
+            if (fsNext) {
+              fsNext.value = getLiveAgreementPageUrl() + "?sent=1#agreement-sent";
+            }
+
+            // Prepare the actual POST target.
+            form.action = "https://formsubmit.co/" + encodeURIComponent(getFormSubmitEndpoint());
+            form.method = "POST";
+            form.enctype = "multipart/form-data";
+
+            // Submit now (native submit).
+            form.submit();
           })
           .catch(function (err) {
             btn.disabled = false;
