@@ -654,12 +654,14 @@
   <form onsubmit="handleBookingSubmit(event)" style="max-width: 680px; margin: 0 auto; display: grid; gap: 14px;">
     <input type="text" name="fullName" placeholder="Full Name" autocomplete="name" required style="padding: 12px 14px; border: 1px solid #2e2e2e; border-radius: 6px; background: #171717; color: #ffffff; font-size: 15px;">
     <input type="tel" name="phone" placeholder="Phone Number" autocomplete="tel" required style="padding: 12px 14px; border: 1px solid #2e2e2e; border-radius: 6px; background: #171717; color: #ffffff; font-size: 15px;">
-    <select name="pickupLocation" required>
+    <select name="pickupLocation" id="pickupLocation" required>
       <option value="">Pick Up Location</option>
       <option value="jks-vapeshop-north-baluarte-molo">JKS Vapeshop North Baluarte Molo</option>
       <option value="robinson-main">Robinson Main</option>
       <option value="sm-city">SM City</option>
+      <option value="others">Others</option>
     </select>
+    <input type="text" id="pickupLocationOther" name="pickupLocationOther" placeholder="Type your pick-up location" hidden autocomplete="street-address" style="padding: 12px 14px; border: 1px solid #2e2e2e; border-radius: 6px; background: #171717; color: #ffffff; font-size: 15px;">
     <select name="pickupTime" required>
       <option value="">Pick Up Time</option>
       <option value="07:00">7:00 AM</option>
@@ -1379,6 +1381,40 @@
       });
   }
 
+  function syncPickupLocationOtherField() {
+    var select = document.getElementById("pickupLocation");
+    var other = document.getElementById("pickupLocationOther");
+    if (!select || !other) return;
+    var isOther = select.value === "others";
+    other.hidden = !isOther;
+    other.required = isOther;
+    if (!isOther) {
+      other.value = "";
+    }
+  }
+
+  function getSelectedPickupLocationText(form) {
+    var pickupLocationField = form.querySelector('select[name="pickupLocation"]');
+    var pickupLocationOtherField = form.querySelector('input[name="pickupLocationOther"]');
+    if (!pickupLocationField) return "";
+    if (pickupLocationField.value === "others") {
+      var custom = pickupLocationOtherField ? pickupLocationOtherField.value.trim() : "";
+      if (!custom) return null;
+      return "Others — " + custom;
+    }
+    if (pickupLocationField.selectedIndex >= 0) {
+      return pickupLocationField.options[pickupLocationField.selectedIndex].text;
+    }
+    return pickupLocationField.value || "";
+  }
+
+  function initPickupLocationOther() {
+    var select = document.getElementById("pickupLocation");
+    if (!select) return;
+    select.addEventListener("change", syncPickupLocationOtherField);
+    syncPickupLocationOtherField();
+  }
+
   function handleBookingSubmit(event) {
     event.preventDefault();
 
@@ -1387,7 +1423,6 @@
 
     var fullName = data.get("fullName") || "";
     var phone = data.get("phone") || "";
-    var pickupLocation = data.get("pickupLocation") || "";
     var pickupTime = data.get("pickupTime") || "";
     var rentalDate = data.get("rentalDate") || "";
     var returnDate = data.get("returnDate") || "";
@@ -1397,8 +1432,15 @@
     var notes = data.get("notes") || "";
 
     var unitsField = form.querySelector('select[name="units"]');
-    var pickupLocationField = form.querySelector('select[name="pickupLocation"]');
     var pickupTimeField = form.querySelector('select[name="pickupTime"]');
+
+    var selectedPickupLocationText = getSelectedPickupLocationText(form);
+    if (selectedPickupLocationText === null) {
+      alert("Please enter your pick-up location.");
+      var otherField = form.querySelector('input[name="pickupLocationOther"]');
+      if (otherField) otherField.focus();
+      return;
+    }
 
     var selectedUnitText = unitsField && unitsField.selectedIndex >= 0 ? unitsField.options[unitsField.selectedIndex].text : units;
     var calConflict = calFindConflict(selectedUnitText, rentalDate, returnDate);
@@ -1412,7 +1454,6 @@
         return;
       }
     }
-    var selectedPickupLocationText = pickupLocationField && pickupLocationField.selectedIndex >= 0 ? pickupLocationField.options[pickupLocationField.selectedIndex].text : pickupLocation;
     var selectedPickupTimeText = pickupTimeField && pickupTimeField.selectedIndex >= 0 ? pickupTimeField.options[pickupTimeField.selectedIndex].text : pickupTime;
     var selectedDays = getRentalDaysFromDates(form);
     var durationText = selectedDays > 0 ? (selectedDays + " day(s)") : "To be confirmed";
@@ -1553,6 +1594,7 @@
     initRentalReturnDates();
     initBookingDatePresets();
     initBookingDatePickers();
+    initPickupLocationOther();
     updateUnitPricing();
     var bookForm = document.querySelector("#book-now form");
     if (bookForm) {
