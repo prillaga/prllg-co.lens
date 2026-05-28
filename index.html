@@ -1210,17 +1210,173 @@
     }
   }
 
+  function isMessengerOrFacebookWebView() {
+    var ua = navigator.userAgent || "";
+    return /FBAN|FBAV|FB_IAB|Instagram|Messenger/i.test(ua);
+  }
+
   function openMessengerPrefilled(messengerUrl) {
+    if (isMessengerOrFacebookWebView()) {
+      window.location.assign(messengerUrl);
+      return;
+    }
     var w = window.open(messengerUrl, "_blank", "noopener,noreferrer");
     if (!w || w.closed) {
-      window.location.href = messengerUrl;
+      window.location.assign(messengerUrl);
       return;
     }
     closeBookingModal();
   }
 
-  function deliverBookingAfterSubmit(fullName, phone, message, messengerUrl) {
-    openMessengerPrefilled(messengerUrl);
+  function redirectToMessengerAfterBooking(messengerUrl) {
+    closeBookingModal();
+    window.location.assign(messengerUrl);
+  }
+
+  function getBookingFormSubmitEndpoint() {
+    return window.prillagaFormSubmitEndpoint ? window.prillagaFormSubmitEndpoint() : "";
+  }
+
+  function formSubmitBookingSucceeded(json) {
+    return json && (json.success === true || json.success === "true");
+  }
+
+  function buildBookingEmailFormData(payload) {
+    var fd = new FormData();
+    fd.append("name", payload.fullName);
+    fd.append("email", payload.email || "booking@formsubmit.co");
+    fd.append("phone", payload.phone);
+    fd.append("pickup_location", payload.pickupLocation);
+    fd.append("pickup_time", payload.pickupTime);
+    fd.append("rental_date", payload.rentalDate);
+    fd.append("return_date", payload.returnDate);
+    fd.append("unit", payload.unit);
+    fd.append("additional_rent_1", payload.additionalRent);
+    fd.append("additional_rent_2", payload.additionalRent2);
+    fd.append("rental_days", payload.rentalDays);
+    fd.append("estimated_total", payload.estimatedTotal);
+    fd.append("notes", payload.notes || "(none)");
+    fd.append("message", payload.message);
+    fd.append("_subject", payload.subject);
+    fd.append("_captcha", "false");
+    fd.append("_template", "table");
+    if (typeof window.location !== "undefined" && window.location.href) {
+      fd.append("_url", window.location.href.split("#")[0]);
+    }
+    return fd;
+  }
+
+  function appendBookingEmailFieldsToForm(form, payload) {
+    var fields = {
+      name: payload.fullName,
+      email: payload.email || "booking@formsubmit.co",
+      phone: payload.phone,
+      pickup_location: payload.pickupLocation,
+      pickup_time: payload.pickupTime,
+      rental_date: payload.rentalDate,
+      return_date: payload.returnDate,
+      unit: payload.unit,
+      additional_rent_1: payload.additionalRent,
+      additional_rent_2: payload.additionalRent2,
+      rental_days: payload.rentalDays,
+      estimated_total: payload.estimatedTotal,
+      notes: payload.notes || "(none)",
+      message: payload.message,
+      _subject: payload.subject,
+      _captcha: "false",
+      _template: "table"
+    };
+    Object.keys(fields).forEach(function (key) {
+      var input = document.createElement("input");
+      input.type = "hidden";
+      input.name = key;
+      input.value = fields[key];
+      form.appendChild(input);
+    });
+  }
+
+  function sendBookingEmailViaFormSubmitAjax(payload) {
+    var endpoint = getBookingFormSubmitEndpoint();
+    if (!endpoint) {
+      return Promise.reject(new Error("FormSubmit endpoint not configured."));
+    }
+    return fetch("https://formsubmit.co/ajax/" + encodeURIComponent(endpoint), {
+      method: "POST",
+      headers: { Accept: "application/json" },
+      body: buildBookingEmailFormData(payload)
+    }).then(function (res) {
+      return res.json().then(function (json) {
+        if (formSubmitBookingSucceeded(json)) return json;
+        throw new Error((json && json.message) || "FormSubmit could not send booking email.");
+      });
+    });
+  }
+
+  function sendBookingEmailViaFormSubmitIframe(payload) {
+    var endpoint = getBookingFormSubmitEndpoint();
+    if (!endpoint) {
+      return Promise.resolve(false);
+    }
+    return new Promise(function (resolve) {
+      var iframeName = "prillaga-booking-email-" + Date.now();
+      var iframe = document.createElement("iframe");
+      iframe.name = iframeName;
+      iframe.title = "Sending booking email";
+      iframe.style.cssText = "position:absolute;width:0;height:0;border:0;visibility:hidden";
+      iframe.setAttribute("aria-hidden", "true");
+      document.body.appendChild(iframe);
+      var form = document.createElement("form");
+      form.method = "POST";
+      form.action = "https://formsubmit.co/" + encodeURIComponent(endpoint);
+      form.target = iframeName;
+      form.style.display = "none";
+      appendBookingEmailFieldsToForm(form, payload);
+      document.body.appendChild(form);
+      form.submit();
+      window.setTimeout(function () {
+        form.remove();
+        iframe.remove();
+        resolve(true);
+      }, 1400);
+    });
+  }
+
+  function sendBookingEmail(payload) {
+    return sendBookingEmailViaFormSubmitAjax(payload).catch(function () {
+      return sendBookingEmailViaFormSubmitIframe(payload);
+    });
+  }
+
+  function deliverBookingAfterSubmit(payload, messengerUrl) {
+    var submitBtn = document.querySelector("#book-now button[type=\"submit\"]");
+    var submitLabel = submitBtn ? submitBtn.textContent : "";
+    if (submitBtn) {
+      submitBtn.disabled = true;
+      submitBtn.textContent = "Sending…";
+    }
+
+    var redirected = false;
+    function goMessenger() {
+      if (redirected) return;
+      redirected = true;
+      redirectToMessengerAfterBooking(messengerUrl);
+    }
+
+    var redirectTimer = window.setTimeout(goMessenger, 3200);
+    var emailJob = getBookingFormSubmitEndpoint()
+      ? sendBookingEmail(payload)
+      : Promise.resolve(false);
+
+    emailJob
+      .catch(function () { /* still open Messenger */ })
+      .finally(function () {
+        window.clearTimeout(redirectTimer);
+        if (submitBtn) {
+          submitBtn.disabled = false;
+          submitBtn.textContent = submitLabel || "Submit Booking";
+        }
+        goMessenger();
+      });
   }
 
   function handleBookingSubmit(event) {
@@ -1285,7 +1441,24 @@
       alert("Messenger Page ID is missing. Place site-config.js in the same folder as this page.");
       return;
     }
-    deliverBookingAfterSubmit(fullName, phone, message, messengerUrl);
+
+    var emailPayload = {
+      fullName: fullName,
+      phone: phone,
+      pickupLocation: selectedPickupLocationText,
+      pickupTime: selectedPickupTimeText,
+      rentalDate: rentalDate,
+      returnDate: returnDate,
+      unit: selectedUnitText,
+      additionalRent: additionalRent,
+      additionalRent2: additionalRent2,
+      rentalDays: durationText,
+      estimatedTotal: estimatedTotalText,
+      notes: notes,
+      message: message,
+      subject: "New booking request — " + fullName
+    };
+    deliverBookingAfterSubmit(emailPayload, messengerUrl);
   }
 
   function initRentalReturnDates() {
