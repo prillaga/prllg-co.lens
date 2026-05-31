@@ -48,16 +48,19 @@ alter table public.prillaga_store enable row level security;
 ## Step 4 — Add keys on Vercel
 
 1. [vercel.com](https://vercel.com) → your project → **Settings → Environment Variables**
-2. Add:
+2. Add **exactly** these names:
 
 | Name | Value |
 |------|--------|
-| `SUPABASE_URL` | `https://xxxxx.supabase.co` |
-| `SUPABASE_SERVICE_ROLE_KEY` | `eyJ...` (service_role key) |
-| `PRILLAGA_ADMIN_PIN` | your admin PIN (recommended) |
+| `SUPABASE_SERVICE_ROLE_KEY` | **Secret key** from Supabase (`sb_secret_...` or legacy `service_role` JWT) |
+| `PRILLAGA_ADMIN_PIN` | Your admin PIN |
 
-3. Environment: **Production** (and Preview if you use it)
-4. Save
+`SUPABASE_URL` is optional — defaults to `https://fomyzhxajhwqkztfvkue.supabase.co`.
+
+**Wrong:** `sb_publishable_...` · **Correct:** `sb_secret_...` or **service_role**
+
+3. Environment: **Production**
+4. Save → **Deployments → Redeploy**
 
 ---
 
