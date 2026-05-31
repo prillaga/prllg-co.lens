@@ -214,6 +214,13 @@
   border-bottom: 0;
 }
 
+#site-header nav.site-nav a[data-nav="admin"] {
+  color: #b8a060;
+  border-top: 1px solid rgba(212, 175, 55, 0.15);
+  margin-top: 4px;
+  padding-top: 14px;
+}
+
 /* Desktop / large screens: same hamburger + overlay (toggle stays visible at all widths). */
 @media (min-width: 1025px) {
   #site-header {

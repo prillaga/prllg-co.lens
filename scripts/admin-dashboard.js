@@ -256,4 +256,12 @@
     initAdminTabs();
     initProductsTab(pin);
   };
+
+  /** Standalone admin/content.html — products + photos on one page. */
+  global.prillagaInitAdminContentPage = function (pin) {
+    window.__prillagaAdminPin = pin;
+    adminPin = pin;
+    initProductsTab(pin);
+    initMediaTab(pin);
+  };
 })(window);

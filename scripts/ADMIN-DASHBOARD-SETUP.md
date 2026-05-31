@@ -2,7 +2,13 @@
 
 Manage **products, prices, photos, and availability** from one dashboard without editing code or uploading JSON/image files manually.
 
-**URL:** `https://prllg-co-lens.vercel.app/admin.html` (bookmark; not linked from the public site)
+**URLs** (bookmark; not linked from the public site):
+
+| Page | URL |
+|------|-----|
+| **Admin home** | `/admin/` or `/admin/index.html` |
+| **Products & photos** | `/admin/content.html` |
+| **Availability** | `/admin.html` |
 
 ---
 
@@ -38,9 +44,9 @@ Push/deploy so Vercel installs `@upstash/redis` and `@vercel/blob`.
 
 ## Using the dashboard
 
-1. Open **admin.html**
-2. Enter your **admin PIN**
-3. Use the tabs:
+1. Open **Admin home** (`/admin/`) or go straight to **Products & photos** (`/admin/content.html`) or **Availability** (`/admin.html`)
+2. Enter your **admin PIN** (once per browser session — moving between admin pages keeps you signed in)
+3. Use the sections:
 
 ### Availability
 - Quick block dates (red on calendar)

@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Admin — Products &amp; photos | Prillaga&amp;Co. Lens</title>
+  <link rel="stylesheet" href="admin.css">
+  <link rel="stylesheet" href="../responsive.css">
+</head>
+<body>
+  <h1>Products &amp; photos</h1>
+  <p class="lead">
+    Edit camera prices, descriptions, and images here. Changes save to the live website — no code edits or manual file uploads.
+  </p>
+
+  <div id="gate" class="panel">
+    <label for="adminPin">Admin PIN</label>
+    <input id="adminPin" type="password" autocomplete="off" placeholder="PIN">
+    <button type="button" class="primary" id="btnUnlock">Unlock</button>
+  </div>
+
+  <div id="panel" hidden>
+    <nav class="admin-nav" aria-label="Admin sections">
+      <strong style="color:#888;margin-right:4px;">Admin:</strong>
+      <a href="index.html">Home</a>
+      <a href="content.html" class="is-current">Products &amp; photos</a>
+      <a href="../admin.html">Availability</a>
+      <span style="color:#444">|</span>
+      <a href="../index.html" target="_blank" rel="noopener">View live site</a>
+    </nav>
+
+    <p class="ok">Signed in. Save buttons push updates to the live site within about a minute.</p>
+    <p id="catalogSyncStatus" style="margin: 0 0 14px 0; font-size: 13px; color: #8ecf9a; min-height: 1.4em;" role="status">Loading…</p>
+
+    <div class="admin-layout">
+      <div class="panel">
+        <h2>Products</h2>
+        <div id="productUnitList"></div>
+      </div>
+      <div class="panel" id="productEditor">
+        <p style="color:#888">Select a product to edit prices and description.</p>
+      </div>
+    </div>
+
+    <div class="panel">
+      <h2>Upload photo</h2>
+      <p style="margin:0 0 12px 0;font-size:13px;color:#9a9a9a;">JPEG, PNG, WebP, or GIF up to 5 MB. Stored on Vercel Blob — not in your code folder.</p>
+      <label for="mediaUnitSelect">Assign to product (optional)</label>
+      <select id="mediaUnitSelect" aria-label="Assign upload to product"></select>
+      <input id="mediaFileInput" type="file" accept="image/jpeg,image/png,image/webp,image/gif" aria-label="Choose image">
+      <button type="button" class="primary" id="btnUploadMedia">Upload &amp; save</button>
+    </div>
+
+    <div class="panel">
+      <h2>Photo library</h2>
+      <div id="mediaGrid" class="media-grid"></div>
+    </div>
+
+    <button type="button" id="btnLock">Lock</button>
+  </div>
+
+  <div id="toast" role="status"></div>
+
+  <script src="../site-config.js"></script>
+  <script src="../scripts/admin-auth.js"></script>
+  <script src="../scripts/catalog-api.js"></script>
+  <script src="../scripts/admin-dashboard.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      window.prillagaAdminInitGate(function (pin) {
+        if (window.prillagaInitAdminContentPage) {
+          window.prillagaInitAdminContentPage(pin);
+        }
+      });
+    });
+  </script>
+</body>
+</html>
