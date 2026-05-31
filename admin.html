@@ -24,6 +24,18 @@
     <button type="button" class="primary" id="btnUnlock">Unlock</button>
   </div>
 
+  <div id="storageSetup" class="panel" style="border-color:#6b5a30;display:none;">
+    <h2 style="margin:0 0 8px 0;font-size:15px;color:#d4af37;">Server storage not connected</h2>
+    <p id="storageSetupText" style="margin:0 0 10px 0;font-size:13px;color:#e8d080;line-height:1.55;">Checking…</p>
+    <ol style="margin:0;padding-left:18px;font-size:13px;color:#bbb;line-height:1.7;">
+      <li>Supabase → <strong>Settings → API</strong> → copy the <strong>secret</strong> key (<code>sb_secret_...</code> or <code>service_role</code>)</li>
+      <li>Vercel → <strong>Settings → Environment Variables</strong> → name: <code>SUPABASE_SERVICE_ROLE_KEY</code> → paste secret key → <strong>Production</strong></li>
+      <li>Supabase → <strong>SQL Editor</strong> → run <code>supabase/schema.sql</code> from this repo</li>
+      <li>Vercel → <strong>Deployments → Redeploy</strong></li>
+    </ol>
+    <p style="margin:10px 0 0 0;font-size:12px;color:#888;">Do <strong>not</strong> use the publishable key (<code>sb_publishable_...</code>). <a href="/api/health" target="_blank" rel="noopener">Check /api/health</a></p>
+  </div>
+
   <div id="panel" hidden>
     <nav class="admin-nav" aria-label="Admin sections">
       <strong style="color:#888;margin-right:4px;">Admin:</strong>
@@ -128,6 +140,30 @@
 
 <script src="site-config.js"></script>
 <script src="scripts/admin-auth.js"></script>
+<script>
+(function checkStorageHealth() {
+  fetch("/api/health", { cache: "no-store" })
+    .then(function (r) { return r.json(); })
+    .then(function (data) {
+      if (data && data.ok) return;
+      var box = document.getElementById("storageSetup");
+      var text = document.getElementById("storageSetupText");
+      if (!box || !text) return;
+      box.style.display = "block";
+      var missing = (data && data.missing && data.missing.length)
+        ? data.missing.join("; ")
+        : "SUPABASE_SERVICE_ROLE_KEY on Vercel";
+      text.textContent = "Live saves will not work until this is fixed. Missing: " + missing + ".";
+    })
+    .catch(function () {
+      var box = document.getElementById("storageSetup");
+      var text = document.getElementById("storageSetupText");
+      if (!box || !text) return;
+      box.style.display = "block";
+      text.textContent = "Could not reach /api/health — deploy latest code and set Supabase env vars on Vercel.";
+    });
+})();
+</script>
 <script src="scripts/bookings-api.js"></script>
 <script src="scripts/catalog-api.js"></script>
 <script src="scripts/admin-dashboard.js"></script>

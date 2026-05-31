@@ -156,3 +156,17 @@ li { padding: 12px 0; border-bottom: 1px solid #252525; font-size: 14px; color: 
   margin-bottom: 8px;
 }
 .media-card p { margin: 0 0 6px 0; font-size: 12px; word-break: break-all; }
+.upload-preview {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+  margin: 0 0 12px 0;
+}
+.upload-preview img {
+  width: 72px;
+  height: 72px;
+  object-fit: cover;
+  border-radius: 8px;
+  border: 1px solid #333;
+}
+input[type="file"] { margin-bottom: 8px; }

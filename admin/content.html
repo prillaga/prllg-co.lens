@@ -11,7 +11,7 @@
 <body>
   <h1>Products &amp; photos</h1>
   <p class="lead">
-    Edit camera prices, descriptions, and image URLs here. Uses free Supabase storage — see <code>scripts/SUPABASE-SETUP.md</code>.
+    Add, edit, or delete products and upload photos here. Images save to Supabase Storage and appear on the live site after save.
   </p>
 
   <div id="gate" class="panel">
@@ -44,20 +44,20 @@
     </div>
 
     <div class="panel">
-      <h2>Add photo (free plan)</h2>
-      <p style="margin:0 0 12px 0;font-size:13px;color:#9a9a9a;">Use <code>images/photo.jpg</code> or any <code>https://</code> URL. Saved in free Supabase — no paid upload storage.</p>
-      <label for="mediaSiteImageSelect">Pick from site images</label>
-      <select id="mediaSiteImageSelect" aria-label="Pick site image"></select>
-      <label for="mediaUrlInput">Or paste image path / URL</label>
-      <input id="mediaUrlInput" type="text" placeholder="images/my-photo.jpg or https://..." autocomplete="off" aria-label="Image path or URL">
-      <label for="mediaUnitSelect">Assign to product (optional)</label>
-      <select id="mediaUnitSelect" aria-label="Assign photo to product"></select>
-      <button type="button" class="primary" id="btnAddMedia">Add to library &amp; save</button>
+      <h2>Photo library</h2>
+      <p style="margin:0 0 12px 0;font-size:13px;color:#9a9a9a;">Photos uploaded with products appear here. You can also paste a URL below.</p>
+      <div id="mediaGrid" class="media-grid"></div>
     </div>
 
     <div class="panel">
-      <h2>Photo library</h2>
-      <div id="mediaGrid" class="media-grid"></div>
+      <h2>Add photo by URL</h2>
+      <label for="mediaSiteImageSelect">Pick from site images</label>
+      <select id="mediaSiteImageSelect" aria-label="Pick site image"></select>
+      <label for="mediaUrlInput">Or paste URL</label>
+      <input id="mediaUrlInput" type="text" placeholder="https://..." autocomplete="off" aria-label="Image URL">
+      <label for="mediaUnitSelect">Assign to product (optional)</label>
+      <select id="mediaUnitSelect" aria-label="Assign photo to product"></select>
+      <button type="button" class="primary" id="btnAddMedia">Add to library &amp; save</button>
     </div>
 
     <button type="button" id="btnLock">Lock</button>

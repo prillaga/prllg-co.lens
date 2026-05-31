@@ -1,8 +1,7 @@
 import { isAuthorizedAdmin } from "../../lib/auth.js";
-import { handleOptions, sendError, setJsonCors } from "../../lib/bookings/http.js";
-import { getAdminCatalog, saveAdminCatalog } from "../../lib/catalog/storage.js";
-import { uploadImageBuffer, deleteImageByUrl, isBlobConfigured } from "../../lib/upload/blob.js";
-import { safeFileName, validateUploadFile } from "../../lib/upload/validate.js";
+import { handleOptions, sendError, setJsonCors, storageErrorResponse } from "../../lib/bookings/http.js";
+import { uploadProductImage, deleteProductImageByUrl } from "../../lib/upload/supabase-storage.js";
+import { validateUploadFile, safeFileName } from "../../lib/upload/validate.js";
 
 export const config = {
   api: {
@@ -53,13 +52,6 @@ async function handleUpload(req, res) {
     return;
   }
 
-  if (!isBlobConfigured()) {
-    sendError(res, 503, "Image storage is not configured. Connect Vercel Blob on Vercel.", {
-      setup: "Storage → Blob → connect to project (adds BLOB_READ_WRITE_TOKEN)."
-    });
-    return;
-  }
-
   const boundaryMatch = /boundary=(.+)$/i.exec(contentType);
   if (!boundaryMatch) {
     sendError(res, 400, "Invalid multipart boundary.");
@@ -68,92 +60,64 @@ async function handleUpload(req, res) {
 
   const raw = await readRawBody(req);
   const parts = parseMultipart(raw, boundaryMatch[1].trim());
-  const filePart = parts.find(function (p) { return p.name === "file" && p.filename; });
+  const fileParts = parts.filter(function (p) { return p.name === "file" && p.filename; });
   const unitIdPart = parts.find(function (p) { return p.name === "unitId"; });
+  const unitId = unitIdPart ? unitIdPart.body.toString("utf8").trim() : "";
 
-  if (!filePart) {
+  if (!fileParts.length) {
     sendError(res, 400, "Missing file field.");
     return;
   }
 
-  const pseudoFile = {
-    size: filePart.body.length,
-    type: filePart.contentType
-  };
-  const validation = validateUploadFile(pseudoFile);
-  if (!validation.ok) {
-    sendError(res, 400, validation.error);
-    return;
-  }
+  const uploaded = [];
 
-  const fileName = "units/" + safeFileName(filePart.filename);
-  const blob = await uploadImageBuffer(filePart.body, fileName, filePart.contentType);
-  const unitId = unitIdPart ? unitIdPart.body.toString("utf8").trim() : "";
-
-  const catalog = await getAdminCatalog();
-  const mediaItem = {
-    id: "m-" + Date.now(),
-    url: blob.url,
-    name: filePart.filename,
-    unitId: unitId,
-    sortOrder: catalog.media.length,
-    createdAt: Date.now()
-  };
-  catalog.media = catalog.media || [];
-  catalog.media.push(mediaItem);
-
-  if (unitId) {
-    const unit = catalog.units.find(function (u) { return u.id === unitId; });
-    if (unit) {
-      unit.image = blob.url;
-      unit.images = unit.images || [];
-      if (unit.images.indexOf(blob.url) === -1) unit.images.unshift(blob.url);
+  for (let i = 0; i < fileParts.length; i++) {
+    const filePart = fileParts[i];
+    const pseudoFile = {
+      size: filePart.body.length,
+      type: filePart.contentType
+    };
+    const validation = validateUploadFile(pseudoFile);
+    if (!validation.ok) {
+      sendError(res, 400, validation.error);
+      return;
     }
+
+    const result = await uploadProductImage(
+      filePart.body,
+      safeFileName(filePart.filename),
+      filePart.contentType,
+      unitId
+    );
+
+    uploaded.push({
+      url: result.url,
+      path: result.path,
+      name: filePart.filename
+    });
   }
 
-  const saved = await saveAdminCatalog(catalog);
-  res.status(200).json({ media: mediaItem, catalog: saved });
+  res.status(200).json({
+    files: uploaded,
+    url: uploaded[0] ? uploaded[0].url : ""
+  });
 }
 
 async function handleDelete(req, res) {
-  const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
-  const mediaId = body && body.mediaId ? String(body.mediaId) : "";
-  const url = body && body.url ? String(body.url) : "";
-
-  if (!mediaId && !url) {
-    sendError(res, 400, "Provide mediaId or url to delete.");
+  let url = "";
+  if (req.query && req.query.url) {
+    url = String(req.query.url);
+  } else {
+    const body = typeof req.body === "string" ? JSON.parse(req.body) : req.body;
+    url = body && body.url ? String(body.url) : "";
+  }
+  if (!url) {
+    sendError(res, 400, "Provide url to delete.");
     return;
   }
 
-  const catalog = await getAdminCatalog();
-  const target = catalog.media.find(function (m) {
-    return (mediaId && m.id === mediaId) || (url && m.url === url);
-  });
-
-  if (!target) {
-    sendError(res, 404, "Media item not found.");
-    return;
-  }
-
-  if (target.url && target.url.includes("blob.vercel-storage.com")) {
-    try {
-      await deleteImageByUrl(target.url);
-    } catch (e) {
-      console.warn("Blob delete failed:", e.message);
-    }
-  }
-
-  catalog.media = catalog.media.filter(function (m) { return m.id !== target.id; });
-  catalog.units.forEach(function (unit) {
-    if (unit.image === target.url) {
-      unit.image = unit.images.find(function (u) { return u !== target.url; }) || unit.image;
-    }
-    unit.images = (unit.images || []).filter(function (u) { return u !== target.url; });
-    if (!unit.images.length && unit.image !== target.url) unit.images = [unit.image];
-  });
-
-  const saved = await saveAdminCatalog(catalog);
-  res.status(200).json({ deleted: target.id, catalog: saved });
+  await deleteProductImageByUrl(url);
+  res.status(200).json({ deleted: url });
 }
 
 export default async function handler(req, res) {
@@ -176,6 +140,11 @@ export default async function handler(req, res) {
     }
     sendError(res, 405, "Method not allowed.");
   } catch (err) {
+    if (storageErrorResponse(res, err)) return;
+    if (err && err.code === "STORAGE_BUCKET_MISSING") {
+      sendError(res, 503, err.message, { setup: "Run supabase/storage.sql in Supabase SQL editor." });
+      return;
+    }
     console.error("Upload API failed:", err);
     sendError(res, 500, err.message || "Upload failed.");
   }

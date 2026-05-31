@@ -32,6 +32,14 @@ alter table public.prillaga_store enable row level security;
 
 3. Click **Run** — you should see “Success”.
 
+### 2b. Create photo upload bucket (required for product photos)
+
+1. **SQL Editor → New query**
+2. Copy everything from **`supabase/storage.sql`**
+3. Click **Run**
+
+This creates the public **`product-images`** bucket for admin uploads.
+
 ---
 
 ## Step 3 — Copy API keys
@@ -112,6 +120,7 @@ More than enough for a camera rental site catalog + calendar.
 | 503 storage not configured | Add `SUPABASE_URL` + `SUPABASE_SERVICE_ROLE_KEY` on Vercel, redeploy |
 | Table missing error | Run SQL from `supabase/schema.sql` |
 | 401 in admin | Wrong PIN vs `PRILLAGA_ADMIN_PIN` |
+| Photo upload fails | Run **`supabase/storage.sql`** in Supabase SQL editor |
 | Project paused | Log into Supabase → restore project |
 
 ---
