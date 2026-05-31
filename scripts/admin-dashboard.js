@@ -5,6 +5,19 @@
   var selectedUnitId = null;
   var adminPin = "";
 
+  var SITE_IMAGES = [
+    "images/nikon-kitlens.jpg",
+    "images/nikon-zoomlens.jpg",
+    "images/nikon-zoom-kit-battery.jpg",
+    "images/canon-1200d.jpg",
+    "images/canon-4000d.jpg",
+    "images/G6-thumb-camera.jpg",
+    "images/kodak-v603.jpg",
+    "images/zoom lens.jpg",
+    "images/dji-osmo.jpg",
+    "images/gcash-qr.jpg"
+  ];
+
   function setCatalogStatus(text, tone) {
     var el = document.getElementById("catalogSyncStatus");
     if (!el) return;
@@ -16,6 +29,13 @@
     if (!catalog || !catalog.units) return id;
     var u = catalog.units.find(function (x) { return x.id === id; });
     return u ? u.name : id;
+  }
+
+  function normalizeImageUrl(url) {
+    url = String(url || "").trim();
+    if (!url) return "";
+    if (/^https?:\/\//i.test(url)) return url;
+    return url.replace(/^\.\//, "").replace(/^\//, "");
   }
 
   function renderUnitList() {
@@ -46,7 +66,7 @@
     }
 
     var imageOptions = (catalog.media || []).map(function (m) {
-      return '<option value="' + m.url + '"' + (unit.image === m.url ? " selected" : "") + ">" + (m.name || m.url) + "</option>";
+      return '<option value="' + escapeAttr(m.url) + '"' + (unit.image === m.url ? " selected" : "") + ">" + (m.name || m.url) + "</option>";
     }).join("");
 
     panel.innerHTML =
@@ -60,9 +80,9 @@
       '<input id="editUnitLong" type="number" min="0" step="1" value="' + unit.pricing.longRate + '">' +
       "<label>Primary photo</label>" +
       '<select id="editUnitImage"><option value="">— choose —</option>' + imageOptions + "</select>" +
-      '<input id="editUnitImageUrl" type="text" placeholder="Or paste image URL" value="' + escapeAttr(unit.image) + '">' +
+      '<input id="editUnitImageUrl" type="text" placeholder="images/photo.jpg or https://..." value="' + escapeAttr(unit.image) + '">' +
       "<label>Sample photos (one URL per line)</label>" +
-      '<textarea id="editUnitSamples" rows="4" placeholder="https://...">' + escapeHtml((unit.images || []).join("\n")) + "</textarea>" +
+      '<textarea id="editUnitSamples" rows="4" placeholder="images/sample.jpg or https://...">' + escapeHtml((unit.images || []).join("\n")) + "</textarea>" +
       '<label><input id="editUnitActive" type="checkbox"' + (unit.active !== false ? " checked" : "") + "> Show on website</label>" +
       '<label><input id="editUnitBookable" type="checkbox"' + (unit.bookable !== false ? " checked" : "") + "> Allow booking</label>" +
       '<div style="margin-top:12px"><button type="button" class="primary" id="btnSaveUnit">Save product</button></div>';
@@ -78,11 +98,11 @@
     unit.pricing.baseRate = Number(document.getElementById("editUnitBase").value) || 0;
     unit.pricing.longRate = Number(document.getElementById("editUnitLong").value) || 0;
     var picked = document.getElementById("editUnitImage").value;
-    var url = document.getElementById("editUnitImageUrl").value.trim();
+    var url = normalizeImageUrl(document.getElementById("editUnitImageUrl").value);
     unit.image = url || picked || unit.image;
     unit.images = document.getElementById("editUnitSamples").value
       .split("\n")
-      .map(function (s) { return s.trim(); })
+      .map(normalizeImageUrl)
       .filter(Boolean);
     if (unit.images.indexOf(unit.image) === -1) unit.images.unshift(unit.image);
     unit.active = document.getElementById("editUnitActive").checked;
@@ -109,12 +129,57 @@
     });
   }
 
+  function addMediaFromUrl(url, unitId) {
+    url = normalizeImageUrl(url);
+    if (!url) {
+      setCatalogStatus("Enter an image path or URL first.", "warn");
+      return;
+    }
+    catalog.media = catalog.media || [];
+    if (catalog.media.some(function (m) { return m.url === url; })) {
+      setCatalogStatus("That image is already in the library.", "warn");
+      return;
+    }
+    var mediaItem = {
+      id: "m-" + Date.now(),
+      url: url,
+      name: url.split("/").pop() || url,
+      unitId: unitId || "",
+      sortOrder: catalog.media.length,
+      createdAt: Date.now()
+    };
+    catalog.media.push(mediaItem);
+    if (unitId) {
+      var unit = catalog.units.find(function (u) { return u.id === unitId; });
+      if (unit) {
+        unit.image = url;
+        unit.images = unit.images || [];
+        if (unit.images.indexOf(url) === -1) unit.images.unshift(url);
+      }
+    }
+    saveCatalog("Photo added.");
+  }
+
+  function removeMediaItem(mediaId) {
+    var target = catalog.media.find(function (m) { return m.id === mediaId; });
+    if (!target) return;
+    catalog.media = catalog.media.filter(function (m) { return m.id !== mediaId; });
+    catalog.units.forEach(function (unit) {
+      if (unit.image === target.url) {
+        unit.image = (unit.images || []).find(function (u) { return u !== target.url; }) || unit.image;
+      }
+      unit.images = (unit.images || []).filter(function (u) { return u !== target.url; });
+      if (!unit.images.length && unit.image) unit.images = [unit.image];
+    });
+    saveCatalog("Photo removed from catalog.");
+  }
+
   function renderMediaGrid() {
     var grid = document.getElementById("mediaGrid");
     if (!grid || !catalog) return;
     grid.innerHTML = "";
     if (!catalog.media || !catalog.media.length) {
-      grid.innerHTML = "<p style='color:#888'>No uploaded photos yet.</p>";
+      grid.innerHTML = "<p style='color:#888'>No photos in library yet. Add a site image path or external URL below.</p>";
       return;
     }
     catalog.media.forEach(function (item) {
@@ -124,22 +189,50 @@
         '<img src="' + escapeAttr(item.url) + '" alt="">' +
         "<p>" + escapeHtml(item.name || item.url) + "</p>" +
         "<p style='color:#888;font-size:12px'>" + escapeHtml(item.unitId ? unitLabel(item.unitId) : "Unassigned") + "</p>" +
-        '<button type="button" data-del="' + escapeAttr(item.id) + '">Delete</button>';
+        '<button type="button" data-del="' + escapeAttr(item.id) + '">Remove</button>';
       card.querySelector("button").addEventListener("click", function () {
-        if (!window.confirm("Delete this photo from storage and catalog?")) return;
-        global.prillagaDeleteCatalogMedia(adminPin, item.id, function (err, data) {
-          if (err) {
-            setCatalogStatus(err.message, "error");
-            return;
-          }
-          catalog = data.catalog;
-          renderMediaGrid();
-          renderUnitEditor();
-          setCatalogStatus("Photo deleted.");
-        });
+        if (!window.confirm("Remove this photo from the catalog? (The image file stays on the server.)")) return;
+        removeMediaItem(item.id);
       });
       grid.appendChild(card);
     });
+  }
+
+  function populateSiteImageSelect() {
+    var sel = document.getElementById("mediaSiteImageSelect");
+    if (!sel) return;
+    sel.innerHTML = '<option value="">— pick a site image —</option>';
+    SITE_IMAGES.forEach(function (path) {
+      var opt = document.createElement("option");
+      opt.value = path;
+      opt.textContent = path;
+      sel.appendChild(opt);
+    });
+  }
+
+  function wireMediaControls() {
+    populateSiteImageSelect();
+
+    var addBtn = document.getElementById("btnAddMedia");
+    var urlInput = document.getElementById("mediaUrlInput");
+    var siteSelect = document.getElementById("mediaSiteImageSelect");
+    var unitSelect = document.getElementById("mediaUnitSelect");
+
+    if (siteSelect && urlInput) {
+      siteSelect.addEventListener("change", function () {
+        if (siteSelect.value) urlInput.value = siteSelect.value;
+      });
+    }
+
+    if (addBtn) {
+      addBtn.addEventListener("click", function () {
+        var url = urlInput ? urlInput.value : (siteSelect ? siteSelect.value : "");
+        var unitId = unitSelect ? unitSelect.value : "";
+        addMediaFromUrl(url, unitId);
+        if (urlInput) urlInput.value = "";
+        if (siteSelect) siteSelect.value = "";
+      });
+    }
   }
 
   function escapeHtml(s) {
@@ -160,49 +253,12 @@
       catalog = data;
       selectedUnitId = catalog.units[0] && catalog.units[0].id;
       populateMediaUnitSelect();
+      wireMediaControls();
       renderUnitList();
       renderUnitEditor();
+      renderMediaGrid();
       setCatalogStatus("Products loaded.");
     });
-
-    var uploadBtn = document.getElementById("btnUploadMedia");
-    var fileInput = document.getElementById("mediaFileInput");
-    var unitSelect = document.getElementById("mediaUnitSelect");
-    if (unitSelect && catalog) {
-      catalog.units.forEach(function (u) {
-        var opt = document.createElement("option");
-        opt.value = u.id;
-        opt.textContent = u.name;
-        unitSelect.appendChild(opt);
-      });
-    }
-
-    if (uploadBtn && fileInput) {
-      uploadBtn.addEventListener("click", function () {
-        var file = fileInput.files && fileInput.files[0];
-        if (!file) {
-          setCatalogStatus("Choose an image file first.", "warn");
-          return;
-        }
-        if (file.size > 5 * 1024 * 1024) {
-          setCatalogStatus("Image must be 5 MB or smaller.", "error");
-          return;
-        }
-        setCatalogStatus("Uploading…");
-        var unitId = unitSelect ? unitSelect.value : "";
-        global.prillagaUploadCatalogImage(adminPin, file, unitId, function (err, data) {
-          if (err) {
-            setCatalogStatus(err.message, "error");
-            return;
-          }
-          catalog = data.catalog;
-          fileInput.value = "";
-          renderMediaGrid();
-          renderUnitEditor();
-          setCatalogStatus("Photo uploaded and saved.");
-        });
-      });
-    }
   }
 
   function initMediaTab(pin) {
@@ -215,11 +271,13 @@
         }
         catalog = data;
         populateMediaUnitSelect();
+        wireMediaControls();
         renderMediaGrid();
       });
       return;
     }
     populateMediaUnitSelect();
+    wireMediaControls();
     renderMediaGrid();
   }
 
@@ -257,11 +315,9 @@
     initProductsTab(pin);
   };
 
-  /** Standalone admin/content.html — products + photos on one page. */
   global.prillagaInitAdminContentPage = function (pin) {
     window.__prillagaAdminPin = pin;
     adminPin = pin;
     initProductsTab(pin);
-    initMediaTab(pin);
   };
 })(window);

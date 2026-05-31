@@ -14,8 +14,8 @@
     <strong>Easiest — block dates in one tap:</strong> unlock below, then use <strong>Quick block (shows as Booked)</strong>. Pick the gear, start and end dates, press <strong>Block on calendar</strong>. Home and Availability pages show those days in <strong>red</strong> immediately (same browser).
   </p>
   <p class="lead" style="margin-top: -8px;">
-    Manage products, prices, photos, and availability from this dashboard. Changes save to the live website automatically — no code edits or manual JSON/image uploads.
-    Change your PIN before real use. Bookmark this page; it is not linked from the public site.
+    Free-plan admin: uses <strong>Supabase</strong> (free at supabase.com). See <code>scripts/SUPABASE-SETUP.md</code>. Edit products, photo URLs, and availability — saves to the live site automatically.
+    Set <code>PRILLAGA_ADMIN_PIN</code> on Vercel. Bookmark this page; it is not linked from the public site.
   </p>
 
   <div id="gate" class="panel">
@@ -105,12 +105,15 @@
 
     <div data-admin-panel="media" hidden>
       <div class="panel">
-        <h2 style="margin: 0 0 10px 0; font-size: 15px; color: #d4af37;">Upload photo</h2>
-        <p style="margin:0 0 12px 0;font-size:13px;color:#9a9a9a;">JPEG, PNG, WebP, or GIF up to 5 MB. Stored on Vercel Blob — not in your code folder.</p>
+        <h2 style="margin: 0 0 10px 0; font-size: 15px; color: #d4af37;">Add photo (free plan)</h2>
+        <p style="margin:0 0 12px 0;font-size:13px;color:#9a9a9a;">Use a path like <code>images/photo.jpg</code> or a full <code>https://</code> URL. Saved in free Supabase.</p>
+        <label for="mediaSiteImageSelect">Pick from site images</label>
+        <select id="mediaSiteImageSelect" aria-label="Pick site image"></select>
+        <label for="mediaUrlInput">Or paste image path / URL</label>
+        <input id="mediaUrlInput" type="text" placeholder="images/my-photo.jpg or https://..." autocomplete="off" aria-label="Image path or URL">
         <label for="mediaUnitSelect">Assign to product (optional)</label>
-        <select id="mediaUnitSelect" aria-label="Assign upload to product"></select>
-        <input id="mediaFileInput" type="file" accept="image/jpeg,image/png,image/webp,image/gif" aria-label="Choose image">
-        <button type="button" class="primary" id="btnUploadMedia">Upload &amp; save</button>
+        <select id="mediaUnitSelect" aria-label="Assign photo to product"></select>
+        <button type="button" class="primary" id="btnAddMedia">Add to library &amp; save</button>
       </div>
       <div class="panel">
         <h2 style="margin: 0 0 10px 0; font-size: 15px; color: #d4af37;">Library</h2>

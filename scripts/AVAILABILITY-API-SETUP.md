@@ -8,11 +8,14 @@ You no longer need to download or upload `availability-public.json` after every 
 
 ## One-time Vercel setup
 
-### 1. Connect Redis (Upstash)
+### 1. Connect Supabase (free)
 
-1. Open your project on [vercel.com](https://vercel.com)
-2. **Storage** → **Create Database** → **Upstash Redis** → connect to this project  
-   (Vercel adds `UPSTASH_REDIS_REST_URL` and `UPSTASH_REDIS_REST_TOKEN` automatically)
+See **`scripts/SUPABASE-SETUP.md`** for full steps:
+
+1. Create a free project at [supabase.com](https://supabase.com)
+2. Run **`supabase/schema.sql`** in the SQL editor
+3. Add **`SUPABASE_URL`** and **`SUPABASE_SERVICE_ROLE_KEY`** on Vercel
+4. Redeploy
 
 ### 2. Set admin PIN (recommended)
 
@@ -26,7 +29,7 @@ If unset, the default is `lens2026` (change this before going live).
 
 ### 3. Deploy
 
-Push/deploy the repo. Vercel will install `@upstash/redis` from `package.json` and enable:
+Push/deploy the repo. Vercel will install `@supabase/supabase-js` from `package.json` and enable:
 
 - `GET /api/bookings/public` — public calendar (cached ~15s)
 - `GET /api/bookings` — full data (admin, requires PIN header)
@@ -69,7 +72,7 @@ npm install
 npx vercel dev
 ```
 
-Add the same Upstash env vars to a local `.env` file (Vercel CLI loads them during `vercel dev`).
+Add the same Supabase env vars to a local `.env` file (Vercel CLI loads them during `vercel dev`).
 
 Run core validation tests:
 
@@ -83,7 +86,7 @@ node scripts/test-bookings-api.mjs
 
 | Problem | Fix |
 |---------|-----|
-| **503 — storage not configured** | Connect Upstash Redis on Vercel and redeploy |
+| **503 — storage not configured** | Set up Supabase — see `scripts/SUPABASE-SETUP.md` |
 | **401 — unauthorized** | Wrong admin PIN; set `PRILLAGA_ADMIN_PIN` on Vercel |
 | Admin saves but public page old | Wait up to 15s (cache) or refresh; auto-refresh runs every 45s |
 | Still using JSON file | Remove old deploy; ensure latest `index.html` / `availability.html` are live |

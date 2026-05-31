@@ -58,9 +58,6 @@ window.PRILLAGA_CATALOG_PUBLIC_API = "/api/catalog/public";
 /** Admin catalog API. */
 window.PRILLAGA_CATALOG_ADMIN_API = "/api/catalog";
 
-/** Admin image upload API. */
-window.PRILLAGA_UPLOAD_API = "/api/upload";
-
 window.prillagaCatalogPublicApiUrl = function () {
   var path = typeof window.PRILLAGA_CATALOG_PUBLIC_API === "string" ? window.PRILLAGA_CATALOG_PUBLIC_API.trim() : "/api/catalog/public";
   if (!path) return "";
@@ -71,14 +68,6 @@ window.prillagaCatalogPublicApiUrl = function () {
 
 window.prillagaCatalogAdminApiUrl = function () {
   var path = typeof window.PRILLAGA_CATALOG_ADMIN_API === "string" ? window.PRILLAGA_CATALOG_ADMIN_API.trim() : "/api/catalog";
-  if (!path) return "";
-  if (/^https?:\/\//i.test(path)) return path;
-  if (path.charAt(0) === "/") return path;
-  return "./" + path.replace(/^\.\//, "");
-};
-
-window.prillagaUploadApiUrl = function () {
-  var path = typeof window.PRILLAGA_UPLOAD_API === "string" ? window.PRILLAGA_UPLOAD_API.trim() : "/api/upload";
   if (!path) return "";
   if (/^https?:\/\//i.test(path)) return path;
   if (path.charAt(0) === "/") return path;

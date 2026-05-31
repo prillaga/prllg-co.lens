@@ -11,8 +11,8 @@
 <body>
   <h1>Admin home</h1>
   <p class="lead">
-    Choose a section to manage the live website. Sign in once — your PIN stays active while this browser tab session is open.
-    Bookmark this page; it is not linked from the public site.
+    Free-plan admin for your live website. Set up free <strong>Supabase</strong> once (see setup panel below) — then edit products, photo URLs, and availability with no paid storage add-ons.
+    Sign in once; your PIN stays active while this browser session is open. Bookmark this page.
   </p>
 
   <div id="gate" class="panel">
@@ -36,12 +36,22 @@
     <div class="admin-cards">
       <a class="admin-card" href="content.html">
         <h2>Products &amp; photos</h2>
-        <p>Edit prices, descriptions, primary images, and sample photos. Upload or delete photos in the media library.</p>
+        <p>Edit prices, descriptions, and image URLs. Pick from site images or paste links — saved in free Redis.</p>
       </a>
       <a class="admin-card" href="../admin.html">
         <h2>Availability calendar</h2>
         <p>Block dates, add pending requests, confirm or reject bookings. Updates the public calendar in red and amber.</p>
       </a>
+    </div>
+
+    <div class="panel">
+      <h2>Free setup (Supabase)</h2>
+      <p style="margin:0;font-size:13px;line-height:1.7;color:#bbb;">
+        1. <a href="https://supabase.com" target="_blank" rel="noopener">supabase.com</a> → new free project<br>
+        2. SQL Editor → run <code>supabase/schema.sql</code> from this repo<br>
+        3. Vercel → env vars <code>SUPABASE_URL</code> + <code>SUPABASE_SERVICE_ROLE_KEY</code><br>
+        4. Redeploy · Full guide: <code>scripts/SUPABASE-SETUP.md</code>
+      </p>
     </div>
 
     <div class="panel">
