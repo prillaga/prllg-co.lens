@@ -199,15 +199,6 @@
         <label for="rentedUnit">Rented unit</label>
         <select id="rentedUnit" name="rented_unit" required>
           <option value="">Select Units</option>
-          <option value="Nikon DSLR Flipscreen w/ kitlens 15-80mm">Nikon DSLR Flipscreen w/ kitlens 15-80mm</option>
-          <option value="Nikon DSLR Flipscreen w/ Zoom Lens 70-300mm">Nikon DSLR Flipscreen w/ Zoom Lens 70-300mm</option>
-          <option value="Nikon DSLR w/ Zoom Lens + Kitlens + Extra battery">Nikon DSLR w/ Zoom Lens + Kitlens + Extra battery</option>
-          <option value="Canon 1200D DSLR w/ kitlens 18-55mm">Canon 1200D DSLR w/ kitlens 18-55mm</option>
-          <option value="Canon 4000D DSLR w/ kitlens 18-55mm">Canon 4000D DSLR w/ kitlens 18-55mm</option>
-          <option value="G6 THUMB CAMERA">G6 THUMB CAMERA</option>
-          <option value="Kodak EasyShare V603">Kodak EasyShare V603</option>
-          <option value="DJI OSMO MOBILE 3 GIMBAL">DJI OSMO MOBILE 3 GIMBAL</option>
-          <option value="Zoom Lens 70-300mm">Zoom Lens 70-300mm</option>
         </select>
       </div>
       <div class="doc-grid2">
@@ -309,6 +300,8 @@
   </main>
 
 <script src="site-config.js"></script>
+<script src="scripts/catalog-api.js"></script>
+<script src="scripts/site-content.js"></script>
 <script>
 (function () {
   if (typeof window.PRILLAGA_BUSINESS_EMAIL !== "string" || !String(window.PRILLAGA_BUSINESS_EMAIL).trim()) {
@@ -1303,6 +1296,11 @@
       a.setAttribute("href", base);
     });
   })();
+</script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    if (window.prillagaInitSiteCatalog) window.prillagaInitSiteCatalog();
+  });
 </script>
 </body>
 </html>

@@ -46,6 +46,67 @@ window.PRILLAGA_FORMSUBMIT_ENDPOINT = "243e4ab576936c3f12f624ccd78c3dee";
 /** Live site base URL — used when the form is opened as a file:// on a phone. */
 window.PRILLAGA_LIVE_SITE_URL = "https://prllg-co-lens.vercel.app";
 
+/** Public availability API (replaces manual availability-public.json uploads). */
+window.PRILLAGA_BOOKINGS_PUBLIC_API = "/api/bookings/public";
+
+/** Admin availability API (staff dashboard save/load). */
+window.PRILLAGA_BOOKINGS_ADMIN_API = "/api/bookings";
+
+/** Public catalog API (units, prices, photos). */
+window.PRILLAGA_CATALOG_PUBLIC_API = "/api/catalog/public";
+
+/** Admin catalog API. */
+window.PRILLAGA_CATALOG_ADMIN_API = "/api/catalog";
+
+/** Admin image upload API. */
+window.PRILLAGA_UPLOAD_API = "/api/upload";
+
+window.prillagaCatalogPublicApiUrl = function () {
+  var path = typeof window.PRILLAGA_CATALOG_PUBLIC_API === "string" ? window.PRILLAGA_CATALOG_PUBLIC_API.trim() : "/api/catalog/public";
+  if (!path) return "";
+  if (/^https?:\/\//i.test(path)) return path;
+  if (path.charAt(0) === "/") return path;
+  return "./" + path.replace(/^\.\//, "");
+};
+
+window.prillagaCatalogAdminApiUrl = function () {
+  var path = typeof window.PRILLAGA_CATALOG_ADMIN_API === "string" ? window.PRILLAGA_CATALOG_ADMIN_API.trim() : "/api/catalog";
+  if (!path) return "";
+  if (/^https?:\/\//i.test(path)) return path;
+  if (path.charAt(0) === "/") return path;
+  return "./" + path.replace(/^\.\//, "");
+};
+
+window.prillagaUploadApiUrl = function () {
+  var path = typeof window.PRILLAGA_UPLOAD_API === "string" ? window.PRILLAGA_UPLOAD_API.trim() : "/api/upload";
+  if (!path) return "";
+  if (/^https?:\/\//i.test(path)) return path;
+  if (path.charAt(0) === "/") return path;
+  return "./" + path.replace(/^\.\//, "");
+};
+
+window.prillagaBookingsPublicApiUrl = function () {
+  var path =
+    typeof window.PRILLAGA_BOOKINGS_PUBLIC_API === "string"
+      ? window.PRILLAGA_BOOKINGS_PUBLIC_API.trim()
+      : "/api/bookings/public";
+  if (!path) return "";
+  if (/^https?:\/\//i.test(path)) return path;
+  if (path.charAt(0) === "/") return path;
+  return "./" + path.replace(/^\.\//, "");
+};
+
+window.prillagaBookingsAdminApiUrl = function () {
+  var path =
+    typeof window.PRILLAGA_BOOKINGS_ADMIN_API === "string"
+      ? window.PRILLAGA_BOOKINGS_ADMIN_API.trim()
+      : "/api/bookings";
+  if (!path) return "";
+  if (/^https?:\/\//i.test(path)) return path;
+  if (path.charAt(0) === "/") return path;
+  return "./" + path.replace(/^\.\//, "");
+};
+
 window.prillagaBusinessEmail = function () {
   var email = typeof window.PRILLAGA_BUSINESS_EMAIL === "string" ? window.PRILLAGA_BUSINESS_EMAIL.trim() : "";
   return email || "";

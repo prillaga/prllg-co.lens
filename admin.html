@@ -39,6 +39,28 @@
       font-size: 14px; opacity: 0; pointer-events: none; transition: opacity 0.2s; z-index: 10;
     }
     #toast.show { opacity: 1; }
+    .admin-tabs { display: flex; flex-wrap: wrap; gap: 8px; margin: 0 0 16px 0; }
+    .admin-tabs button {
+      padding: 10px 16px; border-radius: 999px; border: 1px solid #444; background: #1a1a1a; color: #ddd; cursor: pointer;
+    }
+    .admin-tabs button.is-active {
+      border-color: #d4af37; color: #f4ebd0; background: #252015;
+    }
+    .admin-layout { display: grid; grid-template-columns: 220px 1fr; gap: 16px; }
+    @media (max-width: 720px) { .admin-layout { grid-template-columns: 1fr; } }
+    #productUnitList { display: flex; flex-direction: column; gap: 6px; }
+    #productUnitList .tab-unit { text-align: left; width: 100%; }
+    #productUnitList .tab-unit.is-active { border-color: #d4af37; color: #d4af37; }
+    textarea {
+      width: 100%; max-width: 100%; padding: 10px 12px; border-radius: 8px;
+      border: 1px solid #333; background: #161616; color: #fff; margin-bottom: 12px; font-size: 14px; min-height: 80px;
+    }
+    .media-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(140px, 1fr)); gap: 12px; }
+    .media-card {
+      background: #161616; border: 1px solid #2a2a2a; border-radius: 10px; padding: 8px;
+    }
+    .media-card img { width: 100%; height: 110px; object-fit: cover; border-radius: 8px; display: block; margin-bottom: 8px; }
+    .media-card p { margin: 0 0 6px 0; font-size: 12px; word-break: break-all; }
   </style>
   <link rel="stylesheet" href="responsive.css">
 </head>
@@ -48,8 +70,8 @@
     <strong>Easiest — block dates in one tap:</strong> unlock below, then use <strong>Quick block (shows as Booked)</strong>. Pick the gear, start and end dates, press <strong>Block on calendar</strong>. Home and Availability pages show those days in <strong>red</strong> immediately (same browser).
   </p>
   <p class="lead" style="margin-top: -8px;">
-    <strong>Customer requests:</strong> use <strong>Add pending request</strong> so the calendar shows <strong>amber</strong> first; press <strong>Confirm</strong> when the rental is final (turns <strong>red</strong> and clears overlapping pendings).
-    Draft data lives in this browser (<code>localStorage</code>). For the live site, use <strong>Download public calendar file</strong> and replace <code>availability-public.json</code> in the project before deploy so every customer sees the same busy dates. Change <code>ADMIN_PIN</code> before real use. Bookmark this file; it is not linked from the public site.
+    Manage products, prices, photos, and availability from this dashboard. Changes save to the live website automatically — no code edits or manual JSON/image uploads.
+    Change your PIN before real use. Bookmark this page; it is not linked from the public site.
   </p>
 
   <div id="gate" class="panel">
@@ -59,11 +81,24 @@
   </div>
 
   <div id="panel" hidden>
-    <p class="ok">Unlocked. Use Quick block to mark dates as Booked in one step, or pending → Confirm for Messenger leads.</p>
+    <p class="ok">Unlocked. Changes save automatically to the live website.</p>
+    <p id="syncStatus" style="margin: 0 0 10px 0; font-size: 13px; color: #8ecf9a; min-height: 1.4em;" role="status">Loading…</p>
+    <p id="catalogSyncStatus" style="margin: 0 0 14px 0; font-size: 13px; color: #8ecf9a; min-height: 1.4em;" role="status"></p>
+
+    <div class="admin-tabs" role="tablist" aria-label="Admin sections">
+      <button type="button" class="is-active" data-admin-tab="availability">Availability</button>
+      <button type="button" data-admin-tab="products">Products &amp; prices</button>
+      <button type="button" data-admin-tab="media">Photos</button>
+    </div>
+
     <p style="margin: 0 0 14px 0;">
-      <button type="button" class="primary" id="btnExportPublic">Download public calendar file</button>
+      <a href="index.html#home">Home</a> · <a href="index.html#availability-calendar">Availability (homepage)</a> · <a href="availability.html">Full-page calendar</a> · <a href="index.html#book-now">Booking form</a>
     </p>
-    <p><a href="index.html#home">Home</a> · <a href="index.html#availability-calendar">Availability (homepage)</a> · <a href="availability.html">Full-page calendar</a> · <a href="index.html#book-now">Booking form</a></p>
+
+    <div data-admin-panel="availability">
+    <p style="margin: 0 0 14px 0;">
+      <button type="button" id="btnExportPublic">Download backup JSON (optional)</button>
+    </p>
     <div class="panel" style="border-color: #6b5a30;">
       <h2 style="margin: 0 0 8px 0; font-size: 15px; color: #d4af37;">Quick block (shows as Booked)</h2>
       <p style="margin: 0 0 14px 0; font-size: 13px; color: #9a9a9a; line-height: 1.5;">For maintenance, personal days, or any time the gear must show as booked. No amber step — dates go <strong style="color:#e8b4b4;">red</strong> on the calendar right away.</p>
@@ -102,11 +137,44 @@
       <h2 style="margin: 0 0 12px 0; font-size: 15px; color: #888;">Recently rejected</h2>
       <ul id="rejectedList"></ul>
     </div>
+    </div>
+
+    <div data-admin-panel="products" hidden>
+      <div class="admin-layout">
+        <div class="panel">
+          <h2 style="margin: 0 0 10px 0; font-size: 15px; color: #d4af37;">Products</h2>
+          <div id="productUnitList"></div>
+        </div>
+        <div class="panel" id="productEditor">
+          <p style="color:#888">Select a product to edit prices and description.</p>
+        </div>
+      </div>
+    </div>
+
+    <div data-admin-panel="media" hidden>
+      <div class="panel">
+        <h2 style="margin: 0 0 10px 0; font-size: 15px; color: #d4af37;">Upload photo</h2>
+        <p style="margin:0 0 12px 0;font-size:13px;color:#9a9a9a;">JPEG, PNG, WebP, or GIF up to 5 MB. Stored on Vercel Blob — not in your code folder.</p>
+        <label for="mediaUnitSelect">Assign to product (optional)</label>
+        <select id="mediaUnitSelect" aria-label="Assign upload to product"></select>
+        <input id="mediaFileInput" type="file" accept="image/jpeg,image/png,image/webp,image/gif" aria-label="Choose image">
+        <button type="button" class="primary" id="btnUploadMedia">Upload &amp; save</button>
+      </div>
+      <div class="panel">
+        <h2 style="margin: 0 0 10px 0; font-size: 15px; color: #d4af37;">Library</h2>
+        <div id="mediaGrid" class="media-grid"></div>
+      </div>
+    </div>
+
     <button type="button" id="btnLock">Lock</button>
   </div>
 
   <div id="toast" role="status"></div>
 
+<script src="site-config.js"></script>
+<script src="scripts/bookings-api.js"></script>
+<script src="scripts/catalog-api.js"></script>
+<script src="scripts/admin-dashboard.js"></script>
 <script>
 (function () {
   var STORAGE_KEY = 'prillaga_lens_bookings_v1';
@@ -125,16 +193,33 @@
     { id: 'dji-gimbal', label: 'DJI OSMO MOBILE 3 GIMBAL' }
   ];
 
+  function applyCatalogUnits(cat) {
+    if (!cat || !Array.isArray(cat.units) || !cat.units.length) return;
+    UNITS = cat.units.map(function (u) { return { id: u.id, label: u.name }; });
+    fillUnitSelects();
+  }
+
   var bookings = [];
+  var adminPinSession = '';
+  var saveQueue = Promise.resolve();
   var channel = typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel(CHANNEL_NAME) : null;
   var toastHideTimer = null;
+
+  function setSyncStatus(text, tone) {
+    var el = document.getElementById('syncStatus');
+    if (!el) return;
+    el.textContent = text;
+    if (tone === 'error') el.style.color = '#e8a0a0';
+    else if (tone === 'warn') el.style.color = '#e8d080';
+    else el.style.color = '#8ecf9a';
+  }
 
   function compareDates(a, b) { return a < b ? -1 : a > b ? 1 : 0; }
   function rangesOverlap(s1, e1, s2, e2) {
     return compareDates(s1, e2) <= 0 && compareDates(s2, e1) <= 0;
   }
 
-  function loadBookings() {
+  function loadBookingsLocal() {
     try {
       var raw = localStorage.getItem(STORAGE_KEY);
       bookings = raw ? JSON.parse(raw) : [];
@@ -142,9 +227,56 @@
     } catch (e) { bookings = []; }
   }
 
+  function loadBookingsFromServer(done) {
+    if (!adminPinSession || !window.prillagaFetchAdminBookings) {
+      loadBookingsLocal();
+      setSyncStatus('Offline mode — using this browser only.', 'warn');
+      if (done) done();
+      return;
+    }
+    setSyncStatus('Loading live calendar…');
+    window.prillagaFetchAdminBookings(adminPinSession, function (err, list) {
+      if (err) {
+        loadBookingsLocal();
+        setSyncStatus('Could not reach server — showing local copy. ' + err.message, 'error');
+        toast(err.message || 'Could not load from server.');
+      } else {
+        bookings = list;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(bookings));
+        setSyncStatus('Live calendar loaded. Changes save automatically.');
+      }
+      if (done) done();
+    });
+  }
+
+  function loadBookings() {
+    loadBookingsLocal();
+  }
+
   function saveBookings() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(bookings));
     if (channel) channel.postMessage({ type: 'update', t: Date.now() });
+
+    if (!adminPinSession || !window.prillagaSaveAdminBookings) {
+      setSyncStatus('Saved locally only — unlock with PIN on live site to sync.', 'warn');
+      return;
+    }
+
+    setSyncStatus('Saving to live site…');
+    saveQueue = saveQueue.then(function () {
+      return new Promise(function (resolve) {
+        window.prillagaSaveAdminBookings(adminPinSession, bookings, function (err) {
+          if (err) {
+            setSyncStatus('Save failed — ' + err.message, 'error');
+            toast('Save failed: ' + err.message);
+          } else {
+            setSyncStatus('Saved — live website updated.');
+            toast('Saved — customers see this calendar now.');
+          }
+          resolve();
+        });
+      });
+    });
   }
 
   function unitLabel(id) {
@@ -380,7 +512,7 @@
 
       if (window.navigator && typeof window.navigator.msSaveOrOpenBlob === 'function') {
         window.navigator.msSaveOrOpenBlob(blob, 'availability-public.json');
-        toast('Saved snapshot — replace availability-public.json on the site, then deploy.');
+        toast('Saved snapshot — optional backup only. Live site already uses the API.');
         return;
       }
 
@@ -396,7 +528,7 @@
         URL.revokeObjectURL(url);
         if (a.parentNode) a.parentNode.removeChild(a);
       }, 2500);
-      toast('Saved snapshot — replace availability-public.json on the site, then deploy.');
+      toast('Saved snapshot — optional backup only. Live site already uses the API.');
     } catch (err) {
       toast('Download failed: ' + (err && err.message ? err.message : String(err)));
     }
@@ -408,20 +540,34 @@
   if (btnExportPublic) btnExportPublic.addEventListener('click', exportPublicCalendarFile);
 
   document.getElementById('btnUnlock').addEventListener('click', function () {
-    if (document.getElementById('adminPin').value === ADMIN_PIN) {
+    var entered = document.getElementById('adminPin').value;
+    if (entered === ADMIN_PIN) {
+      adminPinSession = entered;
       document.getElementById('gate').hidden = true;
       document.getElementById('panel').hidden = false;
       document.getElementById('adminPin').value = '';
       fillUnitSelects();
-      render();
-      toast('Unlocked.');
+      loadBookingsFromServer(function () {
+        render();
+        if (window.prillagaFetchAdminCatalog) {
+          window.prillagaFetchAdminCatalog(adminPinSession, function (err, cat) {
+            if (!err) applyCatalogUnits(cat);
+          });
+        }
+        if (window.prillagaInitAdminDashboard) {
+          window.prillagaInitAdminDashboard(adminPinSession);
+        }
+        toast('Unlocked.');
+      });
     } else {
       toast('Incorrect PIN.');
     }
   });
   document.getElementById('btnLock').addEventListener('click', function () {
+    adminPinSession = '';
     document.getElementById('gate').hidden = false;
     document.getElementById('panel').hidden = true;
+    setSyncStatus('');
   });
 
   window.addEventListener('storage', function (e) {

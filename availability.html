@@ -5,6 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="description" content="See rental availability by unit — Prillaga&amp;Co. Lens.">
   <title>Availability | Prillaga&amp;Co. Lens</title>
+  <script src="site-config.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
@@ -120,6 +121,24 @@
     .note a { color: #d4af37; }
     .owner-only-note { display: none; }
     .owner-unlocked .owner-only-note { display: inline; }
+    #availability-load-error {
+      display: none;
+      margin: 0 0 16px 0;
+      padding: 12px 14px;
+      border-radius: 8px;
+      border: 1px solid #6b3030;
+      background: rgba(120, 28, 28, 0.35);
+      color: #f0caca;
+      font-size: 13px;
+      line-height: 1.5;
+      text-align: center;
+    }
+    #availability-load-error.is-visible { display: block; }
+    #availability-load-error.is-warning {
+      border-color: #6b5a30;
+      background: rgba(90, 70, 20, 0.35);
+      color: #f0e6c4;
+    }
   </style>
   <link rel="stylesheet" href="site-nav.css">
   <link rel="stylesheet" href="responsive.css">
@@ -155,8 +174,9 @@
   <main id="availability-main">
     <h1 class="lux-heading">Availability</h1>
     <p style="text-align: center; margin: 0 0 24px 0; color: #9a9a9a; font-size: 14px; line-height: 1.5;">
-      Confirmed bookings (including staff blocks) show in red as <strong>Booked</strong>. Amber is a pending request. The site also loads a published file (<code>availability-public.json</code>) so everyone sees the same blocks after you deploy an export from staff admin.
+      Confirmed bookings (including staff blocks) show in red as <strong>Booked</strong>. Amber is a pending request. The calendar loads automatically from the live availability server and refreshes after staff save changes in admin.
     </p>
+    <p id="availability-load-error" role="alert"></p>
 
     <div class="toolbar">
       <div>
@@ -187,7 +207,7 @@
 
     <p class="note">
       <span class="owner-only-note">
-        <strong>Customers:</strong> booked dates come from the published <code>availability-public.json</code> on this site (same data for every visitor). <strong>Staff:</strong> open <a href="admin.html"><code>admin.html</code></a>, unlock with your PIN, update the calendar, then use <strong>Download public calendar file</strong> and replace <code>availability-public.json</code> in the project before deploy so customers always see which days are booked. Local browser data still merges for quick testing on one device.
+        <strong>Staff:</strong> open <a href="admin.html"><code>admin.html</code></a>, unlock with your PIN, and update the calendar — changes save to the live site automatically. No JSON upload needed.
       </span>
       <span>
         Questions? <a href="index.html#book-now">Send a booking request</a> and we will confirm on Messenger.
@@ -195,6 +215,8 @@
     </p>
   </main>
 
+<script src="scripts/bookings-api.js"></script>
+<script src="scripts/catalog-api.js"></script>
 <script>
 (function () {
   var STORAGE_KEY = "prillaga_lens_bookings_v1";
@@ -217,6 +239,8 @@
   var viewMonth = now.getMonth();
   var channel = typeof BroadcastChannel !== "undefined" ? new BroadcastChannel(CHANNEL_NAME) : null;
   var publicBookings = null;
+  var publicBookingsLoaded = false;
+  var publicBookingsMeta = { source: "loading", message: "" };
 
   var OWNER_PIN = "lens2026";
   var OWNER_KEY = "prillaga_owner_ok_v1";
@@ -244,56 +268,63 @@
     return compareDates(start, dayStr) <= 0 && compareDates(dayStr, end) <= 0;
   }
 
-  function loadBookingsLocal() {
-    try {
-      var raw = localStorage.getItem(STORAGE_KEY);
-      var arr = raw ? JSON.parse(raw) : [];
-      return Array.isArray(arr) ? arr : [];
-    } catch (e) {
-      return [];
+  function updateAvailabilityLoadNotice() {
+    var el = document.getElementById("availability-load-error");
+    if (!el) return;
+    if (!publicBookingsLoaded) {
+      el.classList.remove("is-visible", "is-warning");
+      el.textContent = "";
+      return;
     }
-  }
-
-  function mergePublicAndLocal(remote, local) {
-    var map = {};
-    var i;
-    for (i = 0; i < remote.length; i++) {
-      var r = remote[i];
-      if (!r || !r.id || !r.unitId || !r.start || !r.end) continue;
-      if (r.status !== "approved" && r.status !== "pending") continue;
-      map[String(r.id)] = r;
+    if (publicBookingsMeta.source === "error") {
+      el.textContent =
+        "Could not load live availability. Please refresh the page or contact us on Messenger. " +
+        (publicBookingsMeta.message || "");
+      el.classList.add("is-visible");
+      el.classList.remove("is-warning");
+      return;
     }
-    for (i = 0; i < local.length; i++) {
-      var l = local[i];
-      if (!l || !l.id) continue;
-      map[String(l.id)] = l;
+    if (publicBookingsMeta.source === "fallback") {
+      el.textContent = publicBookingsMeta.message || "Showing backup calendar data.";
+      el.classList.add("is-visible", "is-warning");
+      return;
     }
-    var out = [];
-    for (var k in map) {
-      if (Object.prototype.hasOwnProperty.call(map, k)) out.push(map[k]);
-    }
-    return out;
+    el.classList.remove("is-visible", "is-warning");
+    el.textContent = "";
   }
 
   function loadBookingsMerged() {
-    var local = loadBookingsLocal();
-    var remote = publicBookings === null ? [] : publicBookings;
-    return mergePublicAndLocal(remote, local);
+    if (!publicBookingsLoaded || publicBookings === null) return [];
+    return publicBookings;
   }
 
   function fetchPublicBookings(cb) {
-    fetch("./availability-public.json", { cache: "no-store" })
-      .then(function (res) {
-        return res.ok ? res.json() : [];
-      })
-      .then(function (data) {
-        publicBookings = Array.isArray(data) ? data : [];
-        if (cb) cb();
-      })
-      .catch(function () {
+    if (!window.prillagaFetchPublicBookings) {
+      publicBookings = [];
+      publicBookingsLoaded = true;
+      publicBookingsMeta = { source: "error", message: "Availability script missing." };
+      updateAvailabilityLoadNotice();
+      if (cb) cb();
+      return;
+    }
+    window.prillagaFetchPublicBookings(function (err, data, meta) {
+      publicBookingsLoaded = true;
+      if (err) {
         publicBookings = [];
-        if (cb) cb();
-      });
+        publicBookingsMeta = { source: "error", message: err.message || String(err) };
+      } else {
+        publicBookings = Array.isArray(data) ? data : [];
+        publicBookingsMeta = meta || { source: "api" };
+      }
+      updateAvailabilityLoadNotice();
+      if (cb) cb();
+    });
+  }
+
+  function refreshAvailabilityFromServer() {
+    fetchPublicBookings(function () {
+      renderMonth();
+    });
   }
 
   function statusForDay(dayStr, unitFilter) {
@@ -321,14 +352,18 @@
     };
   }
 
-  function fillUnitSelect() {
+  function fillUnitSelectFromCatalog(catalog) {
     var sel = document.getElementById("unitSelect");
-    UNITS.forEach(function (u) {
+    if (!sel || !catalog) return;
+    var current = sel.value;
+    while (sel.options.length > 1) sel.remove(1);
+    (catalog.units || []).forEach(function (unit) {
       var opt = document.createElement("option");
-      opt.value = u.id;
-      opt.textContent = u.label;
+      opt.value = unit.id;
+      opt.textContent = unit.name;
       sel.appendChild(opt);
     });
+    if (current) sel.value = current;
   }
 
   function renderMonth() {
@@ -399,19 +434,27 @@
   document.getElementById("unitSelect").addEventListener("change", renderMonth);
 
   window.addEventListener("storage", function (e) {
-    if (e.key === STORAGE_KEY) renderMonth();
+    if (e.key === STORAGE_KEY) refreshAvailabilityFromServer();
   });
   if (channel) {
     channel.addEventListener("message", function () {
-      renderMonth();
+      refreshAvailabilityFromServer();
     });
   }
 
-  fillUnitSelect();
+  fillUnitSelectFromCatalog({ units: [] });
   renderMonth();
   fetchPublicBookings(function () {
     renderMonth();
   });
+  if (window.prillagaFetchPublicCatalog) {
+    window.prillagaFetchPublicCatalog(function (err, catalog) {
+      if (!err && catalog) fillUnitSelectFromCatalog(catalog);
+    });
+  }
+  if (window.prillagaStartPublicBookingsAutoRefresh) {
+    window.prillagaStartPublicBookingsAutoRefresh(refreshAvailabilityFromServer, 45000);
+  }
 })();
 </script>
 <a class="prillaga-messenger-link" href="javascript:void(0)" target="_blank" rel="noopener noreferrer" aria-label="Messenger" style="position: fixed; right: 16px; bottom: 16px; z-index: 999; display: inline-flex; align-items: center; justify-content: center; width: 46px; height: 46px; border-radius: 999px; background: linear-gradient(135deg, rgba(18, 18, 18, 0.96) 0%, rgba(30, 30, 30, 0.96) 100%); border: 1px solid rgba(212, 175, 55, 0.48); color: #f4ebd0; text-decoration: none; line-height: 1; box-shadow: 0 10px 28px rgba(0, 0, 0, 0.42); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);">
