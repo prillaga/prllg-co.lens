@@ -22,8 +22,20 @@
   function setCatalogStatus(text, tone) {
     var el = document.getElementById("catalogSyncStatus");
     if (!el) return;
-    el.textContent = text;
+    el.textContent = text || "";
     el.style.color = tone === "error" ? "#e8a0a0" : tone === "warn" ? "#e8d080" : "#8ecf9a";
+    try {
+      el.scrollIntoView({ behavior: "smooth", block: "nearest" });
+    } catch (e) { /* ignore */ }
+  }
+
+  function setFormError(text) {
+    var el = document.getElementById("productFormError");
+    if (el) {
+      el.textContent = text || "";
+      el.style.display = text ? "block" : "none";
+    }
+    if (text && global.prillagaAdminToast) global.prillagaAdminToast(text);
   }
 
   function unitLabel(id) {
@@ -186,21 +198,26 @@
   }
 
   function renderNewProductForm(panel) {
+    var siteOpts = SITE_IMAGES.map(function (path) {
+      return '<option value="' + escapeAttr(path) + '">' + escapeHtml(path) + "</option>";
+    }).join("");
+
     panel.innerHTML =
       "<h2 style='margin:0 0 12px 0;font-size:15px;color:#d4af37;'>New product</h2>" +
-      "<label>Product name</label>" +
-      '<input id="newUnitName" type="text" placeholder="e.g. Sony A6400 kit">' +
+      '<p id="productFormError" class="field-error" style="display:none;margin-bottom:10px;"></p>' +
+      "<label>Product name *</label>" +
+      '<input id="newUnitName" type="text" placeholder="e.g. Sony A6400 kit" required>' +
       "<label>Description</label>" +
-      '<textarea id="newUnitDesc" rows="4" placeholder="Details shown on the card"></textarea>' +
+      '<textarea id="newUnitDesc" rows="3" placeholder="Details shown on the card"></textarea>' +
       "<label>Base rate (₱/day)</label>" +
       '<input id="newUnitBase" type="number" min="0" step="1" value="500">' +
       "<label>Long rate (₱/day, 3+ days)</label>" +
       '<input id="newUnitLong" type="number" min="0" step="1" value="450">' +
-      "<label>Primary photo (upload)</label>" +
+      "<label>Primary photo (optional — pick site image, URL, or upload)</label>" +
+      '<select id="newUnitSiteImage"><option value="">— optional site image —</option>' + siteOpts + "</select>" +
+      '<input id="newUnitPrimaryUrl" type="text" placeholder="Or paste images/photo.jpg or https://...">' +
       '<input id="newUnitPrimaryFile" type="file" accept="image/jpeg,image/png,image/webp,image/gif">' +
       filePreviewHtml("newUnitPrimaryFile") +
-      "<label>Or primary photo URL / path</label>" +
-      '<input id="newUnitPrimaryUrl" type="text" placeholder="images/photo.jpg or https://...">' +
       "<label>Sample photos (optional, multiple)</label>" +
       '<input id="newUnitSampleFiles" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple>' +
       filePreviewHtml("newUnitSampleFiles") +
@@ -209,10 +226,18 @@
       '<div style="margin-top:12px;display:flex;flex-wrap:wrap;gap:8px;">' +
       '<button type="button" class="primary" id="btnSaveNewUnit">Save new product</button>' +
       '<button type="button" id="btnCancelNewUnit">Cancel</button>' +
-      "</div>";
+      "</div>" +
+      '<p style="margin:10px 0 0;font-size:12px;color:#888;">If you skip a photo, a default image is used. You can change it after saving.</p>';
 
     wireFilePreview("newUnitPrimaryFile");
     wireFilePreview("newUnitSampleFiles");
+    var siteSel = document.getElementById("newUnitSiteImage");
+    var urlInput = document.getElementById("newUnitPrimaryUrl");
+    if (siteSel && urlInput) {
+      siteSel.addEventListener("change", function () {
+        if (siteSel.value) urlInput.value = siteSel.value;
+      });
+    }
     document.getElementById("btnSaveNewUnit").addEventListener("click", saveNewProduct);
     document.getElementById("btnCancelNewUnit").addEventListener("click", function () {
       isCreatingNew = false;
@@ -220,6 +245,8 @@
       renderUnitList();
       renderProductPanel();
     });
+    var nameEl = document.getElementById("newUnitName");
+    if (nameEl) nameEl.focus();
   }
 
   function renderUnitEditor(panel) {
@@ -235,6 +262,7 @@
 
     panel.innerHTML =
       "<h2 style='margin:0 0 12px 0;font-size:15px;color:#d4af37;'>Edit product</h2>" +
+      '<p id="productFormError" class="field-error" style="display:none;margin-bottom:10px;"></p>' +
       "<p style='margin:0 0 10px 0;font-size:12px;color:#888;'>ID: <code>" + escapeHtml(unit.id) + "</code></p>" +
       "<label>Name</label>" +
       '<input id="editUnitName" type="text" value="' + escapeAttr(unit.name) + '">' +
@@ -280,34 +308,43 @@
   }
 
   function saveNewProduct() {
+    setFormError("");
     var name = document.getElementById("newUnitName").value.trim();
     var description = document.getElementById("newUnitDesc").value.trim();
     var baseRate = Number(document.getElementById("newUnitBase").value) || 0;
     var longRate = Number(document.getElementById("newUnitLong").value) || 0;
     var primaryFile = document.getElementById("newUnitPrimaryFile").files;
+    var siteImage = document.getElementById("newUnitSiteImage")
+      ? document.getElementById("newUnitSiteImage").value
+      : "";
     var primaryUrlField = normalizeImageUrl(
       document.getElementById("newUnitPrimaryUrl")
         ? document.getElementById("newUnitPrimaryUrl").value
         : ""
-    );
+    ) || normalizeImageUrl(siteImage);
     var sampleFiles = document.getElementById("newUnitSampleFiles").files;
     var active = document.getElementById("newUnitActive").checked;
     var bookable = document.getElementById("newUnitBookable").checked;
 
     if (!name) {
+      setFormError("Enter a product name first.");
       setCatalogStatus("Enter a product name.", "warn");
+      document.getElementById("newUnitName").focus();
       return;
     }
-    if ((!primaryFile || !primaryFile[0]) && !primaryUrlField) {
-      setCatalogStatus("Upload a primary photo or paste an image URL/path.", "warn");
+    if (!catalog || !Array.isArray(catalog.units)) {
+      setFormError("Catalog not loaded. Unlock again or refresh the page.");
+      setCatalogStatus("Catalog not loaded.", "error");
       return;
     }
 
     var unitId = uniqueUnitId(name);
+    var defaultImage = "images/nikon-kitlens.jpg";
     var btn = document.getElementById("btnSaveNewUnit");
     if (btn) { btn.disabled = true; btn.textContent = "Saving…"; }
 
-    function finishCreate(primaryUrl, sampleUrls) {
+    function finishCreate(primaryUrl, sampleUrls, note) {
+      if (!primaryUrl) primaryUrl = defaultImage;
       var sampleList = [primaryUrl].concat(sampleUrls || []).filter(Boolean);
       sampleList = sampleList.filter(function (u, i, arr) { return arr.indexOf(u) === i; });
       pushMedia(primaryUrl, name + " primary", unitId);
@@ -327,31 +364,34 @@
           longRateMinDays: (catalog.settings && catalog.settings.longRateMinDays) || 3
         },
         sortOrder: nextSortOrder(),
-        active: active,
-        bookable: bookable
+        active: active !== false,
+        bookable: bookable !== false
       });
 
       selectedUnitId = unitId;
+      isCreatingNew = false;
       if (btn) { btn.disabled = false; btn.textContent = "Save new product"; }
-      saveCatalog("New product saved — live website updated.");
+      setFormError("");
+      saveCatalog(note || "New product saved — live website updated.");
+      if (global.prillagaAdminToast) global.prillagaAdminToast("Saving " + name + "…");
     }
 
+    // Prefer upload when a file is chosen; otherwise URL/site image/default.
     if (primaryFile && primaryFile[0]) {
-      setCatalogStatus("Uploading photos…");
+      setCatalogStatus("Uploading photo…");
       uploadFiles([primaryFile[0]], unitId, function (err, primaryUrls) {
         if (err) {
+          var fallback = primaryUrlField || defaultImage;
           setCatalogStatus(
-            "Upload failed — " + err.message +
-              " Tip: run supabase/storage.sql, or paste an image URL instead.",
-            "error"
+            "Upload failed (" + err.message + "). Saving product with " + fallback + " instead.",
+            "warn"
           );
-          if (btn) { btn.disabled = false; btn.textContent = "Save new product"; }
+          finishCreate(fallback, [], "Product saved with fallback image — upload failed.");
           return;
         }
         uploadFiles(sampleFiles ? Array.prototype.slice.call(sampleFiles) : [], unitId, function (err2, extraUrls) {
           if (err2) {
-            setCatalogStatus(err2.message, "error");
-            if (btn) { btn.disabled = false; btn.textContent = "Save new product"; }
+            finishCreate(primaryUrls[0], [], "Product saved (sample upload skipped).");
             return;
           }
           finishCreate(primaryUrls[0], extraUrls);
@@ -360,7 +400,7 @@
       return;
     }
 
-    finishCreate(primaryUrlField, []);
+    finishCreate(primaryUrlField || defaultImage, []);
   }
 
   function saveSelectedUnit() {
