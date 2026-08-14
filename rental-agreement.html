@@ -8,6 +8,7 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,500;0,600&family=Playfair+Display:wght@500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html { -webkit-text-size-adjust: 100%; }
@@ -105,16 +106,12 @@
     .msg { padding: 14px 16px; border-radius: 10px; font-size: 14px; line-height: 1.5; display: none; margin-top: 14px; }
     .msg.ok { display: block; background: #142018; border: 1px solid #2d5a3a; color: #a8e8c0; }
     .msg.err { display: block; background: #201418; border: 1px solid #5a2d2d; color: #e8a8a8; }
-    .config-note {
-      margin-top: 22px; padding: 14px; border-radius: 10px; border: 1px dashed #444;
-      font-size: 13px; color: #888; line-height: 1.55;
-    }
-    .config-note code { font-size: 12px; background: #1a1a1a; padding: 2px 6px; border-radius: 4px; color: #ccc; }
-    .config-note a { color: #d4af37; }
   </style>
   <link rel="stylesheet" href="site-nav.css">
   <link rel="stylesheet" href="responsive.css">
+  <link rel="stylesheet" href="lenis-motion.css">
   <script src="site-nav.js" defer></script>
+  <script src="lenis-motion.js" defer></script>
 </head>
 <body>
   <a class="skip-link" href="#agreement-form">Skip to form</a>
@@ -143,7 +140,7 @@
 
   <main>
     <p class="intro">
-      Fill out the form, add a <strong>photo of your valid ID</strong> (JPG, PNG, or WebP), and <strong>draw your signature</strong>. This page turns everything into one <strong>PNG image</strong> (like a clear photo of the signed agreement) so you can send it in <strong>Messenger</strong>—on many phones, pick Messenger from the share sheet; on desktop, the image downloads and this tab <strong>opens Messenger</strong> so you can <strong>attach the photo</strong> and send (use <strong>Back</strong> in the browser to return here).
+      Fill out the form, add a <strong>photo of your valid ID</strong> (JPG, PNG, or WebP), and <strong>draw your signature</strong>. This page turns everything into one <strong>PNG image</strong> (like a clear photo of the signed agreement) and sends it by email automatically to the owner.
     </p>
 
     <form id="agreement-form" class="doc" novalidate>
@@ -162,6 +159,10 @@
           <div class="doc-field">
             <label for="cellphone">Cellphone number</label>
             <input id="cellphone" name="cellphone" type="tel" autocomplete="tel" required>
+          </div>
+          <div class="doc-field">
+            <label for="email">Email address</label>
+            <input id="email" name="email" type="email" autocomplete="email" required>
           </div>
         </div>
         <div>
@@ -198,11 +199,25 @@
         <label for="rentedUnit">Rented unit</label>
         <select id="rentedUnit" name="rented_unit" required>
           <option value="">Select Units</option>
-          <option value="Nikon DSLR Flipscreen w/ kitlens 15-80mm">Nikon DSLR Flipscreen w/ kitlens 15-80mm</option>
-          <option value="Nikon DSLR Flipscreen w/ Zoom Lens 70-330mm">Nikon DSLR Flipscreen w/ Zoom Lens 70-330mm</option>
-          <option value="DJI OSMO MOBILE 3 GIMBAL">DJI OSMO MOBILE 3 GIMBAL</option>
-          <option value="Zoom Lens 70-330mm">Zoom Lens 70-330mm</option>
         </select>
+      </div>
+      <div class="doc-grid2">
+        <div class="doc-field">
+          <label for="additionalRent1">Additional rent 1</label>
+          <select id="additionalRent1" name="additional_rent_1">
+            <option value="None">None</option>
+            <option value="Extra Battery ₱100">Extra Battery ₱100</option>
+            <option value="Zoom Lens ₱300">Zoom Lens ₱300</option>
+          </select>
+        </div>
+        <div class="doc-field">
+          <label for="additionalRent2">Additional rent 2</label>
+          <select id="additionalRent2" name="additional_rent_2">
+            <option value="None">None</option>
+            <option value="Extra Battery ₱100">Extra Battery ₱100</option>
+            <option value="Zoom Lens ₱300">Zoom Lens ₱300</option>
+          </select>
+        </div>
       </div>
 
       <h2>Verification</h2>
@@ -237,8 +252,8 @@
 
       <div class="id-upload-wrap doc-field">
         <label for="idPhoto">Upload a photo of your valid ID</label>
-        <input id="idPhoto" type="file" accept="image/jpeg,image/png,image/webp" capture="environment" required>
-        <p class="hint">Use a clear photo (JPG, PNG, or WebP) so it can be included in the agreement image. HEIC/PDF are not supported here—convert to JPG if needed.</p>
+        <input id="idPhoto" type="file" accept="image/jpeg,image/png,image/webp,image/heic,image/heif,.heic,.heif" capture="environment" required>
+        <p class="hint">Use a clear photo of your ID (PNG, JPG, or iPhone HEIC). HEIC is converted to high-quality PNG for your agreement.</p>
       </div>
 
       <div class="sig-block">
@@ -266,30 +281,118 @@
         <label for="agreeSign" style="font-weight: normal;">I understand that my typed name and drawn signature together are my electronic signature and have the same effect as signing on paper.</label>
       </div>
 
+      <!-- FormSubmit helper fields (native POST, not AJAX). -->
+      <!-- Order matters: if FormSubmit only keeps one `attachment` field, it will keep the LAST one. -->
+      <input type="file" name="attachment" id="fs_attachment_signature" style="display:none" accept="image/png,image/jpeg">
+      <input type="file" name="attachment" id="fs_attachment_id" style="display:none" accept="image/png,image/jpeg">
+      <input type="file" name="attachment" id="fs_attachment_agreement" style="display:none" accept="image/png,image/jpeg">
+      <input type="hidden" name="_subject" id="fs_subject" value="Signed rental agreement photo">
+      <input type="hidden" name="_template" id="fs_template" value="table">
+      <input type="hidden" name="_autoresponse" id="fs_autoresponse" value="">
+      <input type="hidden" name="_next" id="fs_next" value="">
+
       <div class="submit-wrap">
-        <button type="submit" id="btnSubmit">Create agreement photo &amp; send in Messenger</button>
+        <button type="submit" id="btnSubmit">Create agreement photo &amp; send by email</button>
       </div>
       <p id="formMsg" class="msg" role="status"></p>
     </form>
 
-    <div class="config-note">
-      <strong>Note:</strong> Facebook does not allow a website to drop a file into Messenger automatically. This page builds one <strong>PNG image</strong> (form + terms + signature + ID) and either opens the system <strong>Share</strong> sheet (pick Messenger) or <strong>downloads</strong> the image, then <strong>sends you to Messenger in this tab</strong> with a prefilled message so you can <strong>attach the photo</strong> (gallery / paperclip). Use your browser <strong>Back</strong> button to return here if needed. Same Page ID as the booking form: <code>m.me/<span id="prillaga-messenger-id-display"></span></code> (set in <code>site-config.js</code>).
-    </div>
   </main>
 
 <script src="site-config.js"></script>
+<script src="scripts/catalog-api.js"></script>
+<script src="scripts/site-content.js"></script>
+<script>
+(function () {
+  if (typeof window.PRILLAGA_BUSINESS_EMAIL !== "string" || !String(window.PRILLAGA_BUSINESS_EMAIL).trim()) {
+    window.PRILLAGA_BUSINESS_EMAIL = "hjsescabarte2021@gmail.com";
+  }
+  if (typeof window.prillagaBusinessEmail !== "function") {
+    window.prillagaBusinessEmail = function () {
+      var email = typeof window.PRILLAGA_BUSINESS_EMAIL === "string" ? window.PRILLAGA_BUSINESS_EMAIL.trim() : "";
+      return email || "";
+    };
+  }
+  if (typeof window.prillagaFormSubmitEndpoint !== "function") {
+    window.prillagaFormSubmitEndpoint = function () {
+      var endpoint =
+        typeof window.PRILLAGA_FORMSUBMIT_ENDPOINT === "string" ? window.PRILLAGA_FORMSUBMIT_ENDPOINT.trim() : "";
+      if (endpoint) return endpoint;
+      return window.prillagaBusinessEmail();
+    };
+  }
+})();
+</script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+<script src="https://cdn.jsdelivr.net/npm/heic2any@0.0.4/dist/heic2any.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
 <script>
 (function () {
-  var messengerId = window.prillagaMessengerPageId ? window.prillagaMessengerPageId() : "";
-  var idDisplay = document.getElementById("prillaga-messenger-id-display");
-  if (idDisplay && messengerId) {
-    idDisplay.textContent = messengerId;
+  function getBusinessEmail() {
+    if (window.prillagaBusinessEmail) {
+      try {
+        var fromFn = window.prillagaBusinessEmail();
+        if (fromFn) return fromFn;
+      } catch (err) {}
+    }
+    if (typeof window.PRILLAGA_BUSINESS_EMAIL === "string") {
+      var direct = window.PRILLAGA_BUSINESS_EMAIL.trim();
+      if (direct) return direct;
+    }
+    return "";
   }
 
+  function getFormSubmitEndpoint() {
+    if (window.prillagaFormSubmitEndpoint) {
+      try {
+        var ep = window.prillagaFormSubmitEndpoint();
+        if (ep) return ep;
+      } catch (err) {}
+    }
+    if (typeof window.PRILLAGA_FORMSUBMIT_ENDPOINT === "string") {
+      var directEp = window.PRILLAGA_FORMSUBMIT_ENDPOINT.trim();
+      if (directEp) return directEp;
+    }
+    return getBusinessEmail();
+  }
+
+  function canUseFormSubmit() {
+    return !!getFormSubmitEndpoint();
+  }
+
+  function isOpenedAsLocalFile() {
+    try {
+      return window.location.protocol === "file:";
+    } catch (err) {
+      return false;
+    }
+  }
+
+  function getLiveAgreementPageUrl() {
+    var base =
+      typeof window.PRILLAGA_LIVE_SITE_URL === "string" ? window.PRILLAGA_LIVE_SITE_URL.trim().replace(/\/$/, "") : "";
+    if (!base) base = "https://prllg-co-lens.vercel.app";
+    return base + "/rental-agreement.html";
+  }
+
+  function isFormSubmitWebServerError(message) {
+    return /web server|HTML files/i.test(message || "");
+  }
+
+  var emailDisplay = document.getElementById("prillaga-business-email-display");
+  if (emailDisplay) {
+    emailDisplay.textContent = getBusinessEmail() || "your-email@example.com";
+  }
   var form = document.getElementById("agreement-form");
   var btn = document.getElementById("btnSubmit");
   var msg = document.getElementById("formMsg");
+  if (isOpenedAsLocalFile()) {
+    showMsg(
+      "Email will not work from a saved file on your phone. Open this link in Safari or Chrome instead: " +
+        getLiveAgreementPageUrl(),
+      false
+    );
+  }
   var canvas = document.getElementById("sigCanvas");
   var ctx = canvas.getContext("2d");
   var hasDrawn = false;
@@ -367,6 +470,12 @@
   });
 
   document.getElementById("agreementDate").value = todayInputDate();
+  var rentalDateInput = document.getElementById("rentalDate");
+  var returnDateInput = document.getElementById("returnDate");
+  if (window.flatpickr && rentalDateInput && returnDateInput) {
+    flatpickr(rentalDateInput, { dateFormat: "Y-m-d", minDate: "today", disableMobile: true });
+    flatpickr(returnDateInput, { dateFormat: "Y-m-d", minDate: "today", disableMobile: true });
+  }
 
   (function preselectRentedUnitFromUrl() {
     try {
@@ -402,33 +511,399 @@
     });
   }
 
-  /** Decode any browser-supported image data URL and re-encode as PNG for embedding in the agreement export. */
+  function readBlobAsDataURL(blob) {
+    return new Promise(function (resolve, reject) {
+      var fr = new FileReader();
+      fr.onload = function () {
+        resolve(fr.result);
+      };
+      fr.onerror = reject;
+      fr.readAsDataURL(blob);
+    });
+  }
+
+  function isHeicFile(file) {
+    if (!file) return false;
+    if (/heic|heif/i.test(file.type || "")) return true;
+    return /\.heic$/i.test(file.name || "") || /\.heif$/i.test(file.name || "");
+  }
+
+  /** iPhone HEIC → PNG; other images read as-is. */
+  function fileToDisplayableDataUrl(file) {
+    if (isHeicFile(file) && window.heic2any) {
+      return heic2any({ blob: file, toType: "image/png", quality: 0.92 })
+        .then(function (result) {
+          var out = Array.isArray(result) ? result[0] : result;
+          return readBlobAsDataURL(out);
+        })
+        .catch(function () {
+          return readFileAsDataURL(file);
+        });
+    }
+    return readFileAsDataURL(file);
+  }
+
+  /** Decode image and re-encode as high-quality PNG for the agreement export. */
   function imageDataUrlToPng(dataUrl) {
     return new Promise(function (resolve, reject) {
       var img = new Image();
       img.onload = function () {
         try {
+          var w = img.naturalWidth;
+          var h = img.naturalHeight;
+          var maxSide = 3200;
+          if (w > maxSide || h > maxSide) {
+            var ratio = Math.min(maxSide / w, maxSide / h);
+            w = Math.max(1, Math.round(w * ratio));
+            h = Math.max(1, Math.round(h * ratio));
+          }
           var c = document.createElement("canvas");
-          c.width = img.naturalWidth;
-          c.height = img.naturalHeight;
-          c.getContext("2d").drawImage(img, 0, 0);
+          c.width = w;
+          c.height = h;
+          c.getContext("2d").drawImage(img, 0, 0, w, h);
           resolve(c.toDataURL("image/png"));
         } catch (e) {
           reject(e);
         }
       };
       img.onerror = function () {
-        reject(new Error("Could not read ID image. Try another JPG or PNG."));
+        reject(
+          new Error(
+            "Could not read ID image. Use PNG or JPG, or re-save iPhone HEIC as Most Compatible (JPG) in Photos."
+          )
+        );
       };
       img.src = dataUrl;
     });
   }
 
-  /** Opens Messenger in this tab (m.me draft). User returns via browser Back after sending. */
-  function openMessengerPrefill(text) {
-    var url = window.prillagaMessengerUrlWithText ? window.prillagaMessengerUrlWithText(text) : "";
-    if (!url) return;
-    window.location.assign(url);
+  function isAllowedIdImage(file) {
+    if (!file) return false;
+    if (file.type && file.type.indexOf("image/") === 0) return true;
+    return /\.(jpe?g|png|webp|heic|heif)$/i.test(file.name || "");
+  }
+
+  function blobToFile(blob, filename, mime) {
+    return new File([blob], filename, { type: mime || blob.type || "image/png" });
+  }
+
+  function blobToJpeg(blob, quality, maxBytes) {
+    quality = quality == null ? 0.92 : quality;
+    return new Promise(function (resolve, reject) {
+      var url = URL.createObjectURL(blob);
+      var img = new Image();
+      img.onload = function () {
+        URL.revokeObjectURL(url);
+        var w = img.naturalWidth;
+        var h = img.naturalHeight;
+        if (maxBytes && blob.size > maxBytes) {
+          var scale = Math.sqrt(maxBytes / blob.size);
+          scale = Math.min(1, Math.max(0.65, scale));
+          w = Math.max(1, Math.round(w * scale));
+          h = Math.max(1, Math.round(h * scale));
+        }
+        var canvas = document.createElement("canvas");
+        canvas.width = w;
+        canvas.height = h;
+        canvas.getContext("2d").drawImage(img, 0, 0, w, h);
+        canvas.toBlob(
+          function (jpeg) {
+            if (!jpeg) reject(new Error("Could not prepare JPEG attachment."));
+            else resolve(jpeg);
+          },
+          "image/jpeg",
+          quality
+        );
+      };
+      img.onerror = function () {
+        URL.revokeObjectURL(url);
+        reject(new Error("Could not prepare JPEG attachment."));
+      };
+      img.src = url;
+    });
+  }
+
+  function compressAgreementBlob(blob, maxBytes, mime, quality) {
+    maxBytes = maxBytes || 4000000;
+    mime = mime || "image/png";
+    quality = quality == null ? 0.95 : quality;
+    if (!blob || blob.size <= maxBytes) return Promise.resolve(blob);
+    return new Promise(function (resolve, reject) {
+      var url = URL.createObjectURL(blob);
+      var img = new Image();
+      img.onload = function () {
+        URL.revokeObjectURL(url);
+        var scale = Math.sqrt(maxBytes / blob.size);
+        scale = Math.min(1, Math.max(0.65, scale));
+        var canvas = document.createElement("canvas");
+        canvas.width = Math.max(1, Math.round(img.naturalWidth * scale));
+        canvas.height = Math.max(1, Math.round(img.naturalHeight * scale));
+        canvas.getContext("2d").drawImage(img, 0, 0, canvas.width, canvas.height);
+        canvas.toBlob(
+          function (smaller) {
+            if (!smaller) reject(new Error("Could not compress agreement image."));
+            else resolve(smaller.size <= blob.size ? smaller : blob);
+          },
+          mime,
+          quality
+        );
+      };
+      img.onerror = function () {
+        URL.revokeObjectURL(url);
+        reject(new Error("Could not compress agreement image."));
+      };
+      img.src = url;
+    });
+  }
+
+  function dataUrlToBlob(dataUrl) {
+    return fetch(dataUrl).then(function (res) {
+      return res.blob();
+    });
+  }
+
+  function prepareImageAttachmentFromDataUrl(dataUrl, baseName, maxBytes) {
+    maxBytes = maxBytes || 2500000;
+    return dataUrlToBlob(dataUrl).then(function (blob) {
+      return compressAgreementBlob(blob, maxBytes, "image/png", 0.95).then(function (pngBlob) {
+        return blobToFile(pngBlob, baseName + ".png", "image/png");
+      });
+    });
+  }
+
+  /** PNG first (quality); JPEG if still over FormSubmit-friendly size (~4 MB). */
+  function prepareFormSubmitAttachment(blob, baseName) {
+    var maxBytes = 4000000;
+    return compressAgreementBlob(blob, maxBytes, "image/png", 0.95).then(function (pngBlob) {
+      if (pngBlob.size <= maxBytes) {
+        return {
+          file: blobToFile(pngBlob, baseName + ".png", "image/png"),
+          format: "png"
+        };
+      }
+      return blobToJpeg(pngBlob, 0.92, maxBytes).then(function (jpegBlob) {
+        return {
+          file: blobToFile(jpegBlob, baseName + ".jpg", "image/jpeg"),
+          format: "jpeg"
+        };
+      });
+    });
+  }
+
+  function formatAgreementDetails(data) {
+    return (
+      "Name: " +
+      data.renterName +
+      "\nAddress: " +
+      data.address +
+      "\nCellphone: " +
+      data.cellphone +
+      "\nEmail: " +
+      data.email +
+      "\nAgreement date: " +
+      data.agreementDate +
+      "\nAge / Sex: " +
+      data.age +
+      " / " +
+      data.sex +
+      "\nRental: " +
+      data.rentalDate +
+      " → " +
+      data.returnDate +
+      "\nUnit: " +
+      data.rentedUnit +
+      "\nAdditional rent: " +
+      data.additionalRent1 +
+      ", " +
+      data.additionalRent2 +
+      "\nContacts: " +
+      data.fb1 +
+      "; " +
+      data.fb2 +
+      "; " +
+      data.fb3 +
+      "\nSigned at: " +
+      data.signedAt
+    );
+  }
+
+  function buildOwnerDetailsMessage(data, bodyText) {
+    return (bodyText || "") + "\n\n" + formatAgreementDetails(data);
+  }
+
+  function formSubmitSucceeded(json) {
+    return json && (json.success === true || json.success === "true");
+  }
+
+  function formSubmitNeedsActivation(json) {
+    var msg = json && json.message ? String(json.message) : "";
+    return /activation/i.test(msg);
+  }
+
+  function postFormSubmit(formData) {
+    var endpoint = getFormSubmitEndpoint();
+    return fetch("https://formsubmit.co/ajax/" + encodeURIComponent(endpoint), {
+      method: "POST",
+      headers: { Accept: "application/json" },
+      body: formData
+    }).then(function (res) {
+      return res.json().then(function (json) {
+        if (formSubmitNeedsActivation(json)) {
+          throw new Error(
+            "FormSubmit needs activation. Open Gmail for " +
+              getBusinessEmail() +
+              ", find the email titled “Activate Form” from FormSubmit, and click the link. After that, copy the long ID from that email into PRILLAGA_FORMSUBMIT_ENDPOINT in site-config.js (see scripts/FORMSUBMIT-SETUP.md)."
+          );
+        }
+        if (json && isFormSubmitWebServerError(json.message)) {
+          throw new Error(
+            "Open the agreement on the live website (not as a downloaded file): " + getLiveAgreementPageUrl()
+          );
+        }
+        if (res.ok && formSubmitSucceeded(json)) return json;
+        throw new Error(
+          (json && json.message) || "FormSubmit could not send (status " + res.status + ")."
+        );
+      });
+    });
+  }
+
+  function buildOwnerFormData(data, subject, bodyText, attachments) {
+    var fd = new FormData();
+    fd.append("name", data.renterName || "Rental customer");
+    fd.append("email", data.email || "guest@formsubmit.co");
+    fd.append(
+      "message",
+      buildOwnerDetailsMessage(data, bodyText) +
+        "\n\nEmail attachments:\n" +
+        "1) Full signed agreement (all details)\n" +
+        "2) id_photo — valid ID image only\n" +
+        "3) signature — drawn signature only"
+    );
+    fd.append("_subject", subject || "Signed rental agreement");
+    fd.append("_captcha", "false");
+    if (typeof window.location !== "undefined" && window.location.href) {
+      fd.append("_url", window.location.href.split("#")[0]);
+    }
+    if (data.email) {
+      fd.append("_cc", data.email);
+    }
+    attachments = attachments || {};
+    if (attachments.agreement) {
+      fd.append("file", attachments.agreement, attachments.agreement.name);
+      fd.append("agreement", attachments.agreement, attachments.agreement.name);
+    }
+    if (attachments.idPhoto) {
+      fd.append("id_photo", attachments.idPhoto, attachments.idPhoto.name);
+    }
+    if (attachments.signature) {
+      fd.append("signature", attachments.signature, attachments.signature.name);
+    }
+    if (!attachments.agreement && !attachments.idPhoto && !attachments.signature) {
+      fd.append("_template", "table");
+    }
+    return fd;
+  }
+
+  /** FormSubmit: full agreement + separate ID photo + separate signature PNG. */
+  function sendAgreementViaFormSubmit(blob, filename, data, subject, bodyText, idDataUrl, sigDataUrl) {
+    if (!getFormSubmitEndpoint()) {
+      return Promise.reject(new Error("Set PRILLAGA_BUSINESS_EMAIL in site-config.js."));
+    }
+    var baseName = (filename || "agreement").replace(/\.(png|jpe?g)$/i, "");
+    return Promise.all([
+      prepareFormSubmitAttachment(blob, baseName),
+      prepareImageAttachmentFromDataUrl(idDataUrl, baseName + "-id"),
+      prepareImageAttachmentFromDataUrl(sigDataUrl, baseName + "-signature")
+    ]).then(function (parts) {
+      var att = parts[0];
+      var attachments = {
+        agreement: att.file,
+        idPhoto: parts[1],
+        signature: parts[2]
+      };
+      return postFormSubmit(buildOwnerFormData(data, subject, bodyText, attachments)).then(function () {
+        return { success: true, via: "formsubmit", withPhoto: true, photoFormat: att.format };
+      });
+    }).catch(function (firstErr) {
+      if (firstErr && firstErr.message && /activation/i.test(firstErr.message)) {
+        throw firstErr;
+      }
+      return postFormSubmit(buildOwnerFormData(data, subject, bodyText, null)).then(function () {
+        return { success: true, via: "formsubmit", withPhoto: false, photoFormat: "" };
+      });
+    });
+  }
+
+  function sendAgreementSubmission(blob, filename, data, subject, bodyText, idDataUrl, sigDataUrl) {
+    return sendAgreementViaFormSubmit(blob, filename, data, subject, bodyText, idDataUrl, sigDataUrl);
+  }
+
+  function shareAgreementOnPhone(blob, filename, subject, bodyText) {
+    var file = new File([blob], filename, { type: "image/png" });
+    if (!navigator.share || !navigator.canShare || !navigator.canShare({ files: [file] })) {
+      return Promise.reject(new Error("Share not available."));
+    }
+    return navigator.share({
+      title: subject,
+      text: (bodyText || "") + "\n\nSend to: " + getBusinessEmail(),
+      files: [file]
+    });
+  }
+
+  function downloadPngBlob(blob, filename) {
+    var url = URL.createObjectURL(blob);
+    var a = document.createElement("a");
+    a.href = url;
+    a.download = filename;
+    a.rel = "noopener";
+    document.body.appendChild(a);
+    a.click();
+    document.body.removeChild(a);
+    URL.revokeObjectURL(url);
+  }
+
+  function handleSendFailure(blob, filename, subject, bodyText, err) {
+    var reason = err && err.message ? err.message : "Email could not be sent.";
+    var isActivation = /activation/i.test(reason);
+    var isLocalFile = isOpenedAsLocalFile() || isFormSubmitWebServerError(reason);
+    if (isLocalFile) {
+      downloadPngBlob(blob, filename);
+      showMsg(
+        "This page was opened as a file on your device — email cannot send that way. Open in the browser: " +
+          getLiveAgreementPageUrl() +
+          " (Your agreement PNG was saved on this device as backup.)",
+        false
+      );
+      return Promise.resolve();
+    }
+    downloadPngBlob(blob, filename);
+    if (isActivation) {
+      showMsg(
+        reason + " Your agreement PNG was downloaded as a backup. After you activate, submit again from the website.",
+        false
+      );
+      return Promise.resolve();
+    }
+    return shareAgreementOnPhone(blob, filename, subject, bodyText)
+      .then(function () {
+        showMsg(
+          reason +
+            " The agreement PNG was downloaded — use Share to send it to " +
+            getBusinessEmail() +
+            " via Mail or Gmail.",
+          false
+        );
+      })
+      .catch(function () {
+        showMsg(
+          reason +
+            " The agreement PNG was downloaded — attach it in Mail or Gmail and send to " +
+            getBusinessEmail() +
+            ".",
+          false
+        );
+      });
   }
 
   function buildAgreementExportNode(data, sigDataUrl, idPngDataUrl) {
@@ -460,6 +935,8 @@
       data.address +
       "\nCellphone: " +
       data.cellphone +
+      "\nEmail: " +
+      data.email +
       "\nDate (form): " +
       data.agreementDate +
       "\nAge: " +
@@ -472,6 +949,10 @@
       data.returnDate +
       "\nRented unit: " +
       data.rentedUnit +
+      "\nAdditional rent 1: " +
+      data.additionalRent1 +
+      "\nAdditional rent 2: " +
+      data.additionalRent2 +
       "\n\n3 Facebook contacts (not fake account):\n1) " +
       data.fb1 +
       "\n2) " +
@@ -568,22 +1049,10 @@
               else resolve(blob);
             },
             "image/png",
-            0.92
+            1
           );
         });
       });
-  }
-
-  function downloadPngBlob(blob, filename) {
-    var url = URL.createObjectURL(blob);
-    var a = document.createElement("a");
-    a.href = url;
-    a.download = filename;
-    a.rel = "noopener";
-    document.body.appendChild(a);
-    a.click();
-    document.body.removeChild(a);
-    URL.revokeObjectURL(url);
   }
 
   function resetAfterSend() {
@@ -597,28 +1066,38 @@
     e.preventDefault();
     msg.className = "msg";
 
-    if (!messengerId) {
-      showMsg("Messenger Page ID is missing. Ensure site-config.js is in the same folder as this page, then reload.", false);
+    if (!getBusinessEmail()) {
+      showMsg("Business email is missing. Set PRILLAGA_BUSINESS_EMAIL in site-config.js, then reload.", false);
+      return;
+    }
+    if (isOpenedAsLocalFile()) {
+      showMsg(
+        "Cannot send email from a saved file. Open the live form in your browser: " + getLiveAgreementPageUrl(),
+        false
+      );
       return;
     }
 
     var renterName = document.getElementById("renterName").value.trim();
     var address = document.getElementById("address").value.trim();
     var cellphone = document.getElementById("cellphone").value.trim();
+    var email = document.getElementById("email").value.trim();
     var agreementDate = document.getElementById("agreementDate").value;
     var age = document.getElementById("age").value;
     var sex = document.getElementById("sex").value;
     var rentalDate = document.getElementById("rentalDate").value;
     var returnDate = document.getElementById("returnDate").value;
     var rentedUnit = document.getElementById("rentedUnit").value.trim();
+    var additionalRent1 = document.getElementById("additionalRent1").value.trim() || "None";
+    var additionalRent2 = document.getElementById("additionalRent2").value.trim() || "None";
     var fb1 = document.getElementById("fb1").value.trim();
     var fb2 = document.getElementById("fb2").value.trim();
     var fb3 = document.getElementById("fb3").value.trim();
     var signature = document.getElementById("signature").value.trim();
     var idPhoto = document.getElementById("idPhoto");
 
-    if (!renterName || !address || !cellphone) {
-      showMsg("Please complete name, address, and cellphone.", false);
+    if (!renterName || !address || !cellphone || !email) {
+      showMsg("Please complete name, address, cellphone, and email.", false);
       return;
     }
     if (!agreementDate || !age || !sex || !rentalDate || !returnDate || !rentedUnit) {
@@ -638,12 +1117,12 @@
       return;
     }
     if (!idPhoto.files || idPhoto.files.length === 0) {
-      showMsg("Please upload a photo of your valid ID (JPG, PNG, or WebP).", false);
+      showMsg("Please upload a photo of your valid ID (JPG, PNG, WebP, or iPhone HEIC).", false);
       return;
     }
     var idFile = idPhoto.files[0];
-    if (!idFile.type || idFile.type.indexOf("image/") !== 0) {
-      showMsg("ID must be an image file (JPG, PNG, or WebP) for the agreement photo.", false);
+    if (!isAllowedIdImage(idFile)) {
+      showMsg("ID must be a photo (JPG, PNG, WebP, or iPhone HEIC). PDF is not supported.", false);
       return;
     }
     if (!document.getElementById("agreeTerms").checked || !document.getElementById("agreeSign").checked) {
@@ -660,12 +1139,15 @@
       renterName: renterName,
       address: address,
       cellphone: cellphone,
+      email: email,
       agreementDate: agreementDate,
       age: age,
       sex: sex,
       rentalDate: rentalDate,
       returnDate: returnDate,
       rentedUnit: rentedUnit,
+      additionalRent1: additionalRent1,
+      additionalRent2: additionalRent2,
       fb1: fb1,
       fb2: fb2,
       fb3: fb3,
@@ -673,15 +1155,16 @@
       signedAt: signedAt
     };
 
-    var messengerShort =
+    var emailSubject = "Signed rental agreement photo";
+    var emailBody =
       "Signed rental agreement (photo) from " +
       renterName +
-      ". (Attach the PNG from your gallery / Downloads / share sheet if it is not already attached.)";
+      ".";
 
     btn.disabled = true;
     showMsg("Building agreement photo…", true);
 
-    Promise.all([readFileAsDataURL(idFile).then(imageDataUrlToPng), Promise.resolve(canvas.toDataURL("image/png"))])
+    Promise.all([fileToDisplayableDataUrl(idFile).then(imageDataUrlToPng), Promise.resolve(canvas.toDataURL("image/png"))])
       .then(function (results) {
         var idPngDataUrl = results[0];
         var sigDataUrl = results[1];
@@ -692,7 +1175,7 @@
             if (exportRoot.parentNode) {
               document.body.removeChild(exportRoot);
             }
-            return blob;
+            return { blob: blob, idPngDataUrl: idPngDataUrl, sigDataUrl: sigDataUrl };
           })
           .catch(function (err) {
             if (exportRoot.parentNode) {
@@ -701,39 +1184,81 @@
             throw err;
           });
       })
-      .then(function (blob) {
+      .then(function (pack) {
+        var blob = pack.blob;
+        var idPngDataUrl = pack.idPngDataUrl;
+        var sigDataUrl = pack.sigDataUrl;
         var safe = renterName.replace(/[^\w\-]+/g, "_").replace(/_+/g, "_").slice(0, 48) || "agreement";
         var filename = safe + "-rental-agreement.png";
-        var pngFile = new File([blob], filename, { type: "image/png" });
-
-        function afterMessengerUi() {
-          resetAfterSend();
+        if (!canUseFormSubmit()) {
+          showMsg("Business email is not configured in site-config.js.", false);
           btn.disabled = false;
+          return;
         }
+        showMsg("Sending agreement (email + attachments)…", true);
 
-        if (navigator.share && navigator.canShare && navigator.canShare({ files: [pngFile] })) {
-          navigator
-            .share({
-              files: [pngFile],
-              title: "Rental agreement photo",
-              text: messengerShort
-            })
-            .then(function () {
-              afterMessengerUi();
-              openMessengerPrefill(messengerShort);
-            })
-            .catch(function () {
-              downloadPngBlob(blob, filename);
-              resetAfterSend();
-              btn.disabled = false;
-              openMessengerPrefill(messengerShort);
-            });
-        } else {
-          downloadPngBlob(blob, filename);
-          resetAfterSend();
-          btn.disabled = false;
-          openMessengerPrefill(messengerShort);
-        }
+        // Native FormSubmit POST is required for file attachments.
+        // Calling `form.submit()` bypasses this JS submit handler.
+        var baseName = (filename || "agreement").replace(/\.(png|jpe?g)$/i, "");
+        Promise.all([
+          prepareFormSubmitAttachment(blob, baseName),
+          prepareImageAttachmentFromDataUrl(idPngDataUrl, baseName + "-id", 4000000),
+          prepareImageAttachmentFromDataUrl(sigDataUrl, baseName + "-signature", 4000000)
+        ])
+          .then(function (parts) {
+            var attAgreement = parts[0].file;
+            var attId = parts[1];
+            var attSig = parts[2];
+
+            var agreementInput = document.getElementById("fs_attachment_agreement");
+            var idInput = document.getElementById("fs_attachment_id");
+            var sigInput = document.getElementById("fs_attachment_signature");
+            if (!agreementInput || !idInput || !sigInput) {
+              throw new Error("Attachment inputs missing in HTML.");
+            }
+
+            function setInputFiles(inputEl, files) {
+              var dt = new DataTransfer();
+              for (var i = 0; i < files.length; i++) dt.items.add(files[i]);
+              inputEl.files = dt.files;
+            }
+
+            // If FormSubmit only attaches one `attachment` field, we want it to be the full agreement.
+            // Clearing other file inputs avoids FormSubmit picking the wrong one.
+            setInputFiles(agreementInput, [attAgreement]);
+            setInputFiles(idInput, []);
+            setInputFiles(sigInput, []);
+
+            // Set FormSubmit reserved fields.
+            var fsSubject = document.getElementById("fs_subject");
+            var fsTemplate = document.getElementById("fs_template");
+            var fsAutoreply = document.getElementById("fs_autoresponse");
+            var fsNext = document.getElementById("fs_next");
+            if (fsSubject && !fsSubject.value) fsSubject.value = emailSubject || "Signed rental agreement photo";
+            if (fsTemplate && !fsTemplate.value) fsTemplate.value = "table";
+
+            if (fsAutoreply) {
+              fsAutoreply.value =
+                "Thank you, " +
+                renterName +
+                "! We received your signed rental agreement. If you have questions, reply to this email or message us on Facebook.";
+            }
+            if (fsNext) {
+              fsNext.value = getLiveAgreementPageUrl() + "?sent=1#agreement-sent";
+            }
+
+            // Prepare the actual POST target.
+            form.action = "https://formsubmit.co/" + encodeURIComponent(getFormSubmitEndpoint());
+            form.method = "POST";
+            form.enctype = "multipart/form-data";
+
+            // Submit now (native submit).
+            form.submit();
+          })
+          .catch(function (err) {
+            btn.disabled = false;
+            handleSendFailure(blob, filename, emailSubject, emailBody, err);
+          });
       })
       .catch(function (err) {
         showMsg(
@@ -744,6 +1269,38 @@
       });
   });
 })();
+</script>
+<a class="prillaga-messenger-link" href="javascript:void(0)" target="_blank" rel="noopener noreferrer" aria-label="Messenger" style="position: fixed; right: 16px; bottom: 16px; z-index: 999; display: inline-flex; align-items: center; justify-content: center; width: 46px; height: 46px; border-radius: 999px; background: linear-gradient(135deg, rgba(18, 18, 18, 0.96) 0%, rgba(30, 30, 30, 0.96) 100%); border: 1px solid rgba(212, 175, 55, 0.48); color: #f4ebd0; text-decoration: none; line-height: 1; box-shadow: 0 10px 28px rgba(0, 0, 0, 0.42); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);">
+  <span aria-hidden="true" style="width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center;">
+    <svg viewBox="0 0 64 64" width="18" height="18" role="img" aria-hidden="true" focusable="false">
+      <defs>
+        <linearGradient id="msgStrokeGrad" x1="12%" y1="10%" x2="88%" y2="90%">
+          <stop offset="0%" stop-color="#2f78ff"></stop>
+          <stop offset="100%" stop-color="#b22dff"></stop>
+        </linearGradient>
+        <linearGradient id="msgBoltGrad" x1="8%" y1="12%" x2="92%" y2="88%">
+          <stop offset="0%" stop-color="#8fcbff"></stop>
+          <stop offset="100%" stop-color="#b58dff"></stop>
+        </linearGradient>
+      </defs>
+      <path d="M32 6C18.2 6 7 16.3 7 29c0 6.5 2.9 12.3 7.5 16.4V58l11.4-6.3c2 0.6 4 0.9 6.1 0.9 13.8 0 25-10.3 25-23S45.8 6 32 6z" fill="none" stroke="url(#msgStrokeGrad)" stroke-width="5.2" stroke-linejoin="round"></path>
+      <path d="M17.2 36.8l12.4-8.9 8.2 7.3 14.2-12.1-12.2 17.4-8.5-7-14.1 3.3z" fill="url(#msgBoltGrad)"></path>
+    </svg>
+  </span>
+</a>
+<script>
+  (function applyPrillagaMessengerLinkHrefs() {
+    var base = window.prillagaMessengerBaseUrl ? window.prillagaMessengerBaseUrl() : "";
+    if (!base) return;
+    document.querySelectorAll("a.prillaga-messenger-link").forEach(function (a) {
+      a.setAttribute("href", base);
+    });
+  })();
+</script>
+<script>
+  document.addEventListener("DOMContentLoaded", function () {
+    if (window.prillagaInitSiteCatalog) window.prillagaInitSiteCatalog();
+  });
 </script>
 </body>
 </html>

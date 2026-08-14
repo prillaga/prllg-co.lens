@@ -7,17 +7,41 @@
 html {
   overflow-x: hidden;
   color-scheme: dark;
+  background-color: #0a0a0a;
 }
 
-@media (prefers-reduced-motion: no-preference) {
+/* Page enter animation: lenis-motion.js */
+
+@media (prefers-reduced-motion: reduce) {
   html {
-    scroll-behavior: smooth;
+    scroll-behavior: auto;
   }
 }
 
 body {
   overflow-x: hidden;
   max-width: 100%;
+  font-family: "Segoe UI", "Inter", "Helvetica Neue", Arial, sans-serif;
+  line-height: 1.55;
+}
+
+/* Unified clean body font across pages, including legacy inline Arial/Avenir blocks */
+body,
+p,
+li,
+label,
+input,
+select,
+textarea,
+button {
+  font-family: "Segoe UI", "Inter", "Helvetica Neue", Arial, sans-serif !important;
+}
+
+[style*="font-family: Arial"],
+[style*="font-family: Avenir"],
+[style*="font-family: 'Avenir Next'"],
+[style*='font-family: "Avenir Next"'] {
+  font-family: "Segoe UI", "Inter", "Helvetica Neue", Arial, sans-serif !important;
 }
 
 ::selection {
@@ -30,6 +54,44 @@ select,
 textarea,
 button {
   max-width: 100%;
+}
+
+/* ----- Selects / dropdowns (clearer tap targets + custom chevron) ----- */
+select:not([multiple]):not([size]) {
+  box-sizing: border-box;
+  min-height: 44px;
+  padding: 10px 40px 10px 14px;
+  border-radius: 10px;
+  border: 1px solid #343434;
+  background-color: #171717;
+  color: #f5f5f5;
+  font-size: 15px;
+  line-height: 1.35;
+  cursor: pointer;
+  appearance: none;
+  -webkit-appearance: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%23d4af37' d='M1.4 0L6 4.6 10.6 0 12 1.4l-6 6-6-6z'/%3E%3C/svg%3E");
+  background-repeat: no-repeat;
+  background-position: right 14px center;
+  background-size: 12px 8px;
+  transition: border-color 0.18s ease, box-shadow 0.18s ease;
+}
+
+select:not([multiple]):not([size]):hover {
+  border-color: #4a4a4a;
+}
+
+select:not([multiple]):not([size]):focus-visible {
+  outline: none;
+  border-color: #d4af37;
+  box-shadow: 0 0 0 2px rgba(212, 175, 55, 0.22);
+}
+
+@media (max-width: 768px) {
+  select:not([multiple]):not([size]) {
+    min-height: 48px;
+    font-size: 16px;
+  }
 }
 
 #site-header,
@@ -129,24 +191,37 @@ a[href="index.html#book-now"][aria-label="Book now"] {
 .home-hero__title {
   margin: 0;
   color: #ffffff;
-  font-family: "Playfair Display", "Times New Roman", serif;
-  font-size: clamp(1.35rem, 5.2vw, 3rem);
+  font-family: "Playfair Display", "Times New Roman", serif !important;
+  font-size: clamp(1.75rem, 5.8vw, 3.35rem);
   font-weight: 600;
-  letter-spacing: clamp(0.02em, 0.08vw, 1px);
-  line-height: 1.15;
+  letter-spacing: 0.02em;
+  line-height: 1.12;
   text-wrap: balance;
+  text-shadow: 0 2px 28px rgba(0, 0, 0, 0.55), 0 1px 3px rgba(0, 0, 0, 0.4);
 }
 
 .home-hero__tagline {
   margin: 0;
-  color: #e8e0d0;
-  font-family: "Cormorant Garamond", Georgia, serif;
-  font-size: clamp(0.95rem, 2.8vw, 1.35rem);
+  color: #f5f0e6;
+  font-family: "Cormorant Garamond", Georgia, serif !important;
+  font-size: clamp(1.05rem, 3vw, 1.45rem);
   font-style: italic;
   font-weight: 500;
-  letter-spacing: clamp(0.08em, 1.8vw, 0.28em);
+  letter-spacing: 0.22em;
   line-height: 1.35;
   text-wrap: balance;
+  max-width: 100%;
+  text-shadow: 0 2px 20px rgba(0, 0, 0, 0.5);
+}
+
+.home-hero__actions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin-top: clamp(2px, 1vw, 8px);
+  width: 100%;
   max-width: 100%;
 }
 
@@ -154,24 +229,41 @@ a[href="index.html#book-now"][aria-label="Book now"] {
   display: inline-flex;
   align-items: center;
   justify-content: center;
+  gap: 8px;
   min-height: 48px;
   touch-action: manipulation;
-  padding: 12px clamp(22px, 5vw, 34px);
-  margin-top: clamp(2px, 1vw, 8px);
-  background: linear-gradient(135deg, #f3d77b 0%, #d4af37 45%, #b8901f 100%);
-  color: #111;
+  padding: 12px clamp(20px, 4.5vw, 30px);
   text-decoration: none;
-  font-family: "Playfair Display", "Times New Roman", serif;
-  font-size: clamp(0.9rem, 2.4vw, 1.05rem);
+  font-family: "Playfair Display", "Times New Roman", serif !important;
+  font-size: clamp(0.85rem, 2.2vw, 1.05rem);
   font-weight: 700;
-  border: 1px solid rgba(255, 230, 150, 0.75);
   border-radius: 999px;
   letter-spacing: clamp(0.06em, 0.4vw, 1.5px);
   text-transform: uppercase;
-  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35), 0 0 12px rgba(212, 175, 55, 0.35) inset;
   max-width: calc(100% - 8px);
   text-align: center;
   -webkit-tap-highlight-color: transparent;
+}
+
+.home-hero__cta--primary {
+  background: linear-gradient(135deg, #f3d77b 0%, #d4af37 45%, #b8901f 100%);
+  color: #111;
+  border: 1px solid rgba(255, 230, 150, 0.75);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35), 0 0 12px rgba(212, 175, 55, 0.35) inset;
+}
+
+.home-hero__cta--secondary {
+  background: rgba(12, 12, 12, 0.55);
+  color: #f4ebd0;
+  border: 1px solid rgba(212, 175, 55, 0.65);
+  box-shadow: 0 6px 20px rgba(0, 0, 0, 0.35);
+  backdrop-filter: blur(6px);
+  -webkit-backdrop-filter: blur(6px);
+}
+
+.home-hero__cta-icon {
+  flex-shrink: 0;
+  opacity: 0.95;
 }
 
 .home-hero__cta:focus-visible {
@@ -181,11 +273,19 @@ a[href="index.html#book-now"][aria-label="Book now"] {
 
 @media (prefers-reduced-motion: no-preference) {
   .home-hero__cta {
-    transition: transform 0.18s ease, box-shadow 0.18s ease;
+    transition: transform 0.18s ease, box-shadow 0.18s ease, filter 0.18s ease;
+  }
+
+  .home-hero__cta--primary:hover,
+  .home-hero__cta--secondary:hover {
+    filter: brightness(1.06);
   }
 
   .home-hero__cta:active {
     transform: scale(0.98);
+  }
+
+  .home-hero__cta--primary:active {
     box-shadow: 0 4px 14px rgba(0, 0, 0, 0.3), 0 0 10px rgba(212, 175, 55, 0.28) inset;
   }
 }
@@ -218,98 +318,68 @@ svg {
 }
 
 /* ----- Unit cards (index #units + units.html) ----- */
+#units .units-scroll,
+section#units .units-scroll,
+.units-scroll {
+  display: grid !important;
+  grid-template-columns: repeat(1, minmax(0, 1fr));
+  gap: 16px !important;
+  justify-content: stretch !important;
+  overflow-x: visible !important;
+  scroll-snap-type: none !important;
+  padding-left: max(0px, env(safe-area-inset-left));
+  padding-right: max(0px, env(safe-area-inset-right));
+}
+
 #units .units-scroll > div,
 section#units .units-scroll > div,
 .units-scroll > div {
-  min-width: 0;
+  width: auto !important;
+  max-width: none !important;
+  min-width: 0 !important;
 }
 
-/* Mobile: single column, full-width cards */
-@media (max-width: 768px) {
+#units .units-scroll img,
+.units-scroll img {
+  width: 100% !important;
+  height: auto !important;
+  aspect-ratio: 16 / 10;
+  object-fit: cover;
+  display: block;
+}
+
+#units .units-scroll a[href*="book-now"],
+.units-scroll a[href*="book-now"],
+#units .units-scroll a[href*="index.html"],
+.units-scroll a[href*="index.html"] {
+  min-height: 44px;
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  padding: 12px 22px !important;
+}
+
+#units .units-scroll h3,
+.units-scroll h3 {
+  font-size: clamp(1rem, 4vw, 1.125rem) !important;
+}
+
+/* Mobile: 1-2 columns */
+@media (min-width: 560px) and (max-width: 1024px) {
   #units .units-scroll,
   section#units .units-scroll,
   .units-scroll {
-    flex-wrap: wrap !important;
-    justify-content: center !important;
-    overflow-x: visible !important;
-    scroll-snap-type: none !important;
-    gap: 18px;
-    padding-left: max(0px, env(safe-area-inset-left));
-    padding-right: max(0px, env(safe-area-inset-right));
-  }
-
-  #units .units-scroll > div,
-  section#units .units-scroll > div,
-  .units-scroll > div {
-    flex: 1 1 100% !important;
-    width: 100% !important;
-    max-width: min(520px, 100%) !important;
-    min-width: 0 !important;
-  }
-
-  #units .units-scroll img,
-  .units-scroll img {
-    width: 100% !important;
-    height: auto !important;
-    aspect-ratio: 16 / 10;
-    object-fit: cover;
-    display: block;
-  }
-
-  #units .units-scroll a[href*="book-now"],
-  .units-scroll a[href*="book-now"],
-  #units .units-scroll a[href*="index.html"],
-  .units-scroll a[href*="index.html"] {
-    min-height: 44px;
-    display: inline-flex !important;
-    align-items: center;
-    justify-content: center;
-    padding: 12px 22px !important;
-  }
-
-  #units .units-scroll h3,
-  .units-scroll h3 {
-    font-size: clamp(1rem, 4vw, 1.125rem) !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
-/* Tablet: two columns */
-@media (min-width: 769px) and (max-width: 1024px) {
-  #units .units-scroll,
-  section#units .units-scroll,
-  .units-scroll {
-    flex-wrap: wrap !important;
-    justify-content: center !important;
-    overflow-x: visible !important;
-    scroll-snap-type: none !important;
-    gap: 16px;
-  }
-
-  #units .units-scroll > div,
-  section#units .units-scroll > div,
-  .units-scroll > div {
-    flex: 1 1 calc(50% - 12px) !important;
-    width: calc(50% - 12px) !important;
-    max-width: calc(50% - 12px) !important;
-    min-width: 0 !important;
-  }
-
-  #units .units-scroll img,
-  .units-scroll img {
-    width: 100% !important;
-    height: auto !important;
-    aspect-ratio: 16 / 10;
-    object-fit: cover;
-  }
-}
-
-/* Desktop: horizontal row with flexible card width */
+/* Desktop: 3-4 columns */
 @media (min-width: 1025px) {
-  #units .units-scroll > div,
-  .units-scroll > div {
-    width: min(380px, 28vw) !important;
-    min-width: min(300px, 26vw) !important;
-    max-width: min(420px, 94vw) !important;
+  #units .units-scroll,
+  section#units .units-scroll,
+  .units-scroll {
+    grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+    gap: 18px !important;
   }
 }
 
@@ -389,9 +459,14 @@ section#units .units-scroll > div,
     padding-bottom: 220px !important;
   }
 
+  :root {
+    --mobile-fab-right: max(12px, env(safe-area-inset-right));
+    --mobile-fab-bottom: max(12px, env(safe-area-inset-bottom));
+  }
+
   footer#contact-page ~ a.prillaga-messenger-link:first-of-type {
-    bottom: max(12px, env(safe-area-inset-bottom)) !important;
-    right: max(12px, env(safe-area-inset-right)) !important;
+    bottom: var(--mobile-fab-bottom) !important;
+    right: var(--mobile-fab-right) !important;
   }
 
   footer#contact-page ~ a.prillaga-messenger-link + a.prillaga-messenger-link {
@@ -408,8 +483,8 @@ section#units .units-scroll > div,
   }
 
   footer#contact-page ~ a[href="#book-now"][aria-label="Book now"] {
-    bottom: calc(152px + env(safe-area-inset-bottom, 0px)) !important;
-    right: max(12px, env(safe-area-inset-right)) !important;
+    bottom: calc(var(--mobile-fab-bottom) + 66px) !important;
+    right: var(--mobile-fab-right) !important;
   }
 }
 
@@ -581,6 +656,34 @@ label,
   .booking-modal__panel {
     margin: 8px auto 16px;
     border-radius: 10px;
+    max-height: calc(100dvh - 24px);
+    overflow-y: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  #book-now form {
+    width: 100%;
+    min-width: 0;
+  }
+
+  #book-now form > * {
+    min-width: 0;
+  }
+
+  #book-now input,
+  #book-now select,
+  #book-now textarea,
+  #book-now button[type="submit"] {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+
+  #book-now input,
+  #book-now select,
+  #book-now textarea {
+    line-height: 1.25;
   }
 }
 
@@ -597,106 +700,10 @@ label,
 @media (prefers-reduced-motion: no-preference) and (min-width: 1025px) {
   #units .units-scroll > div,
   .units-scroll > div {
-    transition: box-shadow 0.28s ease, transform 0.28s ease;
-  }
-
-  #units .units-scroll > div:active,
-  .units-scroll > div:active {
-    transform: translateY(1px);
+    transition: box-shadow 0.28s ease;
   }
 }
 
-/* ----- Page opening animation (all pages that load this stylesheet) ----- */
-/* Curtain overlay: does not use transform on body (keeps position:fixed descendants correct). */
-body::after {
-  content: "";
-  position: fixed;
-  inset: 0;
-  z-index: 4500;
-  pointer-events: auto;
-  background:
-    radial-gradient(ellipse 110% 65% at 50% 0%, rgba(212, 175, 55, 0.16) 0%, transparent 58%),
-    linear-gradient(180deg, #040404 0%, #0c0a08 42%, #060606 100%);
-  animation: prillaga-curtain-out 0.82s cubic-bezier(0.33, 0.86, 0.24, 1) forwards;
-}
+/* Scroll reveal: see lenis-motion.js + .prillaga-motion-reveal in lenis-motion.css */
 
-@keyframes prillaga-curtain-out {
-  from {
-    opacity: 1;
-  }
-  to {
-    opacity: 0;
-    visibility: hidden;
-    pointer-events: none;
-  }
-}
-
-@media (prefers-reduced-motion: no-preference) {
-  /*
-   * Header intro: opacity only — never transform on #site-header.
-   * Transform on the header creates a containing block and breaks
-   * position:fixed full-screen nav inside <header> (menu clips to bar height).
-   */
-  #site-header {
-    animation: prillaga-header-open 0.58s cubic-bezier(0.22, 1, 0.36, 1) 0.1s both;
-  }
-
-  @keyframes prillaga-header-open {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
-
-  /*
-   * Main flow: opacity only (no transform) so sections that wrap fixed headers
-   * (e.g. About, Payment) do not break position:fixed.
-   */
-  body > *:not(script):not(.skip-link):not(a):not(#site-header):not(#toast) {
-    animation: prillaga-content-open 0.62s cubic-bezier(0.22, 1, 0.36, 1) 0.32s both;
-  }
-
-  @keyframes prillaga-content-open {
-    from {
-      opacity: 0;
-    }
-    to {
-      opacity: 1;
-    }
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  body::after {
-    animation-duration: 0.22s;
-    animation-timing-function: ease-out;
-  }
-
-  #site-header {
-    animation: prillaga-header-open-soft 0.2s ease-out 0.04s both;
-  }
-
-  @keyframes prillaga-header-open-soft {
-    from {
-      opacity: 0.92;
-    }
-    to {
-      opacity: 1;
-    }
-  }
-
-  body > *:not(script):not(.skip-link):not(a):not(#site-header):not(#toast) {
-    animation: prillaga-content-open-soft 0.22s ease-out 0.08s both;
-  }
-
-  @keyframes prillaga-content-open-soft {
-    from {
-      opacity: 0.94;
-    }
-    to {
-      opacity: 1;
-    }
-  }
-}
+/* ----- Page enter: single smooth fade on <html> (no curtain, no staggered children) ----- */

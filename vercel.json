@@ -1,0 +1,22 @@
+{
+  "headers": [
+    {
+      "source": "/api/bookings/public",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, s-maxage=15, stale-while-revalidate=30"
+        }
+      ]
+    },
+    {
+      "source": "/api/catalog/public",
+      "headers": [
+        {
+          "key": "Cache-Control",
+          "value": "public, s-maxage=15, stale-while-revalidate=30"
+        }
+      ]
+    }
+  ]
+}

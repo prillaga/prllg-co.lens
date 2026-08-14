@@ -1,9 +1,25 @@
 (function () {
+  function injectAdminNavLink(nav) {
+    if (!nav || nav.querySelector('[data-nav="admin"]')) return;
+    var href = window.prillagaAdminPageUrl ? window.prillagaAdminPageUrl() : "admin.html";
+    var link = document.createElement("a");
+    link.href = href;
+    link.setAttribute("data-nav", "admin");
+    link.textContent = "Admin";
+    if (/admin\.html/i.test(window.location.pathname || "")) {
+      link.className = "is-active";
+      link.setAttribute("aria-current", "page");
+    }
+    nav.appendChild(link);
+  }
+
   function init() {
     var header = document.getElementById("site-header");
     var toggle = header && header.querySelector(".nav-toggle");
     var nav = document.getElementById("site-main-nav");
     if (!header || !toggle || !nav) return;
+
+    injectAdminNavLink(nav);
 
     function syncAria() {
       var open = header.classList.contains("nav-open");

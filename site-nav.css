@@ -173,7 +173,7 @@
   box-sizing: border-box;
   margin: 0;
   min-height: 48px;
-  padding: 15px max(24px, env(safe-area-inset-left)) 15px max(28px, calc(env(safe-area-inset-left) + 4px));
+  padding: 15px max(24px, env(safe-area-inset-left));
   border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   border-radius: 0;
   font-family: Arial, Helvetica, sans-serif;
@@ -210,53 +210,15 @@
   box-shadow: inset 3px 0 0 #d4af37;
 }
 
-#site-header nav.site-nav a[data-nav]::before {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  width: 2.1em;
-  min-width: 2.1em;
-  margin-right: 12px;
-  font-size: 1.2em;
-  line-height: 1;
-  flex-shrink: 0;
-  opacity: 0.95;
-}
-
-#site-header nav.site-nav a[data-nav="home"]::before {
-  content: "🏠";
-}
-
-#site-header nav.site-nav a[data-nav="about"]::before {
-  content: "👤";
-}
-
-#site-header nav.site-nav a[data-nav="units"]::before {
-  content: "📷";
-}
-
-#site-header nav.site-nav a[data-nav="availability"]::before {
-  content: "🗓️";
-}
-
-#site-header nav.site-nav a[data-nav="policy"]::before {
-  content: "📋";
-}
-
-#site-header nav.site-nav a[data-nav="agreement"]::before {
-  content: "✍️";
-}
-
-#site-header nav.site-nav a[data-nav="payment"]::before {
-  content: "💳";
-}
-
-#site-header nav.site-nav a[data-nav="contact"]::before {
-  content: "💬";
-}
-
 #site-header nav.site-nav a:last-of-type {
   border-bottom: 0;
+}
+
+#site-header nav.site-nav a[data-nav="admin"] {
+  color: #b8a060;
+  border-top: 1px solid rgba(212, 175, 55, 0.15);
+  margin-top: 4px;
+  padding-top: 14px;
 }
 
 /* Desktop / large screens: same hamburger + overlay (toggle stays visible at all widths). */

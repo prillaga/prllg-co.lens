@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="robots" content="noindex, nofollow">
+  <title>Admin — Receipts | Prillaga&amp;Co. Lens</title>
+  <link rel="stylesheet" href="admin.css">
+  <link rel="stylesheet" href="../responsive.css">
+</head>
+<body class="receipt-page">
+  <h1>Receipts</h1>
+  <p class="lead">
+    Create a receipt, preview it, then download as PDF or print. Receipt numbers auto-increment and save to your Supabase store when available.
+  </p>
+
+  <div id="gate" class="panel no-print">
+    <label for="adminPin">Admin PIN</label>
+    <input id="adminPin" type="password" autocomplete="off" placeholder="PIN">
+    <button type="button" class="primary" id="btnUnlock">Unlock</button>
+  </div>
+
+  <div id="panel" hidden>
+    <nav class="admin-nav no-print" aria-label="Admin sections">
+      <strong style="color:#888;margin-right:4px;">Admin:</strong>
+      <a href="index.html">Home</a>
+      <a href="content.html">Products &amp; photos</a>
+      <a href="receipt.html" class="is-current">Receipts</a>
+      <a href="../admin.html">Availability</a>
+      <span style="color:#444">|</span>
+      <a href="../index.html" target="_blank" rel="noopener">View live site</a>
+    </nav>
+
+    <p class="ok no-print">Signed in. Fill in the form — the preview updates as you type.</p>
+    <p id="receiptStatus" class="no-print" style="margin:0 0 14px 0;font-size:13px;color:#8ecf9a;min-height:1.4em;" role="status"></p>
+
+    <div class="receipt-actions no-print">
+      <button type="button" class="primary" id="btnDownloadPdf">Download Receipt (PDF)</button>
+      <button type="button" id="btnPrint">Print Receipt</button>
+      <button type="button" id="btnSaveReceipt">Save Receipt</button>
+      <button type="button" id="btnReset">Reset / Clear</button>
+    </div>
+
+    <div class="receipt-layout">
+      <div class="no-print">
+        <div class="panel">
+          <h2>Receipt details</h2>
+          <label for="receiptNumber">Receipt number</label>
+          <input id="receiptNumber" type="text" readonly aria-label="Receipt number">
+          <label for="receiptDate">Receipt date</label>
+          <input id="receiptDate" type="date" required>
+          <p id="errDate" class="field-error"></p>
+
+          <label for="rentalStart">Rental start date *</label>
+          <input id="rentalStart" type="date" required>
+          <p id="errRental" class="field-error"></p>
+
+          <label for="rentalEnd">Rental end / return date *</label>
+          <input id="rentalEnd" type="date" required>
+
+          <label for="customerName">Customer name *</label>
+          <input id="customerName" type="text" required placeholder="Full name" autocomplete="name">
+          <p id="errCustomer" class="field-error"></p>
+
+          <label for="customerContact">Customer / contact information</label>
+          <input id="customerContact" type="text" placeholder="Phone, email, or Messenger" autocomplete="tel">
+
+          <label for="transactionDetails">Transaction / order details</label>
+          <textarea id="transactionDetails" rows="2" placeholder="e.g. 3-day Nikon kit rental, May 15–17"></textarea>
+
+          <label for="paymentMethod">Payment method</label>
+          <select id="paymentMethod">
+            <option value="GCash">GCash</option>
+            <option value="Cash">Cash</option>
+            <option value="Bank transfer">Bank transfer</option>
+            <option value="Other">Other</option>
+          </select>
+
+          <label for="amountPaid">Amount paid (₱)</label>
+          <input id="amountPaid" type="number" min="0" step="0.01" value="0">
+
+          <label for="discount">Discount (₱)</label>
+          <input id="discount" type="number" min="0" step="0.01" value="0">
+
+          <label for="notes">Notes</label>
+          <textarea id="notes" rows="2" placeholder="Optional notes for the customer"></textarea>
+        </div>
+
+        <div class="panel">
+          <h2>Business information</h2>
+          <label for="bizName">Business name</label>
+          <input id="bizName" type="text">
+          <label for="bizTagline">Tagline</label>
+          <input id="bizTagline" type="text">
+          <label for="bizEmail">Email</label>
+          <input id="bizEmail" type="text">
+          <label for="bizPhone">Phone</label>
+          <input id="bizPhone" type="text">
+          <label for="bizAddress">Address / location</label>
+          <input id="bizAddress" type="text">
+          <label for="bizThanks">Thank-you message</label>
+          <input id="bizThanks" type="text">
+        </div>
+
+        <div class="panel">
+          <h2>Itemized products / services</h2>
+          <p id="errItems" class="field-error"></p>
+          <div id="itemsList"></div>
+          <button type="button" id="btnAddItem">+ Add item</button>
+          <div class="totals-grid" aria-live="polite">
+            <span>Subtotal</span><span id="formSubtotal">₱0.00</span>
+            <span>Discount</span><span id="formDiscount">₱0.00</span>
+            <span class="grand">Grand total</span><span class="grand" id="formGrand">₱0.00</span>
+            <span>Amount paid</span><span id="formPaid">₱0.00</span>
+            <span>Balance due</span><span id="formBalance">₱0.00</span>
+          </div>
+        </div>
+
+        <div class="panel">
+          <h2>Saved receipts</h2>
+          <ul id="savedReceiptList"><li style="color:#888">None yet.</li></ul>
+        </div>
+      </div>
+
+      <div class="receipt-preview-wrap">
+        <h2 class="no-print" style="margin-top:0;">Receipt preview</h2>
+        <div id="receiptSheet" class="receipt-sheet" aria-live="polite">
+          <!-- filled by script -->
+        </div>
+      </div>
+    </div>
+
+    <button type="button" class="no-print" id="btnLock">Lock</button>
+  </div>
+
+  <div id="toast" role="status"></div>
+
+  <script src="../site-config.js"></script>
+  <script src="../scripts/admin-auth.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+  <script src="../scripts/receipt.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", function () {
+      window.prillagaAdminInitGate(function (pin) {
+        if (window.prillagaInitReceiptPage) window.prillagaInitReceiptPage(pin);
+      });
+    });
+  </script>
+</body>
+</html>

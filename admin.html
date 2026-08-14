@@ -5,51 +5,17 @@
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <meta name="robots" content="noindex, nofollow">
   <title>Staff — Calendar requests | Prillaga&amp;Co. Lens</title>
-  <style>
-    *, *::before, *::after { box-sizing: border-box; }
-    body { margin: 0; background: #0a0a0a; color: #eee; font-family: Arial, sans-serif; padding: 28px 20px 48px; max-width: 640px; margin-left: auto; margin-right: auto; }
-    h1 { font-size: 1.35rem; margin: 0 0 8px 0; color: #d4af37; letter-spacing: 0.06em; }
-    p.lead { margin: 0 0 20px 0; font-size: 14px; color: #9a9a9a; line-height: 1.55; }
-    a { color: #d4af37; }
-    label { display: block; font-size: 13px; color: #d4af37; margin-bottom: 6px; }
-    input[type="password"] {
-      width: 100%; max-width: 280px; padding: 10px 12px; border-radius: 8px;
-      border: 1px solid #333; background: #161616; color: #fff; margin-bottom: 12px;
-    }
-    button {
-      padding: 10px 18px; border-radius: 999px; cursor: pointer; font-size: 14px; border: 1px solid #444;
-      background: #222; color: #eee; margin-right: 8px; margin-bottom: 8px;
-    }
-    button.primary { background: linear-gradient(135deg, #f3d77b, #b8901f); color: #111; border-color: #c9a227; font-weight: 700; }
-    button.approve { border-color: #2d5a3a; color: #a8e8c0; }
-    button.reject { border-color: #5a2d2d; color: #e8a8a8; }
-    .panel { background: #141414; border: 1px solid #2a2a2a; border-radius: 10px; padding: 16px 18px; margin-bottom: 16px; }
-    ul { list-style: none; padding: 0; margin: 0; }
-    li { padding: 12px 0; border-bottom: 1px solid #252525; font-size: 14px; color: #ddd; }
-    .ok { color: #8ecf9a; font-size: 13px; margin-bottom: 16px; }
-    code { font-size: 12px; background: #1a1a1a; padding: 2px 6px; border-radius: 4px; }
-    input[type="date"], input[type="text"], select {
-      width: 100%; max-width: 100%; padding: 10px 12px; border-radius: 8px;
-      border: 1px solid #333; background: #161616; color: #fff; margin-bottom: 12px; font-size: 14px;
-    }
-    input[type="date"] { max-width: 280px; }
-    #toast {
-      position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-      background: #1a1a1a; border: 1px solid #d4af37; padding: 10px 18px; border-radius: 8px;
-      font-size: 14px; opacity: 0; pointer-events: none; transition: opacity 0.2s; z-index: 10;
-    }
-    #toast.show { opacity: 1; }
-  </style>
+  <link rel="stylesheet" href="admin/admin.css">
   <link rel="stylesheet" href="responsive.css">
 </head>
 <body>
-  <h1>Staff — availability requests</h1>
+  <h1>Staff — availability calendar</h1>
   <p class="lead">
-    <strong>Easiest — block dates in one tap:</strong> unlock below, then use <strong>Quick block (not available)</strong>. Pick the gear, start and end dates, press <strong>Block on calendar</strong>. Home and Availability pages show those days in <strong>red</strong> immediately (same browser).
+    <strong>Easiest — block dates in one tap:</strong> unlock below, then use <strong>Quick block (shows as Booked)</strong>. Pick the gear, start and end dates, press <strong>Block on calendar</strong>. Home and Availability pages show those days in <strong>red</strong> immediately (same browser).
   </p>
   <p class="lead" style="margin-top: -8px;">
-    <strong>Customer requests:</strong> use <strong>Add pending request</strong> so the calendar shows <strong>amber</strong> first; press <strong>Confirm</strong> when the rental is final (turns <strong>red</strong> and clears overlapping pendings).
-    Data stays in this browser only (<code>localStorage</code>). Change <code>ADMIN_PIN</code> before real use. Bookmark this file; it is not linked from the public site.
+    Free-plan admin: uses <strong>Supabase</strong> (free at supabase.com). See <code>scripts/SUPABASE-SETUP.md</code>. Edit products, photo URLs, and availability — saves to the live site automatically.
+    Set <code>PRILLAGA_ADMIN_PIN</code> on Vercel. Bookmark this page; it is not linked from the public site.
   </p>
 
   <div id="gate" class="panel">
@@ -58,17 +24,54 @@
     <button type="button" class="primary" id="btnUnlock">Unlock</button>
   </div>
 
+  <div id="storageSetup" class="panel" style="border-color:#6b5a30;display:none;">
+    <h2 style="margin:0 0 8px 0;font-size:15px;color:#d4af37;">Server storage not connected</h2>
+    <p id="storageSetupText" style="margin:0 0 10px 0;font-size:13px;color:#e8d080;line-height:1.55;">Checking…</p>
+    <ol style="margin:0;padding-left:18px;font-size:13px;color:#bbb;line-height:1.7;">
+      <li>Supabase → <strong>Settings → API</strong> → copy the <strong>secret</strong> key (<code>sb_secret_...</code> or <code>service_role</code>)</li>
+      <li>Vercel → <strong>Settings → Environment Variables</strong> → name: <code>SUPABASE_SERVICE_ROLE_KEY</code> → paste secret key → <strong>Production</strong></li>
+      <li>Supabase → <strong>SQL Editor</strong> → run <code>supabase/schema.sql</code> from this repo</li>
+      <li>Vercel → <strong>Deployments → Redeploy</strong></li>
+    </ol>
+    <p style="margin:10px 0 0 0;font-size:12px;color:#888;">Do <strong>not</strong> use the publishable key (<code>sb_publishable_...</code>). <a href="/api/health" target="_blank" rel="noopener">Check /api/health</a></p>
+  </div>
+
   <div id="panel" hidden>
-    <p class="ok">Unlocked. Use Quick block for “not available” in one step, or pending → Confirm for Messenger leads.</p>
-    <p><a href="index.html#home">Home</a> · <a href="index.html#availability-calendar">Availability (homepage)</a> · <a href="availability.html">Full-page calendar</a> · <a href="index.html#book-now">Booking form</a></p>
+    <nav class="admin-nav" aria-label="Admin sections">
+      <strong style="color:#888;margin-right:4px;">Admin:</strong>
+      <a href="admin/index.html">Home</a>
+      <a href="admin/content.html">Products &amp; photos</a>
+      <a href="admin/receipt.html">Receipts</a>
+      <a href="admin.html" class="is-current">Availability</a>
+      <span style="color:#444">|</span>
+      <a href="index.html" target="_blank" rel="noopener">View live site</a>
+    </nav>
+
+    <p class="ok">Unlocked. Changes save automatically to the live website.</p>
+    <p id="syncStatus" style="margin: 0 0 10px 0; font-size: 13px; color: #8ecf9a; min-height: 1.4em;" role="status">Loading…</p>
+    <p id="catalogSyncStatus" style="margin: 0 0 14px 0; font-size: 13px; color: #8ecf9a; min-height: 1.4em;" role="status"></p>
+
+    <div class="admin-tabs" role="tablist" aria-label="Admin sections">
+      <button type="button" class="is-active" data-admin-tab="availability">Availability</button>
+      <button type="button" data-admin-tab="products">Products &amp; prices</button>
+      <button type="button" data-admin-tab="media">Photos</button>
+    </div>
+    <p style="margin: 0 0 14px 0; font-size: 13px; color: #888;">
+      Tip: for a full-screen editor, use <a href="admin/content.html">Products &amp; photos</a> or <a href="admin/index.html">Admin home</a>.
+    </p>
+
+    <div data-admin-panel="availability">
+    <p style="margin: 0 0 14px 0;">
+      <button type="button" id="btnExportPublic">Download backup JSON (optional)</button>
+    </p>
     <div class="panel" style="border-color: #6b5a30;">
-      <h2 style="margin: 0 0 8px 0; font-size: 15px; color: #d4af37;">Quick block (not available)</h2>
+      <h2 style="margin: 0 0 8px 0; font-size: 15px; color: #d4af37;">Quick block (shows as Booked)</h2>
       <p style="margin: 0 0 14px 0; font-size: 13px; color: #9a9a9a; line-height: 1.5;">For maintenance, personal days, or any time the gear must show as booked. No amber step — dates go <strong style="color:#e8b4b4;">red</strong> on the calendar right away.</p>
       <label for="blockUnit">Equipment</label>
       <select id="blockUnit" aria-label="Unit to block"></select>
-      <label for="blockStart">First day not available</label>
+      <label for="blockStart">First day of block (Booked)</label>
       <input id="blockStart" type="date" aria-label="Block start date">
-      <label for="blockEnd">Last day not available</label>
+      <label for="blockEnd">Last day of block (Booked)</label>
       <input id="blockEnd" type="date" aria-label="Block end date">
       <label for="blockNote">Note (optional)</label>
       <input id="blockNote" type="text" placeholder="e.g. Maintenance / reserved" autocomplete="off" aria-label="Optional note for this block">
@@ -99,34 +102,128 @@
       <h2 style="margin: 0 0 12px 0; font-size: 15px; color: #888;">Recently rejected</h2>
       <ul id="rejectedList"></ul>
     </div>
+    </div>
+
+    <div data-admin-panel="products" hidden>
+      <div class="admin-layout">
+        <div class="panel">
+          <h2 style="margin: 0 0 10px 0; font-size: 15px; color: #d4af37;">Products</h2>
+          <div id="productUnitList"></div>
+        </div>
+        <div class="panel" id="productEditor">
+          <p style="color:#888">Select a product to edit prices and description.</p>
+        </div>
+      </div>
+    </div>
+
+    <div data-admin-panel="media" hidden>
+      <div class="panel">
+        <h2 style="margin: 0 0 10px 0; font-size: 15px; color: #d4af37;">Add photo (free plan)</h2>
+        <p style="margin:0 0 12px 0;font-size:13px;color:#9a9a9a;">Use a path like <code>images/photo.jpg</code> or a full <code>https://</code> URL. Saved in free Supabase.</p>
+        <label for="mediaSiteImageSelect">Pick from site images</label>
+        <select id="mediaSiteImageSelect" aria-label="Pick site image"></select>
+        <label for="mediaUrlInput">Or paste image path / URL</label>
+        <input id="mediaUrlInput" type="text" placeholder="images/my-photo.jpg or https://..." autocomplete="off" aria-label="Image path or URL">
+        <label for="mediaUnitSelect">Assign to product (optional)</label>
+        <select id="mediaUnitSelect" aria-label="Assign photo to product"></select>
+        <button type="button" class="primary" id="btnAddMedia">Add to library &amp; save</button>
+      </div>
+      <div class="panel">
+        <h2 style="margin: 0 0 10px 0; font-size: 15px; color: #d4af37;">Library</h2>
+        <div id="mediaGrid" class="media-grid"></div>
+      </div>
+    </div>
+
     <button type="button" id="btnLock">Lock</button>
   </div>
 
   <div id="toast" role="status"></div>
 
+<script src="site-config.js"></script>
+<script src="scripts/admin-auth.js"></script>
+<script>
+(function checkStorageHealth() {
+  fetch("/api/health", { cache: "no-store" })
+    .then(function (r) {
+      return r.json().catch(function () {
+        return { ok: false, error: "Server returned HTTP " + r.status + " (not JSON). Deploy latest code on Vercel." };
+      }).then(function (data) {
+        return { status: r.status, data: data };
+      });
+    })
+    .then(function (result) {
+      if (result.data && result.data.ok) return;
+      var box = document.getElementById("storageSetup");
+      var text = document.getElementById("storageSetupText");
+      if (!box || !text) return;
+      box.style.display = "block";
+      var data = result.data || {};
+      if (data.missing && data.missing.length) {
+        text.textContent = "Storage not ready. Missing on Vercel: " + data.missing.join("; ") + ". Then Redeploy.";
+      } else if (data.error) {
+        text.textContent = data.error;
+      } else if (result.status >= 500) {
+        text.textContent = "Server error (HTTP " + result.status + "). Push latest code to Vercel and Redeploy — include api/health.js and package.json.";
+      } else {
+        text.textContent = data.hint || "Connect Supabase on Vercel, then Redeploy.";
+      }
+    })
+    .catch(function () {
+      var box = document.getElementById("storageSetup");
+      var text = document.getElementById("storageSetupText");
+      if (!box || !text) return;
+      box.style.display = "block";
+      text.textContent = "Could not reach /api/health. Check your internet or open the site on the live Vercel URL (not as a local file).";
+    });
+})();
+</script>
+<script src="scripts/bookings-api.js"></script>
+<script src="scripts/catalog-api.js"></script>
+<script src="scripts/admin-dashboard.js"></script>
 <script>
 (function () {
   var STORAGE_KEY = 'prillaga_lens_bookings_v1';
   var CHANNEL_NAME = 'prillaga-availability-v1';
-  var ADMIN_PIN = 'lens2026';
 
   var UNITS = [
     { id: 'nikon-kit', label: 'Nikon DSLR Flipscreen w/ kitlens 15-80mm' },
-    { id: 'nikon-zoom', label: 'Nikon DSLR Flipscreen w/ Zoom Lens 70-330mm' },
-    { id: 'zoom-lens', label: 'Zoom Lens 70-330mm' },
+    { id: 'nikon-zoom', label: 'Nikon DSLR Flipscreen w/ Zoom Lens 70-300mm' },
+    { id: 'nikon-zoom-kit-battery', label: 'Nikon DSLR w/ Zoom Lens + Kitlens + Extra battery' },
+    { id: 'canon-1200d', label: 'Canon 1200D DSLR w/ kitlens 18-55mm' },
+    { id: 'canon-4000d', label: 'Canon 4000D DSLR w/ kitlens 18-55mm' },
+    { id: 'g6-thumb', label: 'G6 THUMB CAMERA' },
+    { id: 'kodak-v603', label: 'Kodak EasyShare V603' },
+    { id: 'zoom-lens', label: 'Zoom Lens 70-300mm' },
     { id: 'dji-gimbal', label: 'DJI OSMO MOBILE 3 GIMBAL' }
   ];
 
+  function applyCatalogUnits(cat) {
+    if (!cat || !Array.isArray(cat.units) || !cat.units.length) return;
+    UNITS = cat.units.map(function (u) { return { id: u.id, label: u.name }; });
+    fillUnitSelects();
+  }
+
   var bookings = [];
+  var adminPinSession = '';
+  var saveQueue = Promise.resolve();
   var channel = typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel(CHANNEL_NAME) : null;
   var toastHideTimer = null;
+
+  function setSyncStatus(text, tone) {
+    var el = document.getElementById('syncStatus');
+    if (!el) return;
+    el.textContent = text;
+    if (tone === 'error') el.style.color = '#e8a0a0';
+    else if (tone === 'warn') el.style.color = '#e8d080';
+    else el.style.color = '#8ecf9a';
+  }
 
   function compareDates(a, b) { return a < b ? -1 : a > b ? 1 : 0; }
   function rangesOverlap(s1, e1, s2, e2) {
     return compareDates(s1, e2) <= 0 && compareDates(s2, e1) <= 0;
   }
 
-  function loadBookings() {
+  function loadBookingsLocal() {
     try {
       var raw = localStorage.getItem(STORAGE_KEY);
       bookings = raw ? JSON.parse(raw) : [];
@@ -134,9 +231,56 @@
     } catch (e) { bookings = []; }
   }
 
+  function loadBookingsFromServer(done) {
+    if (!adminPinSession || !window.prillagaFetchAdminBookings) {
+      loadBookingsLocal();
+      setSyncStatus('Offline mode — using this browser only.', 'warn');
+      if (done) done();
+      return;
+    }
+    setSyncStatus('Loading live calendar…');
+    window.prillagaFetchAdminBookings(adminPinSession, function (err, list) {
+      if (err) {
+        loadBookingsLocal();
+        setSyncStatus('Could not reach server — showing local copy. ' + err.message, 'error');
+        toast(err.message || 'Could not load from server.');
+      } else {
+        bookings = list;
+        localStorage.setItem(STORAGE_KEY, JSON.stringify(bookings));
+        setSyncStatus('Live calendar loaded. Changes save automatically.');
+      }
+      if (done) done();
+    });
+  }
+
+  function loadBookings() {
+    loadBookingsLocal();
+  }
+
   function saveBookings() {
     localStorage.setItem(STORAGE_KEY, JSON.stringify(bookings));
     if (channel) channel.postMessage({ type: 'update', t: Date.now() });
+
+    if (!adminPinSession || !window.prillagaSaveAdminBookings) {
+      setSyncStatus('Saved locally only — unlock with PIN on live site to sync.', 'warn');
+      return;
+    }
+
+    setSyncStatus('Saving to live site…');
+    saveQueue = saveQueue.then(function () {
+      return new Promise(function (resolve) {
+        window.prillagaSaveAdminBookings(adminPinSession, bookings, function (err) {
+          if (err) {
+            setSyncStatus('Save failed — ' + err.message, 'error');
+            toast('Save failed: ' + err.message);
+          } else {
+            setSyncStatus('Saved — live website updated.');
+            toast('Saved — customers see this calendar now.');
+          }
+          resolve();
+        });
+      });
+    });
   }
 
   function unitLabel(id) {
@@ -157,6 +301,10 @@
   }
 
   function toast(msg) {
+    if (window.prillagaAdminToast) {
+      window.prillagaAdminToast(msg);
+      return;
+    }
     var t = document.getElementById('toast');
     t.textContent = msg;
     t.classList.add('show');
@@ -268,7 +416,7 @@
       unitId: unitId,
       start: start,
       end: end,
-      customerName: note || 'Not available',
+      customerName: note || 'Booked',
       status: 'approved',
       approvedAt: Date.now(),
       staffBlock: true
@@ -350,25 +498,77 @@
       .replace(/"/g, '&quot;');
   }
 
+  function exportPublicCalendarFile() {
+    try {
+      loadBookings();
+      var out = bookings
+        .filter(function (b) {
+          return b && (b.status === 'approved' || b.status === 'pending');
+        })
+        .map(function (b) {
+          return {
+            id: String(b.id),
+            unitId: String(b.unitId),
+            start: String(b.start),
+            end: String(b.end),
+            status: b.status === 'pending' ? 'pending' : 'approved',
+            staffBlock: b.status === 'approved' ? !!b.staffBlock : false
+          };
+        });
+      var json = JSON.stringify(out, null, 2);
+      var blob = new Blob([json], { type: 'application/json;charset=utf-8' });
+
+      if (window.navigator && typeof window.navigator.msSaveOrOpenBlob === 'function') {
+        window.navigator.msSaveOrOpenBlob(blob, 'availability-public.json');
+        toast('Saved snapshot — optional backup only. Live site already uses the API.');
+        return;
+      }
+
+      var url = URL.createObjectURL(blob);
+      var a = document.createElement('a');
+      a.href = url;
+      a.setAttribute('download', 'availability-public.json');
+      a.style.position = 'fixed';
+      a.style.left = '-9999px';
+      document.body.appendChild(a);
+      a.click();
+      setTimeout(function () {
+        URL.revokeObjectURL(url);
+        if (a.parentNode) a.parentNode.removeChild(a);
+      }, 2500);
+      toast('Saved snapshot — optional backup only. Live site already uses the API.');
+    } catch (err) {
+      toast('Download failed: ' + (err && err.message ? err.message : String(err)));
+    }
+  }
+
   document.getElementById('btnAddPending').addEventListener('click', addPendingFromForm);
   document.getElementById('btnAddBlock').addEventListener('click', addBlockFromForm);
+  var btnExportPublic = document.getElementById('btnExportPublic');
+  if (btnExportPublic) btnExportPublic.addEventListener('click', exportPublicCalendarFile);
 
-  document.getElementById('btnUnlock').addEventListener('click', function () {
-    if (document.getElementById('adminPin').value === ADMIN_PIN) {
-      document.getElementById('gate').hidden = true;
-      document.getElementById('panel').hidden = false;
-      document.getElementById('adminPin').value = '';
-      fillUnitSelects();
+  function onAdminUnlocked(pin) {
+    adminPinSession = pin;
+    fillUnitSelects();
+    loadBookingsFromServer(function () {
       render();
-      toast('Unlocked.');
-    } else {
-      toast('Incorrect PIN.');
-    }
-  });
-  document.getElementById('btnLock').addEventListener('click', function () {
-    document.getElementById('gate').hidden = false;
-    document.getElementById('panel').hidden = true;
-  });
+      if (window.prillagaFetchAdminCatalog) {
+        window.prillagaFetchAdminCatalog(adminPinSession, function (err, cat) {
+          if (!err) applyCatalogUnits(cat);
+        });
+      }
+      if (window.prillagaInitAdminDashboard) {
+        window.prillagaInitAdminDashboard(adminPinSession);
+      }
+    });
+  }
+
+  if (window.prillagaAdminInitGate) {
+    window.prillagaAdminInitGate(onAdminUnlocked, function () {
+      adminPinSession = '';
+      setSyncStatus('');
+    });
+  }
 
   window.addEventListener('storage', function (e) {
     if (e.key === STORAGE_KEY && !document.getElementById('panel').hidden) render();
@@ -379,6 +579,33 @@
     });
   }
 })();
+</script>
+<a class="prillaga-messenger-link" href="javascript:void(0)" target="_blank" rel="noopener noreferrer" aria-label="Messenger" style="position: fixed; right: 16px; bottom: 16px; z-index: 999; display: inline-flex; align-items: center; justify-content: center; width: 46px; height: 46px; border-radius: 999px; background: linear-gradient(135deg, rgba(18, 18, 18, 0.96) 0%, rgba(30, 30, 30, 0.96) 100%); border: 1px solid rgba(212, 175, 55, 0.48); color: #f4ebd0; text-decoration: none; line-height: 1; box-shadow: 0 10px 28px rgba(0, 0, 0, 0.42); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);">
+  <span aria-hidden="true" style="width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center;">
+    <svg viewBox="0 0 64 64" width="18" height="18" role="img" aria-hidden="true" focusable="false">
+      <defs>
+        <linearGradient id="msgStrokeGrad" x1="12%" y1="10%" x2="88%" y2="90%">
+          <stop offset="0%" stop-color="#2f78ff"></stop>
+          <stop offset="100%" stop-color="#b22dff"></stop>
+        </linearGradient>
+        <linearGradient id="msgBoltGrad" x1="8%" y1="12%" x2="92%" y2="88%">
+          <stop offset="0%" stop-color="#8fcbff"></stop>
+          <stop offset="100%" stop-color="#b58dff"></stop>
+        </linearGradient>
+      </defs>
+      <path d="M32 6C18.2 6 7 16.3 7 29c0 6.5 2.9 12.3 7.5 16.4V58l11.4-6.3c2 0.6 4 0.9 6.1 0.9 13.8 0 25-10.3 25-23S45.8 6 32 6z" fill="none" stroke="url(#msgStrokeGrad)" stroke-width="5.2" stroke-linejoin="round"></path>
+      <path d="M17.2 36.8l12.4-8.9 8.2 7.3 14.2-12.1-12.2 17.4-8.5-7-14.1 3.3z" fill="url(#msgBoltGrad)"></path>
+    </svg>
+  </span>
+</a>
+<script>
+  (function applyPrillagaMessengerLinkHrefs() {
+    var base = window.prillagaMessengerBaseUrl ? window.prillagaMessengerBaseUrl() : "";
+    if (!base) return;
+    document.querySelectorAll("a.prillaga-messenger-link").forEach(function (a) {
+      a.setAttribute("href", base);
+    });
+  })();
 </script>
 </body>
 </html>
