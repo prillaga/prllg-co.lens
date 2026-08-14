@@ -108,8 +108,27 @@
       renderUnitList();
       renderProductPanel();
       renderMediaGrid();
-      setCatalogStatus(successMsg || "Saved — live website updated.");
-      if (typeof afterSave === "function") afterSave();
+
+      // Confirm public API sees the same data (busts CDN/browser cache)
+      if (global.prillagaFetchPublicCatalog) {
+        global.prillagaFetchPublicCatalog(function (pubErr, pubCatalog) {
+          if (pubErr || !pubCatalog) {
+            setCatalogStatus((successMsg || "Saved.") + " Warning: public site could not be verified yet — hard-refresh the homepage.", "warn");
+            if (typeof afterSave === "function") afterSave();
+            return;
+          }
+          var savedCount = (catalog.units || []).length;
+          var liveCount = (pubCatalog.units || []).length;
+          setCatalogStatus(
+            (successMsg || "Saved — live website updated.") +
+              " Live catalog now has " + liveCount + " product(s) (admin has " + savedCount + "). Hard-refresh the homepage if needed."
+          );
+          if (typeof afterSave === "function") afterSave();
+        });
+      } else {
+        setCatalogStatus(successMsg || "Saved — live website updated.");
+        if (typeof afterSave === "function") afterSave();
+      }
     });
   }
 
@@ -177,9 +196,11 @@
       '<input id="newUnitBase" type="number" min="0" step="1" value="500">' +
       "<label>Long rate (₱/day, 3+ days)</label>" +
       '<input id="newUnitLong" type="number" min="0" step="1" value="450">' +
-      "<label>Primary photo</label>" +
+      "<label>Primary photo (upload)</label>" +
       '<input id="newUnitPrimaryFile" type="file" accept="image/jpeg,image/png,image/webp,image/gif">' +
       filePreviewHtml("newUnitPrimaryFile") +
+      "<label>Or primary photo URL / path</label>" +
+      '<input id="newUnitPrimaryUrl" type="text" placeholder="images/photo.jpg or https://...">' +
       "<label>Sample photos (optional, multiple)</label>" +
       '<input id="newUnitSampleFiles" type="file" accept="image/jpeg,image/png,image/webp,image/gif" multiple>' +
       filePreviewHtml("newUnitSampleFiles") +
@@ -264,6 +285,11 @@
     var baseRate = Number(document.getElementById("newUnitBase").value) || 0;
     var longRate = Number(document.getElementById("newUnitLong").value) || 0;
     var primaryFile = document.getElementById("newUnitPrimaryFile").files;
+    var primaryUrlField = normalizeImageUrl(
+      document.getElementById("newUnitPrimaryUrl")
+        ? document.getElementById("newUnitPrimaryUrl").value
+        : ""
+    );
     var sampleFiles = document.getElementById("newUnitSampleFiles").files;
     var active = document.getElementById("newUnitActive").checked;
     var bookable = document.getElementById("newUnitBookable").checked;
@@ -272,62 +298,69 @@
       setCatalogStatus("Enter a product name.", "warn");
       return;
     }
-    if (!primaryFile || !primaryFile[0]) {
-      setCatalogStatus("Choose a primary photo.", "warn");
+    if ((!primaryFile || !primaryFile[0]) && !primaryUrlField) {
+      setCatalogStatus("Upload a primary photo or paste an image URL/path.", "warn");
       return;
     }
 
     var unitId = uniqueUnitId(name);
     var btn = document.getElementById("btnSaveNewUnit");
-    if (btn) { btn.disabled = true; btn.textContent = "Uploading…"; }
+    if (btn) { btn.disabled = true; btn.textContent = "Saving…"; }
 
-    setCatalogStatus("Uploading photos…");
+    function finishCreate(primaryUrl, sampleUrls) {
+      var sampleList = [primaryUrl].concat(sampleUrls || []).filter(Boolean);
+      sampleList = sampleList.filter(function (u, i, arr) { return arr.indexOf(u) === i; });
+      pushMedia(primaryUrl, name + " primary", unitId);
+      (sampleUrls || []).forEach(function (u, i) {
+        pushMedia(u, name + " sample " + (i + 1), unitId);
+      });
 
-    uploadFiles([primaryFile[0]], unitId, function (err, primaryUrls) {
-      if (err) {
-        setCatalogStatus(err.message, "error");
-        if (btn) { btn.disabled = false; btn.textContent = "Save new product"; }
-        return;
-      }
-      var primaryUrl = primaryUrls[0];
-      var sampleList = primaryUrls.slice();
+      catalog.units.push({
+        id: unitId,
+        name: name,
+        description: description,
+        image: primaryUrl,
+        images: sampleList,
+        pricing: {
+          baseRate: baseRate,
+          longRate: longRate,
+          longRateMinDays: (catalog.settings && catalog.settings.longRateMinDays) || 3
+        },
+        sortOrder: nextSortOrder(),
+        active: active,
+        bookable: bookable
+      });
 
-      uploadFiles(sampleFiles ? Array.prototype.slice.call(sampleFiles) : [], unitId, function (err2, extraUrls) {
-        if (err2) {
-          setCatalogStatus(err2.message, "error");
+      selectedUnitId = unitId;
+      if (btn) { btn.disabled = false; btn.textContent = "Save new product"; }
+      saveCatalog("New product saved — live website updated.");
+    }
+
+    if (primaryFile && primaryFile[0]) {
+      setCatalogStatus("Uploading photos…");
+      uploadFiles([primaryFile[0]], unitId, function (err, primaryUrls) {
+        if (err) {
+          setCatalogStatus(
+            "Upload failed — " + err.message +
+              " Tip: run supabase/storage.sql, or paste an image URL instead.",
+            "error"
+          );
           if (btn) { btn.disabled = false; btn.textContent = "Save new product"; }
           return;
         }
-        extraUrls.forEach(function (u) {
-          if (sampleList.indexOf(u) === -1) sampleList.push(u);
+        uploadFiles(sampleFiles ? Array.prototype.slice.call(sampleFiles) : [], unitId, function (err2, extraUrls) {
+          if (err2) {
+            setCatalogStatus(err2.message, "error");
+            if (btn) { btn.disabled = false; btn.textContent = "Save new product"; }
+            return;
+          }
+          finishCreate(primaryUrls[0], extraUrls);
         });
-
-        pushMedia(primaryUrl, primaryFile[0].name, unitId);
-        (sampleFiles || []).forEach(function (f, i) {
-          if (extraUrls[i]) pushMedia(extraUrls[i], f.name, unitId);
-        });
-
-        catalog.units.push({
-          id: unitId,
-          name: name,
-          description: description,
-          image: primaryUrl,
-          images: sampleList,
-          pricing: {
-            baseRate: baseRate,
-            longRate: longRate,
-            longRateMinDays: (catalog.settings && catalog.settings.longRateMinDays) || 3
-          },
-          sortOrder: nextSortOrder(),
-          active: active,
-          bookable: bookable
-        });
-
-        selectedUnitId = unitId;
-        if (btn) { btn.disabled = false; btn.textContent = "Save new product"; }
-        saveCatalog("New product saved — live website updated.");
       });
-    });
+      return;
+    }
+
+    finishCreate(primaryUrlField, []);
   }
 
   function saveSelectedUnit() {

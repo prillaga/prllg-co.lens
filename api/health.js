@@ -1,5 +1,5 @@
-import { getStorageDiagnostics } from "../../lib/storage/diagnostics.js";
-import { handleOptions, sendError, setJsonCors } from "../../lib/bookings/http.js";
+import { getStorageDiagnostics } from "../lib/storage/diagnostics.js";
+import { handleOptions, sendError, setJsonCors } from "../lib/bookings/http.js";
 
 export default async function handler(req, res) {
   setJsonCors(res);

@@ -17,9 +17,11 @@
   }
 
   function fetchPublicCatalog(done) {
-    fetch(publicApiUrl(), {
+    var url = publicApiUrl();
+    var sep = url.indexOf("?") === -1 ? "?" : "&";
+    fetch(url + sep + "t=" + Date.now(), {
       cache: "no-store",
-      headers: { Accept: "application/json" }
+      headers: { Accept: "application/json", "Cache-Control": "no-cache" }
     })
       .then(function (res) {
         return res.json().catch(function () { return { error: "Invalid JSON" }; }).then(function (data) {
@@ -132,7 +134,7 @@
   }
 
   function startPublicCatalogAutoRefresh(refreshFn, intervalMs) {
-    var ms = intervalMs || 60000;
+    var ms = intervalMs || 20000;
     var timer = window.setInterval(refreshFn, ms);
     document.addEventListener("visibilitychange", function () {
       if (!document.hidden) refreshFn();
