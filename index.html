@@ -144,12 +144,9 @@
       overflow: hidden; padding: 120px 48px 80px;
     }
     .hero__bg-image {
-      position: absolute; right: -8%; top: 0; transform: none;
-      width: 62%; max-width: 900px; height: 100%;
-      object-fit: cover; object-position: right center;
-      opacity: 0.82; z-index: 1;
-      /* Darken the scene so the left-side text remains high-contrast. */
-      filter: brightness(0.46) contrast(1.16) saturate(1.05);
+      position: absolute; inset: 0; width: 100%; height: 100%;
+      object-fit: cover; object-position: center;
+      opacity: 1; z-index: 1;
     }
     .hero__gradient {
       position: absolute; inset: 0; z-index: 2;
@@ -194,7 +191,7 @@
 
     @media (max-width: 900px) {
       .hero { padding: 140px 24px 60px; min-height: 70vh; }
-      .hero__bg-image { position: relative; right: auto; top: auto; transform: none; width: 80%; max-width: 420px; height: 260px; margin: 28px auto 0; opacity: 0.8; filter: brightness(0.5) contrast(1.1) saturate(1.02); object-fit: cover; }
+      .hero__bg-image { position: relative; right: auto; top: auto; transform: none; width: 100%; max-width: none; height: 260px; margin: 28px auto 0; opacity: 1; object-fit: cover; }
       .hero__gradient { background: linear-gradient(180deg, rgba(8,8,8,0.95) 0%, rgba(8,8,8,0.72) 55%, rgba(8,8,8,0.25) 80%, rgba(8,8,8,0.05) 100%); }
       .hero { flex-direction: column; align-items: flex-start; }
     }

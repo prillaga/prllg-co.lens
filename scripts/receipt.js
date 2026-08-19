@@ -130,7 +130,7 @@
       row.innerHTML =
         '<div class="item-desc"><label>Description</label>' +
         '<input type="text" data-f="description" data-i="' + index + '" value="' + escapeHtml(item.description) + '" placeholder="Item or rental"></div>' +
-        '<div><label>Qty</label><input type="number" min="0.01" step="0.01" data-f="quantity" data-i="' + index + '" value="' + item.quantity + '"></div>' +
+        '<div><label>Days</label><input type="number" min="0.01" step="0.01" data-f="quantity" data-i="' + index + '" value="' + item.quantity + '"></div>' +
         '<div><label>Unit price</label><input type="number" min="0" step="0.01" data-f="unitPrice" data-i="' + index + '" value="' + item.unitPrice + '"></div>' +
         '<div><label>Total</label><input type="text" readonly value="' + formatPeso(item.total) + '"></div>' +
         '<div><button type="button" class="reject" data-remove="' + index + '">Remove</button></div>';
@@ -281,7 +281,7 @@
           "</p>"
         : "") +
       "<table>" +
-      "<thead><tr><th>Description</th><th class='num'>Qty</th><th class='num'>Unit</th><th class='num'>Total</th></tr></thead>" +
+      "<thead><tr><th>Description</th><th class='num'>Days</th><th class='num'>Unit</th><th class='num'>Total</th></tr></thead>" +
       "<tbody>" + rows + "</tbody>" +
       "</table>" +
       '<div class="summary">' +
