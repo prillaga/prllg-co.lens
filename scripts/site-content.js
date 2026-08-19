@@ -109,8 +109,8 @@
         '<div style="padding: 12px 14px 16px 14px; text-align: left;">' +
         "<h3 style=\"margin: 0 0 10px 0; color: #f5f5f5; font-family: Avenir, 'Avenir Next', 'Century Gothic', Arial, sans-serif; font-size: 18px; line-height: 1.35;\">" + escapeHtml(unit.name) + "</h3>" +
         desc +
-        '<p style="margin: 0 0 10px 0; color: #d4af37; font-size: 14px;">' + escapeHtml(priceLine) + "</p>" +
-        '<a href="' + inquireHref + '"' + preselect + ' style="display: inline-block; padding: 9px 20px; background: linear-gradient(135deg, #f3d77b 0%, #d4af37 45%, #b8901f 100%); color: #111; text-decoration: none; font-family: Avenir, \'Avenir Next\', \'Century Gothic\', Arial, sans-serif; font-weight: 700; border-radius: 999px; letter-spacing: 1px; font-size: 14px;">Inquire Now</a>' +
+        '<p style="margin: 0 0 10px 0; color: #7CCFD0; font-size: 14px;">' + escapeHtml(priceLine) + "</p>" +
+        '<a href="' + inquireHref + '"' + preselect + ' style="display: inline-block; padding: 9px 20px; background: linear-gradient(135deg, #bff5f5 0%, #7CCFD0 50%, #3fbfbf 100%); color: #080808; text-decoration: none; font-family: Avenir, \'Avenir Next\', \'Century Gothic\', Arial, sans-serif; font-weight: 700; border-radius: 999px; letter-spacing: 1px; font-size: 14px;">Inquire Now</a>' +
         "</div></div>";
     });
     container.innerHTML = html || '<p style="color:#888;padding:12px;">No units available.</p>';

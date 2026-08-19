@@ -8,11 +8,12 @@
   <script src="site-config.js"></script>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;1,400;1,500&family=Playfair+Display:ital,wght@0,500;0,600;0,700;1,500&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="theme.css">
   <style>
     *, *::before, *::after { box-sizing: border-box; }
     html { -webkit-text-size-adjust: 100%; }
-    body { margin: 0; background: #111; color: #f5f5f5; padding-bottom: 96px; }
+    body { margin: 0; background: #F5F1E8; color: #171717; padding-bottom: 96px; }
     .skip-link {
       position: absolute; left: 12px; top: 12px; z-index: 2000;
       padding: 10px 16px; background: #d4af37; color: #111; font-weight: 700;
@@ -85,10 +86,10 @@
       text-shadow: 0 0 36px rgba(212, 175, 55, 0.12);
     }
   </style>
-  <link rel="stylesheet" href="site-nav.css">
+  <link rel="stylesheet" href="site-header.css">
   <link rel="stylesheet" href="responsive.css">
   <link rel="stylesheet" href="lenis-motion.css">
-  <script src="site-nav.js" defer></script>
+  <script src="site-header.js" defer></script>
   <script src="lenis-motion.js" defer></script>
 </head>
 <body>
@@ -108,7 +109,6 @@
   </button>
   <nav id="site-main-nav" class="site-nav" aria-label="Main">
     <a href="index.html#home" data-nav="home">Home</a>
-    <a href="about-us.html" data-nav="about">About Us</a>
     <a href="units.html" class="is-active" aria-current="page" data-nav="units">Units</a>
     <a href="availability.html" data-nav="availability">Availability</a>
     <a href="index.html#rental-policy" data-nav="policy">Rental Policy</a>
@@ -118,7 +118,7 @@
   </nav>
 </header>
 
-<section id="units" class="units-page" style="background: #111111; padding: 110px max(20px, env(safe-area-inset-left)) 70px max(20px, env(safe-area-inset-right)); color: #f5f5f5; font-family: Arial, sans-serif;">
+<section id="units" class="units-page" style="background: #F5F1E8; padding: 110px max(20px, env(safe-area-inset-left)) 70px max(20px, env(safe-area-inset-right)); color: #171717; font-family: Arial, sans-serif;">
   <div class="units-page-inner">
     <h2 class="lux-heading" style="margin: 0 0 30px 0;">
       Units

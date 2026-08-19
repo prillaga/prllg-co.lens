@@ -6,8 +6,7 @@
 /* ----- Horizontal overflow + dark UI chrome ----- */
 html {
   overflow-x: hidden;
-  color-scheme: dark;
-  background-color: #0a0a0a;
+  background-color: #F5F1E8;
 }
 
 /* Page enter animation: lenis-motion.js */

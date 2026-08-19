@@ -1,0 +1,221 @@
+/**
+ * Prillaga&Co. Lens — Unified Premium Theme
+ * Include this file on all pages to apply consistent color palette, fonts, and styling.
+ */
+
+:root {
+  --color-dark: #080808;
+  --color-charcoal: #171717;
+  --color-card: #1e1e1c;
+  --color-cream: #E8E3D8;
+  --color-mint: #7CCFD0;
+  --color-white: #E8E3D8;
+  --color-gray: #8a8580;
+  --color-border: #4A4743;
+  --color-deep: #080808;
+  --font-serif: 'Cormorant Garamond', Georgia, serif;
+  --font-sans: 'Inter', 'Segoe UI', sans-serif;
+}
+
+html {
+  background-color: #F5F1E8 !important;
+}
+
+body {
+  font-family: var(--font-sans) !important;
+  background: #F5F1E8 !important;
+  color: var(--color-charcoal) !important;
+}
+
+body, p, li, label, input, select, textarea, button {
+  font-family: var(--font-sans) !important;
+}
+
+a:focus-visible, button:focus-visible, input:focus-visible, select:focus-visible, textarea:focus-visible {
+  outline: 2px solid var(--color-mint) !important;
+  outline-offset: 3px;
+}
+
+::selection {
+  background: rgba(124, 207, 208, 0.35);
+  color: #fff;
+}
+
+/* Brand lockup */
+.brand-lockup .brand-name,
+.brand-lockup .brand-line {
+  font-family: var(--font-serif) !important;
+  color: #171717 !important;
+  text-shadow: none !important;
+  letter-spacing: 0.04em !important;
+}
+
+/* Skip link */
+.skip-link {
+  background: var(--color-mint) !important;
+  color: #111 !important;
+}
+
+/* Header */
+#site-header {
+  background: rgba(245, 241, 232, 0.95) !important;
+  border-bottom: 1px solid #ddd8cc !important;
+  backdrop-filter: blur(10px) !important;
+  -webkit-backdrop-filter: blur(10px) !important;
+}
+
+/* Nav links */
+#site-header nav.site-nav a {
+  color: #4A4743 !important;
+}
+#site-header nav.site-nav a.is-active,
+#site-header nav.site-nav a[aria-current="page"] {
+  color: #7CCFD0 !important;
+  box-shadow: inset 3px 0 0 #7CCFD0 !important;
+}
+
+.nav-toggle {
+  border-color: #ddd8cc !important;
+  background: rgba(245,241,232,0.8) !important;
+}
+
+.nav-toggle:hover {
+  border-color: #7CCFD0 !important;
+}
+
+.nav-toggle__bar,
+.nav-toggle__bars .nav-toggle__bar {
+  background: #171717 !important;
+}
+
+/* Lux headings */
+.lux-heading,
+.lux-page-title {
+  font-family: var(--font-serif) !important;
+  color: #171717 !important;
+  text-shadow: none !important;
+}
+
+/* Page titles that use gold → mint */
+h1, h2, h3 {
+  font-family: var(--font-serif);
+}
+
+/* Gold accent overrides → mint */
+[style*="color: #d4af37"],
+[style*="color:#d4af37"] {
+  color: var(--color-mint) !important;
+}
+
+/* Cards / panels */
+.pay-card,
+.admin-card {
+  background: #fff !important;
+  border-color: #ddd8cc !important;
+}
+
+.pay-card h2 {
+  font-family: var(--font-serif) !important;
+}
+
+/* Buttons with gold gradient → teal solid */
+a[href*="book-now"],
+button[type="submit"],
+.home-hero__cta--primary,
+.btn-primary {
+  background: var(--color-mint) !important;
+  color: #080808 !important;
+  border: none !important;
+  box-shadow: none !important;
+  border-radius: 4px !important;
+}
+
+a[href*="book-now"]:hover,
+button[type="submit"]:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 8px 20px rgba(124, 207, 208, 0.3) !important;
+}
+
+/* Selects */
+select:not([multiple]):not([size]) {
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='8' viewBox='0 0 12 8'%3E%3Cpath fill='%237CCFD0' d='M1.4 0L6 4.6 10.6 0 12 1.4l-6 6-6-6z'/%3E%3C/svg%3E") !important;
+}
+
+select:not([multiple]):not([size]):focus-visible {
+  border-color: var(--color-mint) !important;
+  box-shadow: 0 0 0 2px rgba(124, 207, 208, 0.22) !important;
+}
+
+/* Flatpickr overrides */
+.flatpickr-day.today {
+  border-color: var(--color-mint) !important;
+}
+.flatpickr-day.selected,
+.flatpickr-day.startRange,
+.flatpickr-day.endRange {
+  background: var(--color-mint) !important;
+  border-color: var(--color-mint) !important;
+  color: #080808 !important;
+}
+.flatpickr-day.inRange {
+  background: rgba(124, 207, 208, 0.2) !important;
+}
+
+/* Links in content */
+a[style*="color: #d4af37"],
+a[style*="color:#d4af37"],
+.home-cal-foot a,
+#availability-calendar .home-cal-toolbar label {
+  color: var(--color-mint) !important;
+}
+
+/* Footer */
+footer, footer#contact-page {
+  background: #F5F1E8 !important;
+  border-top: 1px solid #ddd8cc !important;
+  color: #171717 !important;
+}
+
+/* Booking date chips */
+.booking-date-chip.is-active {
+  background: rgba(124, 207, 208, 0.15) !important;
+  border-color: rgba(124, 207, 208, 0.55) !important;
+  color: #7CCFD0 !important;
+}
+
+/* About page specifics */
+.page-shell--about {
+  background: #F5F1E8 !important;
+}
+
+/* Rental agreement doc panel keeps light bg */
+.doc {
+  background: #f4f4f0;
+  color: #111;
+}
+
+/* Admin nav link styling */
+#site-header nav.site-nav a[data-nav="admin"] {
+  color: var(--color-mint) !important;
+  border-top-color: rgba(124, 207, 208, 0.15) !important;
+}
+
+/* Payment page buttons */
+.pay-btn--copy {
+  background: var(--color-charcoal) !important;
+  color: var(--color-mint) !important;
+  border-color: var(--color-border) !important;
+}
+.pay-btn--messenger,
+.pay-cta {
+  background: var(--color-mint) !important;
+  color: #080808 !important;
+}
+.pay-foot a { color: var(--color-mint) !important; }
+.about-tagline { color: var(--color-mint) !important; }
+
+/* Ensure ivory pages keep readable type */
+.about-lead { color: #4A4743 !important; }
+.pay-lead { color: #4A4743 !important; }
+.pay-foot { color: #4A4743 !important; }
+.pay-card p { color: #4A4743 !important; }

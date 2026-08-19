@@ -144,7 +144,19 @@
         if (!items[i]) return;
         if (f === "description") items[i].description = input.value;
         else items[i][f] = Number(input.value) || 0;
-        refresh();
+
+        // Avoid re-rendering the entire items list on every keystroke; that replaces the
+        // focused input and makes typing feel broken.
+        var totals = computeTotals();
+        syncFormTotals(totals);
+        renderPreview();
+
+        // Keep the per-row Total input in sync without rebuilding the DOM.
+        var row = input.closest(".receipt-item-row");
+        if (row) {
+          var totalInput = row.querySelector("input[readonly]");
+          if (totalInput) totalInput.value = formatPeso(items[i].total || 0);
+        }
       });
     });
     list.querySelectorAll("button[data-remove]").forEach(function (btn) {
