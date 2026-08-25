@@ -191,7 +191,7 @@
 
     @media (max-width: 900px) {
       .hero { padding: 140px 24px 60px; min-height: 70vh; }
-      .hero__bg-image { position: relative; right: auto; top: auto; transform: none; width: 100%; max-width: none; height: 260px; margin: 28px auto 0; opacity: 1; object-fit: cover; }
+      .hero__bg-image { position: absolute; inset: 0; width: 100%; height: 100%; margin: 0; opacity: 1; z-index: 1; object-fit: cover; object-position: center; }
       .hero__gradient { background: linear-gradient(180deg, rgba(8,8,8,0.95) 0%, rgba(8,8,8,0.72) 55%, rgba(8,8,8,0.25) 80%, rgba(8,8,8,0.05) 100%); }
       .hero { flex-direction: column; align-items: flex-start; }
     }
@@ -525,6 +525,7 @@
       margin: 12px auto 24px; background: #0f0f0f;
       border: 1px solid #333; border-radius: 12px;
       box-shadow: 0 24px 48px rgba(0,0,0,0.55);
+      overflow-x: hidden;
     }
     .booking-modal__close {
       position: absolute; top: 10px; right: 10px; z-index: 2;
@@ -533,6 +534,49 @@
       cursor: pointer; display: flex; align-items: center; justify-content: center; padding: 0;
     }
     .booking-modal__close:hover { background: #252525; }
+    #booking-modal-title.lux-heading,
+    .booking-modal .lux-heading {
+      color: #E8E3D8 !important;
+      letter-spacing: 0.12em;
+    }
+    #book-now {
+      overflow-x: hidden;
+      max-width: 100%;
+    }
+    #book-now form {
+      width: 100%;
+      max-width: 100%;
+      min-width: 0;
+    }
+    #book-now input,
+    #book-now select,
+    #book-now textarea,
+    #book-now .flatpickr-input,
+    #book-now input.flatpickr-input {
+      width: 100% !important;
+      max-width: 100% !important;
+      min-width: 0;
+      box-sizing: border-box !important;
+    }
+    /* Flatpickr alt inputs (visible date fields) — match dark form */
+    #book-now .flatpickr-input,
+    #book-now input.flatpickr-input,
+    #book-now .flatpickr-input.form-control,
+    #book-now input.flatpickr-alt-input {
+      padding: 12px 14px !important;
+      border: 1px solid #2e2e2e !important;
+      border-radius: 6px !important;
+      background: #171717 !important;
+      color: #ffffff !important;
+      font-size: 15px !important;
+      min-height: 44px !important;
+      -webkit-appearance: none;
+      appearance: none;
+    }
+    #book-now input[type="date"]::-webkit-calendar-picker-indicator {
+      filter: invert(1);
+      opacity: 0.7;
+    }
     .booking-date-tools { display: flex; flex-wrap: wrap; gap: 8px; margin: -2px 0 2px; }
     .booking-date-chip {
       border: 1px solid #343434; background: #161616; color: #e7e7e7;
@@ -542,6 +586,30 @@
     }
     .booking-date-chip:hover { background: #222; border-color: #555; }
     .booking-date-chip.is-active { background: rgba(124,207,208,0.15); border-color: rgba(124,207,208,0.55); color: #7CCFD0; }
+
+    @media (max-width: 768px) {
+      .booking-modal {
+        padding: max(12px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
+      }
+      .booking-modal__panel {
+        margin: 4px auto 12px;
+        max-height: calc(100dvh - 20px);
+        overflow-y: auto;
+        -webkit-overflow-scrolling: touch;
+      }
+      #book-now {
+        padding: 52px 14px 22px !important;
+      }
+      #booking-modal-title.lux-heading {
+        font-size: clamp(1.35rem, 6vw, 1.75rem);
+        margin-bottom: 18px !important;
+        padding-right: 36px;
+      }
+      #book-now button[type="submit"] {
+        width: 100%;
+        min-height: 48px;
+      }
+    }
 
     /* Flatpickr theme */
     .flatpickr-calendar { background: #fff !important; border: 1px solid #dde3f0 !important; border-radius: 14px !important; box-shadow: 0 16px 38px rgba(16,24,40,0.2) !important; overflow: hidden; }
@@ -852,10 +920,10 @@
   <div class="booking-modal__panel">
     <button type="button" class="booking-modal__close" aria-label="Close booking form">&times;</button>
     <section id="book-now" style="background: transparent; padding: 56px 20px 28px; color: #f5f5f5; font-family: var(--font-sans);">
-  <h2 id="booking-modal-title" class="lux-heading" style="margin: 0 0 24px 0;">Booking</h2>
-  <form onsubmit="handleBookingSubmit(event)" style="max-width: 680px; margin: 0 auto; display: grid; gap: 14px;">
-    <input type="text" name="fullName" placeholder="Full Name" autocomplete="name" required style="padding: 12px 14px; border: 1px solid #2e2e2e; border-radius: 6px; background: #171717; color: #ffffff; font-size: 15px;">
-    <input type="tel" name="phone" placeholder="Phone Number" autocomplete="tel" required style="padding: 12px 14px; border: 1px solid #2e2e2e; border-radius: 6px; background: #171717; color: #ffffff; font-size: 15px;">
+  <h2 id="booking-modal-title" class="lux-heading" style="margin: 0 0 24px 0;">Booking Form</h2>
+  <form onsubmit="handleBookingSubmit(event)" style="max-width: 680px; width: 100%; margin: 0 auto; display: grid; gap: 14px; min-width: 0;">
+    <input type="text" name="fullName" placeholder="Full Name" autocomplete="name" required style="padding: 12px 14px; border: 1px solid #2e2e2e; border-radius: 6px; background: #171717; color: #ffffff; font-size: 15px; width: 100%; box-sizing: border-box;">
+    <input type="tel" name="phone" placeholder="Phone Number" autocomplete="tel" required style="padding: 12px 14px; border: 1px solid #2e2e2e; border-radius: 6px; background: #171717; color: #ffffff; font-size: 15px; width: 100%; box-sizing: border-box;">
     <select name="pickupLocation" id="pickupLocation" required>
       <option value="">Pick Up Location</option>
       <option value="jks-vapeshop-north-baluarte-molo">JKS Vapeshop North Baluarte Molo</option>
@@ -863,7 +931,7 @@
       <option value="sm-city">SM City</option>
       <option value="others">Others</option>
     </select>
-    <input type="text" id="pickupLocationOther" name="pickupLocationOther" placeholder="Type your pick-up location" hidden autocomplete="street-address" style="padding: 12px 14px; border: 1px solid #2e2e2e; border-radius: 6px; background: #171717; color: #ffffff; font-size: 15px;">
+    <input type="text" id="pickupLocationOther" name="pickupLocationOther" placeholder="Type your pick-up location" hidden autocomplete="street-address" style="padding: 12px 14px; border: 1px solid #2e2e2e; border-radius: 6px; background: #171717; color: #ffffff; font-size: 15px; width: 100%; box-sizing: border-box;">
     <select name="pickupTime" required>
       <option value="">Pick Up Time</option>
       <option value="07:00">7:00 AM</option>
@@ -882,9 +950,9 @@
       <option value="20:00">8:00 PM</option>
     </select>
     <label for="rentalDate" style="font-size: 14px; color: var(--color-mint); letter-spacing: 0.5px;">Rental Date</label>
-    <input id="rentalDate" type="date" name="rentalDate" required onfocus="this.showPicker && this.showPicker()" onclick="this.showPicker && this.showPicker()" onchange="updateUnitPricing()" oninput="updateUnitPricing()" style="padding: 12px 14px; border: 1px solid #2e2e2e; border-radius: 6px; background: #171717; color: #ffffff; font-size: 15px;">
+    <input id="rentalDate" type="date" name="rentalDate" required onfocus="this.showPicker && this.showPicker()" onclick="this.showPicker && this.showPicker()" onchange="updateUnitPricing()" oninput="updateUnitPricing()" style="padding: 12px 14px; border: 1px solid #2e2e2e; border-radius: 6px; background: #171717; color: #ffffff; font-size: 15px; width: 100%; box-sizing: border-box;">
     <label for="returnDate" style="font-size: 14px; color: var(--color-mint); letter-spacing: 0.5px;">Return Date</label>
-    <input id="returnDate" type="date" name="returnDate" required onfocus="this.showPicker && this.showPicker()" onclick="this.showPicker && this.showPicker()" onchange="updateUnitPricing()" oninput="updateUnitPricing()" style="padding: 12px 14px; border: 1px solid #2e2e2e; border-radius: 6px; background: #171717; color: #ffffff; font-size: 15px;">
+    <input id="returnDate" type="date" name="returnDate" required onfocus="this.showPicker && this.showPicker()" onclick="this.showPicker && this.showPicker()" onchange="updateUnitPricing()" oninput="updateUnitPricing()" style="padding: 12px 14px; border: 1px solid #2e2e2e; border-radius: 6px; background: #171717; color: #ffffff; font-size: 15px; width: 100%; box-sizing: border-box;">
     <div class="booking-date-tools" role="group" aria-label="Quick date presets">
       <button type="button" class="booking-date-chip" data-date-preset="today">Today</button>
       <button type="button" class="booking-date-chip" data-date-preset="tomorrow">Tomorrow</button>
@@ -904,7 +972,7 @@
     </select>
     <p id="unitPriceDisplay" style="margin: -6px 0 2px 0; color: var(--color-mint); font-size: 14px;">Select a unit to view price details.</p>
     <p id="estimatedPriceDisplay" style="margin: -6px 0 2px 0; color: #f0f0f0; font-size: 14px;">Total Price (Unit Price x Rental Days) will show here.</p>
-    <textarea name="notes" placeholder="Project details or special requests" rows="5" style="padding: 12px 14px; border: 1px solid #2e2e2e; border-radius: 6px; background: #171717; color: #ffffff; font-size: 15px;"></textarea>
+    <textarea name="notes" placeholder="Project details or special requests" rows="5" style="padding: 12px 14px; border: 1px solid #2e2e2e; border-radius: 6px; background: #171717; color: #ffffff; font-size: 15px; width: 100%; box-sizing: border-box;"></textarea>
     <p style="margin: 0; padding: 10px 12px; border: 1px solid #2e2e2e; border-radius: 6px; background: #151515; color: var(--color-mint); font-size: 14px; line-height: 1.6;">
       Note: To reserve your slots, wait for the confirmation in Messenger and send the reservation fee of 100 pesos in GCash. <a href="payment-methods.html" style="color: var(--color-mint);">Other payment options</a>
     </p>
@@ -1465,10 +1533,10 @@
     var rental = document.getElementById("rentalDate");
     var ret = document.getElementById("returnDate");
     if (!rental || !ret) return;
-    var rentalPicker = flatpickr(rental, { dateFormat: "Y-m-d", altInput: true, altFormat: "d / m / Y", disableMobile: true, minDate: "today",
+    var rentalPicker = flatpickr(rental, { dateFormat: "Y-m-d", altInput: true, altFormat: "d / m / Y", altInputClass: "flatpickr-alt-input", disableMobile: true, minDate: "today",
       onChange: function (selectedDates) { var start = selectedDates && selectedDates[0] ? selectedDates[0] : null; if (!start) return; if (returnPicker) { returnPicker.set("minDate", start); if (!ret.value || new Date(ret.value + "T00:00:00") < start) returnPicker.setDate(start, true); } updateUnitPricing(); updateCalendarAvailabilityNotice(); }
     });
-    var returnPicker = flatpickr(ret, { dateFormat: "Y-m-d", altInput: true, altFormat: "d / m / Y", disableMobile: true, minDate: rental.value || "today",
+    var returnPicker = flatpickr(ret, { dateFormat: "Y-m-d", altInput: true, altFormat: "d / m / Y", altInputClass: "flatpickr-alt-input", disableMobile: true, minDate: rental.value || "today",
       onChange: function () { updateUnitPricing(); updateCalendarAvailabilityNotice(); }
     });
     if (rental.value) rentalPicker.setDate(rental.value, false);

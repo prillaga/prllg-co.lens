@@ -657,6 +657,7 @@ label,
     border-radius: 10px;
     max-height: calc(100dvh - 24px);
     overflow-y: auto;
+    overflow-x: hidden;
     -webkit-overflow-scrolling: touch;
   }
 
@@ -672,17 +673,29 @@ label,
   #book-now input,
   #book-now select,
   #book-now textarea,
-  #book-now button[type="submit"] {
+  #book-now button[type="submit"],
+  #book-now .flatpickr-input,
+  #book-now input.flatpickr-alt-input {
     width: 100% !important;
     max-width: 100% !important;
     min-width: 0;
-    box-sizing: border-box;
+    box-sizing: border-box !important;
   }
 
   #book-now input,
   #book-now select,
-  #book-now textarea {
+  #book-now textarea,
+  #book-now .flatpickr-input,
+  #book-now input.flatpickr-alt-input {
     line-height: 1.25;
+    background: #171717 !important;
+    color: #ffffff !important;
+    border: 1px solid #2e2e2e !important;
+  }
+
+  #booking-modal-title.lux-heading,
+  .booking-modal .lux-heading {
+    color: #E8E3D8 !important;
   }
 }
 
