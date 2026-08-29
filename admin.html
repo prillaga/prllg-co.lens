@@ -29,10 +29,10 @@
     <button type="button" class="primary" id="btnUnlock">Unlock</button>
   </div>
 
-  <div id="storageSetup" class="panel" style="border-color:#6b5a30;display:none;">
-    <h2 style="margin:0 0 8px 0;font-size:15px;color:#d4af37;">Server storage not connected</h2>
-    <p id="storageSetupText" style="margin:0 0 10px 0;font-size:13px;color:#e8d080;line-height:1.55;">Checking…</p>
-    <ol style="margin:0;padding-left:18px;font-size:13px;color:#bbb;line-height:1.7;">
+  <div id="storageSetup" class="panel" style="border-color:#ddd8cc;display:none;">
+    <h2 style="margin:0 0 8px 0;font-size:15px;">Server storage not connected</h2>
+    <p id="storageSetupText" style="margin:0 0 10px 0;font-size:13px;color:#4A4743;line-height:1.55;">Checking…</p>
+    <ol style="margin:0;padding-left:18px;font-size:13px;color:#4A4743;line-height:1.7;">
       <li>Supabase → <strong>Settings → API</strong> → copy the <strong>secret</strong> key (<code>sb_secret_...</code> or <code>service_role</code>)</li>
       <li>Vercel → <strong>Settings → Environment Variables</strong> → name: <code>SUPABASE_SERVICE_ROLE_KEY</code> → paste secret key → <strong>Production</strong></li>
       <li>Supabase → <strong>SQL Editor</strong> → run <code>supabase/schema.sql</code> from this repo</li>
@@ -69,9 +69,9 @@
     <p style="margin: 0 0 14px 0;">
       <button type="button" id="btnExportPublic">Download backup JSON (optional)</button>
     </p>
-    <div class="panel" style="border-color: #6b5a30;">
-      <h2 style="margin: 0 0 8px 0; font-size: 15px; color: #d4af37;">Quick block (shows as Booked)</h2>
-      <p style="margin: 0 0 14px 0; font-size: 13px; color: #9a9a9a; line-height: 1.5;">For maintenance, personal days, or any time the gear must show as booked. No amber step — dates go <strong style="color:#e8b4b4;">red</strong> on the calendar right away.</p>
+    <div class="panel" style="border-color: #7CCFD0;">
+      <h2 style="margin: 0 0 8px 0; font-size: 15px; color: #171717;">Quick block (shows as Booked)</h2>
+      <p style="margin: 0 0 14px 0; font-size: 13px; color: #4A4743; line-height: 1.5;">For maintenance, personal days, or any time the gear must show as booked. No amber step — dates go <strong style="color:#c44;">red</strong> on the calendar right away.</p>
       <label for="blockUnit">Equipment</label>
       <select id="blockUnit" aria-label="Unit to block"></select>
       <label for="blockStart">First day of block (Booked)</label>
@@ -83,12 +83,12 @@
       <button type="button" class="primary" id="btnAddBlock">Block on calendar</button>
     </div>
     <div class="panel">
-      <h2 style="margin: 0 0 10px 0; font-size: 15px; color: #888;">Confirmed blocks (remove if you made a mistake)</h2>
+      <h2 style="margin: 0 0 10px 0; font-size: 15px; color: #4A4743;">Confirmed blocks (remove if you made a mistake)</h2>
       <ul id="approvedList"></ul>
     </div>
     <div class="panel">
-      <h2 style="margin: 0 0 10px 0; font-size: 15px; color: #d4af37;">Add pending request</h2>
-      <p style="margin: 0 0 14px 0; font-size: 13px; color: #9a9a9a; line-height: 1.5;">After you read a booking in Messenger, enter the details here so customers see tentative holds on the calendar.</p>
+      <h2 style="margin: 0 0 10px 0; font-size: 15px; color: #171717;">Add pending request</h2>
+      <p style="margin: 0 0 14px 0; font-size: 13px; color: #4A4743; line-height: 1.5;">After you read a booking in Messenger, enter the details here so customers see tentative holds on the calendar.</p>
       <label for="addUnit">Unit</label>
       <select id="addUnit" aria-label="Unit"></select>
       <label for="addStart">Rental start</label>
@@ -100,11 +100,11 @@
       <button type="button" class="primary" id="btnAddPending">Save as pending</button>
     </div>
     <div class="panel">
-      <h2 style="margin: 0 0 12px 0; font-size: 15px; color: #d4af37;">Pending</h2>
+      <h2 style="margin: 0 0 12px 0; font-size: 15px; color: #171717;">Pending</h2>
       <ul id="pendingList"></ul>
     </div>
     <div class="panel">
-      <h2 style="margin: 0 0 12px 0; font-size: 15px; color: #888;">Recently rejected</h2>
+      <h2 style="margin: 0 0 12px 0; font-size: 15px; color: #4A4743;">Recently rejected</h2>
       <ul id="rejectedList"></ul>
     </div>
     </div>
@@ -112,7 +112,7 @@
     <div data-admin-panel="products" hidden>
       <div class="admin-layout">
         <div class="panel">
-          <h2 style="margin: 0 0 10px 0; font-size: 15px; color: #d4af37;">Products</h2>
+          <h2 style="margin: 0 0 10px 0; font-size: 15px; color: #171717;">Products</h2>
           <div id="productUnitList"></div>
         </div>
         <div class="panel" id="productEditor">
@@ -123,8 +123,8 @@
 
     <div data-admin-panel="media" hidden>
       <div class="panel">
-        <h2 style="margin: 0 0 10px 0; font-size: 15px; color: #d4af37;">Add photo (free plan)</h2>
-        <p style="margin:0 0 12px 0;font-size:13px;color:#9a9a9a;">Use a path like <code>images/photo.jpg</code> or a full <code>https://</code> URL. Saved in free Supabase.</p>
+        <h2 style="margin: 0 0 10px 0; font-size: 15px; color: #171717;">Add photo (free plan)</h2>
+        <p style="margin:0 0 12px 0;font-size:13px;color:#4A4743;">Use a path like <code>images/photo.jpg</code> or a full <code>https://</code> URL. Saved in free Supabase.</p>
         <label for="mediaSiteImageSelect">Pick from site images</label>
         <select id="mediaSiteImageSelect" aria-label="Pick site image"></select>
         <label for="mediaUrlInput">Or paste image path / URL</label>
@@ -134,7 +134,7 @@
         <button type="button" class="primary" id="btnAddMedia">Add to library &amp; save</button>
       </div>
       <div class="panel">
-        <h2 style="margin: 0 0 10px 0; font-size: 15px; color: #d4af37;">Library</h2>
+        <h2 style="margin: 0 0 10px 0; font-size: 15px; color: #171717;">Library</h2>
         <div id="mediaGrid" class="media-grid"></div>
       </div>
     </div>
@@ -198,7 +198,6 @@
     { id: 'canon-1200d', label: 'Canon 1200D DSLR w/ kitlens 18-55mm' },
     { id: 'canon-4000d', label: 'Canon 4000D DSLR w/ kitlens 18-55mm' },
     { id: 'g6-thumb', label: 'G6 THUMB CAMERA' },
-    { id: 'kodak-v603', label: 'Kodak EasyShare V603' },
     { id: 'zoom-lens', label: 'Zoom Lens 70-300mm' },
     { id: 'dji-gimbal', label: 'DJI OSMO MOBILE 3 GIMBAL' }
   ];
@@ -644,7 +643,7 @@
   }
 })();
 </script>
-<a class="prillaga-messenger-link" href="javascript:void(0)" target="_blank" rel="noopener noreferrer" aria-label="Messenger" style="position: fixed; right: 16px; bottom: 16px; z-index: 999; display: inline-flex; align-items: center; justify-content: center; width: 46px; height: 46px; border-radius: 999px; background: linear-gradient(135deg, rgba(18, 18, 18, 0.96) 0%, rgba(30, 30, 30, 0.96) 100%); border: 1px solid rgba(212, 175, 55, 0.48); color: #f4ebd0; text-decoration: none; line-height: 1; box-shadow: 0 10px 28px rgba(0, 0, 0, 0.42); backdrop-filter: blur(4px); -webkit-backdrop-filter: blur(4px);">
+<a class="prillaga-messenger-link admin-messenger-fab" href="javascript:void(0)" target="_blank" rel="noopener noreferrer" aria-label="Messenger">
   <span aria-hidden="true" style="width: 22px; height: 22px; display: inline-flex; align-items: center; justify-content: center;">
     <svg viewBox="0 0 64 64" width="18" height="18" role="img" aria-hidden="true" focusable="false">
       <defs>

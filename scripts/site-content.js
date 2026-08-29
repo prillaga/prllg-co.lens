@@ -14,7 +14,6 @@
       { id: "canon-1200d", name: "Canon 1200D DSLR w/ kitlens 18-55mm", description: "", image: "images/canon-1200d.jpg", images: ["images/canon-1200d.jpg"], pricing: { baseRate: 550, longRate: 500, longRateMinDays: 3 }, sortOrder: 4, bookable: true },
       { id: "canon-4000d", name: "Canon 4000D DSLR w/ kitlens 18-55mm", description: "", image: "images/canon-4000d.jpg", images: ["images/canon-4000d.jpg"], pricing: { baseRate: 550, longRate: 500, longRateMinDays: 3 }, sortOrder: 5, bookable: true },
       { id: "g6-thumb", name: "G6 THUMB CAMERA", description: "", image: "images/G6-thumb-camera.jpg", images: ["images/G6-thumb-camera.jpg"], pricing: { baseRate: 200, longRate: 150, longRateMinDays: 3 }, sortOrder: 6, bookable: true },
-      { id: "kodak-v603", name: "Kodak EasyShare V603", description: "", image: "images/kodak-v603.jpg", images: ["images/kodak-v603.jpg"], pricing: { baseRate: 250, longRate: 200, longRateMinDays: 3 }, sortOrder: 7, bookable: true },
       { id: "zoom-lens", name: "Zoom Lens 70-300mm", description: "", image: "images/zoom lens.jpg", images: ["images/zoom lens.jpg"], pricing: { baseRate: 300, longRate: 250, longRateMinDays: 3 }, sortOrder: 8, bookable: true, available: false },
       { id: "dji-gimbal", name: "DJI OSMO MOBILE 3 GIMBAL", description: "", image: "images/dji-osmo.jpg", images: ["images/dji-osmo.jpg"], pricing: { baseRate: 300, longRate: 250, longRateMinDays: 3 }, sortOrder: 9, bookable: true }
     ],

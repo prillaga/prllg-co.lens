@@ -13,7 +13,6 @@
     "images/canon-1200d.jpg",
     "images/canon-4000d.jpg",
     "images/G6-thumb-camera.jpg",
-    "images/kodak-v603.jpg",
     "images/zoom lens.jpg",
     "images/dji-osmo.jpg",
     "images/gcash-qr.jpg"
@@ -203,7 +202,7 @@
     }).join("");
 
     panel.innerHTML =
-      "<h2 style='margin:0 0 12px 0;font-size:15px;color:#d4af37;'>New product</h2>" +
+      "<h2 style='margin:0 0 12px 0;font-size:15px;color:#171717;'>New product</h2>" +
       '<p id="productFormError" class="field-error" style="display:none;margin-bottom:10px;"></p>' +
       "<label>Product name *</label>" +
       '<input id="newUnitName" type="text" placeholder="e.g. Sony A6400 kit" required>' +
@@ -227,7 +226,7 @@
       '<button type="button" class="primary" id="btnSaveNewUnit">Save new product</button>' +
       '<button type="button" id="btnCancelNewUnit">Cancel</button>' +
       "</div>" +
-      '<p style="margin:10px 0 0;font-size:12px;color:#888;">If you skip a photo, a default image is used. You can change it after saving.</p>';
+      '<p style="margin:10px 0 0;font-size:12px;color:#4A4743;">If you skip a photo, a default image is used. You can change it after saving.</p>';
 
     wireFilePreview("newUnitPrimaryFile");
     wireFilePreview("newUnitSampleFiles");
@@ -252,7 +251,7 @@
   function renderUnitEditor(panel) {
     var unit = catalog.units.find(function (u) { return u.id === selectedUnitId; });
     if (!unit) {
-      panel.innerHTML = "<p style='color:#888'>Select a product to edit.</p>";
+      panel.innerHTML = "<p style='color:#4A4743'>Select a product to edit.</p>";
       return;
     }
 
@@ -261,9 +260,9 @@
     }).join("");
 
     panel.innerHTML =
-      "<h2 style='margin:0 0 12px 0;font-size:15px;color:#d4af37;'>Edit product</h2>" +
+      "<h2 style='margin:0 0 12px 0;font-size:15px;color:#171717;'>Edit product</h2>" +
       '<p id="productFormError" class="field-error" style="display:none;margin-bottom:10px;"></p>' +
-      "<p style='margin:0 0 10px 0;font-size:12px;color:#888;'>ID: <code>" + escapeHtml(unit.id) + "</code></p>" +
+      "<p style='margin:0 0 10px 0;font-size:12px;color:#4A4743;'>ID: <code>" + escapeHtml(unit.id) + "</code></p>" +
       "<label>Name</label>" +
       '<input id="editUnitName" type="text" value="' + escapeAttr(unit.name) + '">' +
       "<label>Description</label>" +
@@ -543,7 +542,7 @@
     if (!grid || !catalog) return;
     grid.innerHTML = "";
     if (!catalog.media || !catalog.media.length) {
-      grid.innerHTML = "<p style='color:#888'>No photos yet. Upload when adding or editing a product.</p>";
+      grid.innerHTML = "<p style='color:#4A4743'>No photos yet. Upload when adding or editing a product.</p>";
       return;
     }
     catalog.media.forEach(function (item) {
@@ -552,7 +551,7 @@
       card.innerHTML =
         '<img src="' + escapeAttr(item.url) + '" alt="">' +
         "<p>" + escapeHtml(item.name || item.url) + "</p>" +
-        "<p style='color:#888;font-size:12px'>" + escapeHtml(item.unitId ? unitLabel(item.unitId) : "Unassigned") + "</p>" +
+        "<p style='color:#4A4743;font-size:12px'>" + escapeHtml(item.unitId ? unitLabel(item.unitId) : "Unassigned") + "</p>" +
         '<button type="button" data-del="' + escapeAttr(item.id) + '">Remove</button>';
       card.querySelector("button").addEventListener("click", function () {
         if (!window.confirm("Remove this photo from the catalog?")) return;

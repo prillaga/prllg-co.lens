@@ -121,7 +121,7 @@
     if (!list) return;
     list.innerHTML = "";
     if (!items.length) {
-      list.innerHTML = "<p style='color:#888;font-size:13px'>No items yet. Click Add item.</p>";
+      list.innerHTML = "<p style='color:#4A4743;font-size:13px'>No items yet. Click Add item.</p>";
       return;
     }
     items.forEach(function (item, index) {
@@ -256,7 +256,7 @@
       .join("");
 
     if (!rows) {
-      rows = '<tr><td colspan="4" style="color:#888">No items yet</td></tr>';
+      rows = '<tr><td colspan="4" style="color:#4A4743">No items yet</td></tr>';
     }
 
     sheet.innerHTML =
@@ -348,7 +348,7 @@
     if (!ul) return;
     ul.innerHTML = "";
     if (!receipts || !receipts.length) {
-      ul.innerHTML = '<li style="color:#888">None yet.</li>';
+      ul.innerHTML = '<li style="color:#4A4743">None yet.</li>';
       return;
     }
     receipts.slice(0, 20).forEach(function (r) {

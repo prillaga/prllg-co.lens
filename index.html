@@ -225,13 +225,23 @@
       .features__grid { grid-template-columns: 1fr; }
     }
 
-    /* ===== FEATURED GEAR ===== */
+    /* ===== FEATURED GEAR / UNITS ===== */
     .featured-gear {
-      background: var(--color-dark); padding: 80px 48px;
+      background: #F5F1E8; padding: 80px 48px; color: #171717;
+    }
+    .featured-gear .section-label {
+      color: #7CCFD0; margin: 0 0 14px 0;
     }
     .featured-gear .lux-heading {
-      color: #E8E3D8 !important;
+      color: #171717 !important;
       text-align: center;
+      text-shadow: none;
+    }
+    .featured-gear .catalog-load-notice.is-visible.is-error {
+      border: 1px solid #c48a8a; background: rgba(120,28,28,0.08); color: #6b3030;
+    }
+    .featured-gear .catalog-load-notice.is-visible.is-warning {
+      border: 1px solid #c4a84a; background: rgba(180,150,40,0.08); color: #6b5a20;
     }
     .section-label {
       font-family: var(--font-sans); font-size: 0.7rem; font-weight: 600;
@@ -261,7 +271,7 @@
     }
     .units-scroll > div:hover {
       transform: translateY(-4px);
-      box-shadow: 0 16px 40px rgba(0,0,0,0.5);
+      box-shadow: 0 16px 40px rgba(0,0,0,0.12);
       border-color: var(--color-mint);
     }
     .units-scroll img {
@@ -644,6 +654,42 @@
       background: #222; color: #eee; font-size: 14px; cursor: pointer;
     }
     .booking-success__close:hover { background: #2a2a2a; }
+    .booking-messenger-contact {
+      margin: -12px 0 18px 0;
+      padding: 12px 14px;
+      border: 1px solid #2e2e2e;
+      border-radius: 6px;
+      background: #151515;
+      display: flex;
+      flex-wrap: wrap;
+      align-items: center;
+      justify-content: space-between;
+      gap: 10px 14px;
+      font-size: 13px;
+      line-height: 1.5;
+      color: #cfcfcf;
+    }
+    .booking-messenger-link {
+      display: inline-flex;
+      align-items: center;
+      gap: 8px;
+      padding: 10px 16px;
+      border-radius: 999px;
+      background: rgba(124, 207, 208, 0.12);
+      border: 1px solid rgba(124, 207, 208, 0.45);
+      color: var(--color-mint) !important;
+      font-size: 14px;
+      font-weight: 600;
+      text-decoration: none !important;
+      white-space: nowrap;
+    }
+    .booking-messenger-link:hover {
+      background: rgba(124, 207, 208, 0.2);
+      border-color: var(--color-mint);
+    }
+    .booking-messenger-link svg {
+      flex-shrink: 0;
+    }
     #book-now form[hidden] { display: none !important; }
 
     @media (max-width: 768px) {
@@ -817,6 +863,16 @@
   </div>
 </section>
 
+<!-- Units -->
+<section id="units" class="featured-gear reveal" aria-labelledby="units-title">
+  <p class="section-label">UNITS</p>
+  <h2 id="units-title" class="lux-heading" style="margin: 0 0 30px 0;">Browse Our Gear</h2>
+  <p class="catalog-load-notice" role="status"></p>
+  <div class="units-scroll" data-units-catalog="home">
+    <p style="color:#888;padding:12px;margin:0;">Loading units…</p>
+  </div>
+</section>
+
 <!-- Availability Calendar -->
 <section id="availability-calendar" aria-labelledby="availability-calendar-title">
   <div class="home-cal-inner">
@@ -891,16 +947,6 @@
       <h3 class="how-step__title">CAPTURE YOUR MOMENTS</h3>
       <p class="how-step__desc">Pick up your gear and start shooting.</p>
     </div>
-  </div>
-</section>
-
-<!-- Units -->
-<section id="units" class="featured-gear reveal" aria-labelledby="units-title">
-  <p class="section-label">UNITS</p>
-  <h2 id="units-title" class="lux-heading" style="margin: 0 0 30px 0;">Browse Our Gear</h2>
-  <p class="catalog-load-notice" role="status"></p>
-  <div class="units-scroll" data-units-catalog="home">
-    <p style="color:#888;padding:12px;margin:0;">Loading units…</p>
   </div>
 </section>
 
@@ -990,16 +1036,30 @@
     <button type="button" class="booking-modal__close" aria-label="Close booking form">&times;</button>
     <section id="book-now" style="background: transparent; padding: 56px 20px 28px; color: #f5f5f5; font-family: var(--font-sans);">
   <h2 id="booking-modal-title" class="lux-heading" style="margin: 0 0 24px 0;">Booking Form</h2>
+  <p id="booking-messenger-contact" class="booking-messenger-contact">
+    <span>Questions before booking? Chat with us on Messenger.</span>
+    <a class="prillaga-messenger-link booking-messenger-link" href="javascript:void(0)" target="_blank" rel="noopener noreferrer">
+      <svg viewBox="0 0 64 64" width="16" height="16" aria-hidden="true" focusable="false">
+        <path d="M32 6C18.2 6 7 16.3 7 29c0 6.5 2.9 12.3 7.5 16.4V58l11.4-6.3c2 0.6 4 0.9 6.1 0.9 13.8 0 25-10.3 25-23S45.8 6 32 6z" fill="none" stroke="currentColor" stroke-width="5.2" stroke-linejoin="round"/>
+        <path d="M17.2 36.8l12.4-8.9 8.2 7.3 14.2-12.1-12.2 17.4-8.5-7-14.1 3.3z" fill="currentColor"/>
+      </svg>
+      Message on Messenger
+    </a>
+  </p>
   <form onsubmit="handleBookingSubmit(event)" style="max-width: 680px; width: 100%; margin: 0 auto; display: grid; gap: 14px; min-width: 0;">
     <input type="text" name="fullName" placeholder="Full Name" autocomplete="name" required style="padding: 12px 14px; border: 1px solid #2e2e2e; border-radius: 6px; background: #171717; color: #ffffff; font-size: 15px; width: 100%; box-sizing: border-box;">
     <input type="tel" name="phone" placeholder="Phone Number" autocomplete="tel" required style="padding: 12px 14px; border: 1px solid #2e2e2e; border-radius: 6px; background: #171717; color: #ffffff; font-size: 15px; width: 100%; box-sizing: border-box;">
+    <label for="customerMessengerLink" style="font-size: 14px; color: var(--color-mint); letter-spacing: 0.5px;">Your Messenger link</label>
+    <input id="customerMessengerLink" type="text" name="customerMessengerLink" placeholder="m.me/yourname or your Messenger profile link" inputmode="url" autocomplete="url" style="padding: 12px 14px; border: 1px solid #2e2e2e; border-radius: 6px; background: #171717; color: #ffffff; font-size: 15px; width: 100%; box-sizing: border-box;">
+    <p style="margin: -8px 0 2px 0; color: #9a9a9a; font-size: 12px; line-height: 1.5;">Open Messenger → your profile → copy link, or paste your <strong style="color: var(--color-mint);">m.me</strong> link so we can message you easily.</p>
     <select name="pickupLocation" id="pickupLocation" required>
       <option value="">Pick Up Location</option>
-      <option value="jks-vapeshop-north-baluarte-molo">JKS Vapeshop North Baluarte Molo</option>
-      <option value="robinson-main">Robinson Main</option>
-      <option value="sm-city">SM City</option>
-      <option value="others">Others</option>
+      <option value="jks-vapeshop-north-baluarte-pickup">JKS Vapeshop North Baluarte (Pick-up only)</option>
+      <option value="rider-delivery-only">Rider delivery only</option>
     </select>
+    <p class="pickup-delivery-note" style="margin: -4px 0 2px 0; padding: 10px 12px; border: 1px solid #2e2e2e; border-radius: 6px; background: #151515; color: #cfcfcf; font-size: 13px; line-height: 1.6;">
+      Due to availability, we’re unable to provide face-to-face or in-person delivery. We currently offer <strong style="color: var(--color-mint);">pick-up</strong> and <strong style="color: var(--color-mint);">rider delivery</strong> options only. Thank you for understanding! 😊
+    </p>
     <input type="text" id="pickupLocationOther" name="pickupLocationOther" placeholder="Type your pick-up location" hidden autocomplete="street-address" style="padding: 12px 14px; border: 1px solid #2e2e2e; border-radius: 6px; background: #171717; color: #ffffff; font-size: 15px; width: 100%; box-sizing: border-box;">
     <select name="pickupTime" required>
       <option value="">Pick Up Time</option>
@@ -1176,7 +1236,9 @@
     var form = document.querySelector("#book-now form");
     var success = document.getElementById("booking-success");
     var modalTitle = document.getElementById("booking-modal-title");
+    var contactBar = document.getElementById("booking-messenger-contact");
     if (form) form.hidden = false;
+    if (contactBar) contactBar.hidden = false;
     if (success) success.hidden = true;
     if (modalTitle) modalTitle.textContent = "Booking Form";
     var submitBtn = document.getElementById("booking-submit-btn");
@@ -1191,7 +1253,9 @@
     var refEl = document.getElementById("booking-success-ref");
     var continueLink = document.getElementById("booking-messenger-continue");
     var modalTitle = document.getElementById("booking-modal-title");
+    var contactBar = document.getElementById("booking-messenger-contact");
     if (form) form.hidden = true;
+    if (contactBar) contactBar.hidden = true;
     if (success) success.hidden = false;
     if (title) {
       title.textContent = emailOk
@@ -1554,7 +1618,9 @@
   function buildBookingEmailFormData(payload) {
     var fd = new FormData();
     fd.append("name", payload.fullName); fd.append("email", payload.email || "booking@formsubmit.co");
-    fd.append("phone", payload.phone); fd.append("pickup_location", payload.pickupLocation);
+    fd.append("phone", payload.phone);
+    if (payload.customerMessengerLink) fd.append("customer_messenger_link", payload.customerMessengerLink);
+    fd.append("pickup_location", payload.pickupLocation);
     fd.append("pickup_time", payload.pickupTime); fd.append("rental_date", payload.rentalDate);
     fd.append("return_date", payload.returnDate); fd.append("unit", payload.unit);
     fd.append("additional_rent_1", payload.additionalRent); fd.append("additional_rent_2", payload.additionalRent2);
@@ -1567,6 +1633,7 @@
 
   function appendBookingEmailFieldsToForm(form, payload) {
     var fields = { name: payload.fullName, email: payload.email || "booking@formsubmit.co", phone: payload.phone, pickup_location: payload.pickupLocation, pickup_time: payload.pickupTime, rental_date: payload.rentalDate, return_date: payload.returnDate, unit: payload.unit, additional_rent_1: payload.additionalRent, additional_rent_2: payload.additionalRent2, rental_days: payload.rentalDays, estimated_total: payload.estimatedTotal, notes: payload.notes || "(none)", message: payload.message, _subject: payload.subject, _captcha: "false", _template: "table" };
+    if (payload.customerMessengerLink) fields.customer_messenger_link = payload.customerMessengerLink;
     Object.keys(fields).forEach(function (key) { var input = document.createElement("input"); input.type = "hidden"; input.name = key; input.value = fields[key]; form.appendChild(input); });
   }
 
@@ -1630,6 +1697,13 @@
     });
   }
 
+  function normalizeCustomerMessengerLink(raw) {
+    var link = String(raw || "").trim();
+    if (!link) return "";
+    if (!/^https?:\/\//i.test(link)) link = "https://" + link.replace(/^\/+/, "");
+    return link;
+  }
+
   function syncPickupLocationOtherField() {
     var select = document.getElementById("pickupLocation");
     var other = document.getElementById("pickupLocationOther");
@@ -1664,6 +1738,7 @@
     var data = new FormData(form);
     var fullName = data.get("fullName") || "";
     var phone = data.get("phone") || "";
+    var customerMessengerLink = normalizeCustomerMessengerLink(data.get("customerMessengerLink"));
     var pickupTime = data.get("pickupTime") || "";
     var rentalDate = data.get("rentalDate") || "";
     var returnDate = data.get("returnDate") || "";
@@ -1687,10 +1762,10 @@
     var selectedRate = selectedPricing ? ((selectedPricing.hasLongRate && selectedDays >= (selectedPricing.longRateMinDays || catalogSettings.longRateMinDays || 3)) ? selectedPricing.longRate : selectedPricing.baseRate) : 0;
     var selectedAdditionalPrice = (additionalRentPricingRules[additionalRent] || 0) + (additionalRentPricingRules[additionalRent2] || 0);
     var estimatedTotalText = selectedRate > 0 && selectedDays > 0 ? formatPrice((selectedRate * selectedDays) + selectedAdditionalPrice) : "To be confirmed";
-    var message = "I want to reserve my slots. Please confirm my dates.\n\nFull Name: " + fullName + "\nPhone: " + phone + "\nPick Up Location: " + selectedPickupLocationText + "\nPick Up Time: " + selectedPickupTimeText + "\nRental Date: " + rentalDate + "\nReturn Date: " + returnDate + "\nUnits: " + selectedUnitName + "\nAdditional to rent #1: " + additionalRent + "\nAdditional to rent #2: " + additionalRent2 + "\nRental Days: " + durationText + "\nTotal Price (Unit Price x Rental Days): " + estimatedTotalText + "\nNotes: " + notes;
+    var message = "I want to reserve my slots. Please confirm my dates.\n\nFull Name: " + fullName + "\nPhone: " + phone + "\nCustomer Messenger Link: " + (customerMessengerLink || "Not provided") + "\nPick Up Location: " + selectedPickupLocationText + "\nPick Up Time: " + selectedPickupTimeText + "\nRental Date: " + rentalDate + "\nReturn Date: " + returnDate + "\nUnits: " + selectedUnitName + "\nAdditional to rent #1: " + additionalRent + "\nAdditional to rent #2: " + additionalRent2 + "\nRental Days: " + durationText + "\nTotal Price (Unit Price x Rental Days): " + estimatedTotalText + "\nNotes: " + notes;
     var messengerUrl = window.prillagaMessengerUrlWithText ? window.prillagaMessengerUrlWithText(message) : "";
     if (!messengerUrl) { alert("Messenger Page ID is missing. Place site-config.js in the same folder as this page."); return; }
-    var emailPayload = { fullName: fullName, phone: phone, pickupLocation: selectedPickupLocationText, pickupTime: selectedPickupTimeText, rentalDate: rentalDate, returnDate: returnDate, unit: selectedUnitName, additionalRent: additionalRent, additionalRent2: additionalRent2, rentalDays: durationText, estimatedTotal: estimatedTotalText, notes: notes, message: message, subject: "New booking request — " + fullName };
+    var emailPayload = { fullName: fullName, phone: phone, customerMessengerLink: customerMessengerLink, pickupLocation: selectedPickupLocationText, pickupTime: selectedPickupTimeText, rentalDate: rentalDate, returnDate: returnDate, unit: selectedUnitName, additionalRent: additionalRent, additionalRent2: additionalRent2, rentalDays: durationText, estimatedTotal: estimatedTotalText, notes: notes, message: message, subject: "New booking request — " + fullName };
     deliverBookingAfterSubmit(emailPayload, messengerUrl);
   }
 
