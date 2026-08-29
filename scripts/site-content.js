@@ -9,13 +9,13 @@
     settings: { reservationFee: 100, longRateMinDays: 3, currency: "PHP" },
     units: [
       { id: "nikon-kit", name: "Nikon DSLR Flipscreen w/ kitlens 15-80mm", description: "", image: "images/nikon-kitlens.jpg", images: ["images/nikon-kitlens.jpg"], pricing: { baseRate: 450, longRate: 400, longRateMinDays: 3 }, sortOrder: 1, bookable: true },
-      { id: "nikon-zoom", name: "Nikon DSLR Flipscreen w/ Zoom Lens 70-300mm", description: "", image: "images/nikon-zoomlens.jpg", images: ["images/nikon-zoomlens.jpg"], pricing: { baseRate: 550, longRate: 500, longRateMinDays: 3 }, sortOrder: 2, bookable: true },
-      { id: "nikon-zoom-kit-battery", name: "Nikon DSLR w/ Zoom Lens + Kitlens + Extra battery", description: "", image: "images/nikon-zoom-kit-battery.jpg", images: ["images/nikon-zoom-kit-battery.jpg"], pricing: { baseRate: 950, longRate: 900, longRateMinDays: 3 }, sortOrder: 3, bookable: true },
+      { id: "nikon-zoom", name: "Nikon DSLR Flipscreen w/ Zoom Lens 70-300mm", description: "", image: "images/nikon-zoomlens.jpg", images: ["images/nikon-zoomlens.jpg"], pricing: { baseRate: 550, longRate: 500, longRateMinDays: 3 }, sortOrder: 2, bookable: true, available: false },
+      { id: "nikon-zoom-kit-battery", name: "Nikon DSLR w/ Zoom Lens + Kitlens + Extra battery", description: "", image: "images/nikon-zoom-kit-battery.jpg", images: ["images/nikon-zoom-kit-battery.jpg"], pricing: { baseRate: 950, longRate: 900, longRateMinDays: 3 }, sortOrder: 3, bookable: true, available: false },
       { id: "canon-1200d", name: "Canon 1200D DSLR w/ kitlens 18-55mm", description: "", image: "images/canon-1200d.jpg", images: ["images/canon-1200d.jpg"], pricing: { baseRate: 550, longRate: 500, longRateMinDays: 3 }, sortOrder: 4, bookable: true },
       { id: "canon-4000d", name: "Canon 4000D DSLR w/ kitlens 18-55mm", description: "", image: "images/canon-4000d.jpg", images: ["images/canon-4000d.jpg"], pricing: { baseRate: 550, longRate: 500, longRateMinDays: 3 }, sortOrder: 5, bookable: true },
       { id: "g6-thumb", name: "G6 THUMB CAMERA", description: "", image: "images/G6-thumb-camera.jpg", images: ["images/G6-thumb-camera.jpg"], pricing: { baseRate: 200, longRate: 150, longRateMinDays: 3 }, sortOrder: 6, bookable: true },
       { id: "kodak-v603", name: "Kodak EasyShare V603", description: "", image: "images/kodak-v603.jpg", images: ["images/kodak-v603.jpg"], pricing: { baseRate: 250, longRate: 200, longRateMinDays: 3 }, sortOrder: 7, bookable: true },
-      { id: "zoom-lens", name: "Zoom Lens 70-300mm", description: "", image: "images/zoom lens.jpg", images: ["images/zoom lens.jpg"], pricing: { baseRate: 300, longRate: 250, longRateMinDays: 3 }, sortOrder: 8, bookable: true },
+      { id: "zoom-lens", name: "Zoom Lens 70-300mm", description: "", image: "images/zoom lens.jpg", images: ["images/zoom lens.jpg"], pricing: { baseRate: 300, longRate: 250, longRateMinDays: 3 }, sortOrder: 8, bookable: true, available: false },
       { id: "dji-gimbal", name: "DJI OSMO MOBILE 3 GIMBAL", description: "", image: "images/dji-osmo.jpg", images: ["images/dji-osmo.jpg"], pricing: { baseRate: 300, longRate: 250, longRateMinDays: 3 }, sortOrder: 9, bookable: true }
     ],
     addons: [
@@ -88,6 +88,19 @@
     return unit ? unit.name : unitId;
   }
 
+  /** 70-300mm zoom gear — shown as NOT AVAILABLE until restocked. */
+  function is70300Unit(unit) {
+    if (!unit) return false;
+    if (unit.available === false) return true;
+    var id = String(unit.id || "");
+    if (id === "nikon-zoom" || id === "zoom-lens" || id === "nikon-zoom-kit-battery") return true;
+    return /70[\-–]300/i.test(String(unit.name || ""));
+  }
+
+  function isUnitAvailable(unit) {
+    return !is70300Unit(unit);
+  }
+
   function renderUnitCards(container, catalog, options) {
     if (!container || !catalog) return;
     options = options || {};
@@ -95,6 +108,7 @@
     var html = "";
     units.forEach(function (unit) {
       if (unit.bookable === false) return;
+      var unavailable = !isUnitAvailable(unit);
       var priceLine = formatUnitPriceLine(unit, catalog.settings);
       var inquireHref = options.inquireMode === "units-page"
         ? "index.html?unit=" + encodeURIComponent(unit.id)
@@ -103,14 +117,21 @@
       var desc = unit.description
         ? '<p style="margin: 0 0 10px 0; color: #bdbdbd; font-size: 13px; line-height: 1.45;">' + escapeHtml(unit.description) + "</p>"
         : "";
+      var priceHtml = unavailable
+        ? '<p style="margin: 0 0 10px 0; color: #e8a0a0; font-size: 14px; font-weight: 700; letter-spacing: 0.08em; text-transform: uppercase;">NOT AVAILABLE</p>'
+        : '<p style="margin: 0 0 10px 0; color: #7CCFD0; font-size: 14px;">' + escapeHtml(priceLine) + "</p>";
+      var actionHtml = unavailable
+        ? '<span style="display: inline-block; padding: 9px 20px; background: #2a2a2a; color: #888; font-family: Avenir, \'Avenir Next\', \'Century Gothic\', Arial, sans-serif; font-weight: 700; border-radius: 999px; letter-spacing: 1px; font-size: 14px; border: 1px solid #444; cursor: not-allowed;">NOT AVAILABLE</span>'
+        : '<a href="' + inquireHref + '"' + preselect + ' style="display: inline-block; padding: 9px 20px; background: linear-gradient(135deg, #bff5f5 0%, #7CCFD0 50%, #3fbfbf 100%); color: #080808; text-decoration: none; font-family: Avenir, \'Avenir Next\', \'Century Gothic\', Arial, sans-serif; font-weight: 700; border-radius: 999px; letter-spacing: 1px; font-size: 14px;">Inquire Now</a>';
+      var cardOpacity = unavailable ? " opacity: 0.72;" : "";
       html +=
-        '<div style="width: 400px; min-width: 400px; background: #101010; border: 1px solid #232323; border-radius: 10px; overflow: hidden; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);">' +
+        '<div style="width: 400px; min-width: 400px; background: #101010; border: 1px solid #232323; border-radius: 10px; overflow: hidden; box-shadow: 0 8px 24px rgba(0, 0, 0, 0.35);' + cardOpacity + '">' +
         '<img src="' + escapeHtml(unit.image) + '" alt="' + escapeHtml(unit.name) + '" loading="lazy" decoding="async" style="width: 100%; height: 260px; object-fit: cover; display: block;">' +
         '<div style="padding: 12px 14px 16px 14px; text-align: left;">' +
         "<h3 style=\"margin: 0 0 10px 0; color: #f5f5f5; font-family: Avenir, 'Avenir Next', 'Century Gothic', Arial, sans-serif; font-size: 18px; line-height: 1.35;\">" + escapeHtml(unit.name) + "</h3>" +
         desc +
-        '<p style="margin: 0 0 10px 0; color: #7CCFD0; font-size: 14px;">' + escapeHtml(priceLine) + "</p>" +
-        '<a href="' + inquireHref + '"' + preselect + ' style="display: inline-block; padding: 9px 20px; background: linear-gradient(135deg, #bff5f5 0%, #7CCFD0 50%, #3fbfbf 100%); color: #080808; text-decoration: none; font-family: Avenir, \'Avenir Next\', \'Century Gothic\', Arial, sans-serif; font-weight: 700; border-radius: 999px; letter-spacing: 1px; font-size: 14px;">Inquire Now</a>' +
+        priceHtml +
+        actionHtml +
         "</div></div>";
     });
     container.innerHTML = html || '<p style="color:#888;padding:12px;">No units available.</p>';
@@ -125,7 +146,7 @@
     empty.textContent = emptyLabel || "Select Units";
     select.appendChild(empty);
     (catalog.units || []).forEach(function (unit) {
-      if (unit.bookable === false) return;
+      if (unit.bookable === false || !isUnitAvailable(unit)) return;
       var opt = document.createElement("option");
       opt.value = unit.id;
       opt.textContent = formatUnitPriceOption(unit, catalog.settings);

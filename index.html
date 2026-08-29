@@ -229,6 +229,10 @@
     .featured-gear {
       background: var(--color-dark); padding: 80px 48px;
     }
+    .featured-gear .lux-heading {
+      color: #E8E3D8 !important;
+      text-align: center;
+    }
     .section-label {
       font-family: var(--font-sans); font-size: 0.7rem; font-weight: 600;
       letter-spacing: 0.25em; text-transform: uppercase; color: var(--color-gray);
@@ -587,6 +591,61 @@
     .booking-date-chip:hover { background: #222; border-color: #555; }
     .booking-date-chip.is-active { background: rgba(124,207,208,0.15); border-color: rgba(124,207,208,0.55); color: #7CCFD0; }
 
+    /* Booking success (post-submit) */
+    #booking-success {
+      max-width: 680px;
+      width: 100%;
+      margin: 0 auto;
+      text-align: center;
+      padding: 8px 0 12px;
+    }
+    #booking-success[hidden] { display: none !important; }
+    .booking-success__icon {
+      width: 56px; height: 56px; margin: 0 auto 16px;
+      border-radius: 50%; background: rgba(124,207,208,0.15);
+      border: 1px solid rgba(124,207,208,0.45);
+      display: flex; align-items: center; justify-content: center;
+      font-size: 28px; color: var(--color-mint); line-height: 1;
+    }
+    .booking-success__title {
+      font-family: var(--font-serif); font-size: clamp(1.35rem, 4vw, 1.75rem);
+      color: #E8E3D8; margin: 0 0 12px 0; letter-spacing: 0.04em;
+    }
+    .booking-success__text {
+      color: rgba(232,227,216,0.82); font-size: 0.95rem; line-height: 1.65;
+      margin: 0 0 10px 0;
+    }
+    .booking-success__ref {
+      color: #7CCFD0; font-size: 0.8rem; letter-spacing: 0.06em;
+      margin: 0 0 20px 0;
+    }
+    .booking-success__cta {
+      display: inline-flex; align-items: center; justify-content: center;
+      width: 100%; max-width: 100%; min-height: 52px;
+      padding: 14px 22px; border-radius: 4px;
+      background: var(--color-mint); color: #080808 !important;
+      font-family: var(--font-sans); font-size: 15px; font-weight: 700;
+      letter-spacing: 0.08em; text-transform: uppercase;
+      text-decoration: none !important; border: none;
+      box-sizing: border-box; cursor: pointer;
+      transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .booking-success__cta:hover {
+      transform: translateY(-2px);
+      box-shadow: 0 8px 24px rgba(124,207,208,0.3);
+    }
+    .booking-success__hint {
+      color: #9a9a9a; font-size: 12px; line-height: 1.5;
+      margin: 14px 0 0 0;
+    }
+    .booking-success__close {
+      margin-top: 18px; padding: 10px 18px;
+      border-radius: 999px; border: 1px solid #444;
+      background: #222; color: #eee; font-size: 14px; cursor: pointer;
+    }
+    .booking-success__close:hover { background: #2a2a2a; }
+    #book-now form[hidden] { display: none !important; }
+
     @media (max-width: 768px) {
       .booking-modal {
         padding: max(12px, env(safe-area-inset-top)) max(10px, env(safe-area-inset-right)) max(16px, env(safe-area-inset-bottom)) max(10px, env(safe-area-inset-left));
@@ -692,7 +751,7 @@
   </a>
   <nav class="desktop-nav" aria-label="Main">
     <a href="#home" data-nav="home" class="is-active">Home</a>
-    <a href="units.html" data-nav="units">Units</a>
+    <a href="#units" data-nav="units">Units</a>
     <a href="#rental-policy" data-nav="policy">Rental Policy</a>
     <a href="rental-agreement.html" data-nav="agreement">Rental Agreement</a>
     <a href="payment-methods.html" data-nav="payment">Payment</a>
@@ -709,7 +768,7 @@
 <!-- Mobile Nav -->
 <nav class="mobile-nav" id="mobile-nav" aria-label="Mobile navigation">
   <a href="#home" data-nav="home">Home</a>
-  <a href="units.html" data-nav="units">Units</a>
+  <a href="#units" data-nav="units">Units</a>
   <a href="#rental-policy" data-nav="policy">Rental Policy</a>
   <a href="rental-agreement.html" data-nav="agreement">Rental Agreement</a>
   <a href="payment-methods.html" data-nav="payment">Payment</a>
@@ -727,7 +786,7 @@
     <p class="hero__subtitle">High quality cameras and lenses for your next adventure.</p>
     <div class="hero__actions">
       <a class="btn-primary" href="#book-now">BOOK NOW</a>
-      <a class="btn-secondary" href="units.html">VIEW GEAR →</a>
+      <a class="btn-secondary" href="#units">VIEW GEAR →</a>
     </div>
   </div>
 </section>
@@ -835,11 +894,21 @@
   </div>
 </section>
 
+<!-- Units -->
+<section id="units" class="featured-gear reveal" aria-labelledby="units-title">
+  <p class="section-label">UNITS</p>
+  <h2 id="units-title" class="lux-heading" style="margin: 0 0 30px 0;">Browse Our Gear</h2>
+  <p class="catalog-load-notice" role="status"></p>
+  <div class="units-scroll" data-units-catalog="home">
+    <p style="color:#888;padding:12px;margin:0;">Loading units…</p>
+  </div>
+</section>
+
 <!-- Final CTA -->
 <section class="final-cta reveal">
   <h2 class="final-cta__title">READY TO CAPTURE SOMETHING GREAT?</h2>
   <p class="final-cta__text">Find the gear that fits your next story.</p>
-  <a href="units.html" class="btn-primary">BROWSE ALL GEAR →</a>
+  <a href="#units" class="btn-primary">BROWSE ALL GEAR →</a>
 </section>
 
 <!-- Rental Policy -->
@@ -885,7 +954,7 @@
     <div class="footer-nav">
       <p class="footer-nav__title">Navigation</p>
       <a href="#home">Home</a>
-      <a href="units.html">Units</a>
+      <a href="#units">Units</a>
       <a href="#rental-policy">Rental Policy</a>
       <a href="rental-agreement.html">Rental Agreement</a>
       <a href="payment-methods.html">Payment</a>
@@ -976,10 +1045,19 @@
     <p style="margin: 0; padding: 10px 12px; border: 1px solid #2e2e2e; border-radius: 6px; background: #151515; color: var(--color-mint); font-size: 14px; line-height: 1.6;">
       Note: To reserve your slots, wait for the confirmation in Messenger and send the reservation fee of 100 pesos in GCash. <a href="payment-methods.html" style="color: var(--color-mint);">Other payment options</a>
     </p>
-    <button type="submit" style="padding: 14px 22px; border: 0; border-radius: 4px; background: var(--color-mint); color: #111; font-size: 15px; font-weight: 700; letter-spacing: 1px; cursor: pointer;">
+    <button type="submit" id="booking-submit-btn" style="padding: 14px 22px; border: 0; border-radius: 4px; background: var(--color-mint); color: #111; font-size: 15px; font-weight: 700; letter-spacing: 1px; cursor: pointer;">
       Submit Booking
     </button>
   </form>
+  <div id="booking-success" hidden aria-live="polite">
+    <div class="booking-success__icon" aria-hidden="true">✓</div>
+    <p id="booking-success-title" class="booking-success__title">Booking submitted successfully!</p>
+    <p class="booking-success__text">Your booking details have been sent. Continue to Messenger to confirm your booking.</p>
+    <p id="booking-success-ref" class="booking-success__ref"></p>
+    <a id="booking-messenger-continue" class="booking-success__cta" href="#">Continue to Messenger</a>
+    <p class="booking-success__hint">If Messenger doesn't open automatically, tap the button above.</p>
+    <button type="button" id="booking-success-close" class="booking-success__close">Close</button>
+  </div>
 </section>
   </div>
 </div>
@@ -1060,10 +1138,80 @@
   var calendarFormUnitToId = {};
 
   var bookingModalLastFocus = null;
+  var bookingSubmitInFlight = false;
+  var BOOKING_DONE_KEY = "prillaga_booking_done_v1";
+
+  function generateBookingRef() {
+    return "BK-" + Date.now().toString(36).toUpperCase() + "-" + Math.random().toString(36).slice(2, 6).toUpperCase();
+  }
+
+  function bookingFingerprint(payload) {
+    return [
+      payload.fullName, payload.phone, payload.rentalDate,
+      payload.returnDate, payload.unit, payload.pickupLocation
+    ].join("|");
+  }
+
+  function getRecentBookingRecord() {
+    try {
+      var raw = sessionStorage.getItem(BOOKING_DONE_KEY);
+      return raw ? JSON.parse(raw) : null;
+    } catch (e) { return null; }
+  }
+
+  function isDuplicateBooking(fingerprint) {
+    var record = getRecentBookingRecord();
+    if (!record || !record.fp) return false;
+    if (record.fp !== fingerprint) return false;
+    return (Date.now() - (record.ts || 0)) < 30 * 60 * 1000;
+  }
+
+  function markBookingDone(fingerprint, ref) {
+    try {
+      sessionStorage.setItem(BOOKING_DONE_KEY, JSON.stringify({ fp: fingerprint, ref: ref, ts: Date.now() }));
+    } catch (e) { /* ignore */ }
+  }
+
+  function resetBookingFormView() {
+    var form = document.querySelector("#book-now form");
+    var success = document.getElementById("booking-success");
+    var modalTitle = document.getElementById("booking-modal-title");
+    if (form) form.hidden = false;
+    if (success) success.hidden = true;
+    if (modalTitle) modalTitle.textContent = "Booking Form";
+    var submitBtn = document.getElementById("booking-submit-btn");
+    if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = "Submit Booking"; }
+    bookingSubmitInFlight = false;
+  }
+
+  function showBookingSuccessUI(messengerUrl, bookingRef, emailOk) {
+    var form = document.querySelector("#book-now form");
+    var success = document.getElementById("booking-success");
+    var title = document.getElementById("booking-success-title");
+    var refEl = document.getElementById("booking-success-ref");
+    var continueLink = document.getElementById("booking-messenger-continue");
+    var modalTitle = document.getElementById("booking-modal-title");
+    if (form) form.hidden = true;
+    if (success) success.hidden = false;
+    if (title) {
+      title.textContent = emailOk
+        ? "Booking submitted successfully!"
+        : "Booking recorded — email may be delayed";
+    }
+    if (refEl && bookingRef) refEl.textContent = "Reference: " + bookingRef;
+    if (continueLink) {
+      continueLink.href = messengerUrl;
+      continueLink.setAttribute("target", "_self");
+      continueLink.setAttribute("rel", "noopener noreferrer");
+    }
+    if (modalTitle) modalTitle.textContent = "Booking Complete";
+    if (continueLink && typeof continueLink.focus === "function") continueLink.focus();
+  }
 
   function openBookingModal(preselectUnit) {
     var modal = document.getElementById("booking-modal");
     if (!modal) return;
+    resetBookingFormView();
     bookingModalLastFocus = document.activeElement;
     modal.removeAttribute("hidden");
     document.body.style.overflow = "hidden";
@@ -1113,6 +1261,13 @@
     document.addEventListener("keydown", function (e) {
       if (e.key === "Escape" && modal && !modal.hasAttribute("hidden")) closeBookingModal();
     });
+    var successClose = document.getElementById("booking-success-close");
+    if (successClose) {
+      successClose.addEventListener("click", function () {
+        resetBookingFormView();
+        closeBookingModal();
+      });
+    }
   }
 
   function tryOpenBookingFromUrl() {
@@ -1370,16 +1525,28 @@
     else estimatedPriceDisplay.textContent = "Total Price: " + formatPrice(appliedDailyRate) + " x " + days + " day(s) = " + formatPrice(total);
   }
 
-  function isMessengerOrFacebookWebView() { return /FBAN|FBAV|FB_IAB|Instagram|Messenger/i.test(navigator.userAgent || ""); }
-
-  function openMessengerPrefilled(messengerUrl) {
-    if (isMessengerOrFacebookWebView()) { window.location.assign(messengerUrl); return; }
-    var w = window.open(messengerUrl, "_blank", "noopener,noreferrer");
-    if (!w || w.closed) { window.location.assign(messengerUrl); return; }
-    closeBookingModal();
+  function isMessengerOrFacebookWebView() {
+    var ua = navigator.userAgent || "";
+    return /FBAN|FBAV|FB_IAB|FB4A|FBIOS|Instagram|Messenger/i.test(ua);
   }
 
-  function redirectToMessengerAfterBooking(messengerUrl) { closeBookingModal(); window.location.assign(messengerUrl); }
+  function attemptAutoMessengerRedirect(messengerUrl) {
+    if (isMessengerOrFacebookWebView()) {
+      /* In Messenger/Facebook webview, JS navigation to m.me is often blocked.
+         The visible <a> button is the reliable path; try assign as a bonus. */
+      window.setTimeout(function () {
+        try { window.location.href = messengerUrl; } catch (e) { /* user uses button */ }
+      }, 1800);
+      return;
+    }
+    window.setTimeout(function () {
+      var opened = null;
+      try { opened = window.open(messengerUrl, "_blank", "noopener,noreferrer"); } catch (e) { opened = null; }
+      if (!opened || opened.closed) {
+        try { window.location.assign(messengerUrl); } catch (e2) { /* button remains */ }
+      }
+    }, 1400);
+  }
 
   function getBookingFormSubmitEndpoint() { return window.prillagaFormSubmitEndpoint ? window.prillagaFormSubmitEndpoint() : ""; }
   function formSubmitBookingSucceeded(json) { return json && (json.success === true || json.success === "true"); }
@@ -1430,17 +1597,36 @@
   function sendBookingEmail(payload) { return sendBookingEmailViaFormSubmitAjax(payload).catch(function () { return sendBookingEmailViaFormSubmitIframe(payload); }); }
 
   function deliverBookingAfterSubmit(payload, messengerUrl) {
-    var submitBtn = document.querySelector("#book-now button[type=\"submit\"]");
-    var submitLabel = submitBtn ? submitBtn.textContent : "";
+    if (bookingSubmitInFlight) return;
+
+    var fingerprint = bookingFingerprint(payload);
+    if (isDuplicateBooking(fingerprint)) {
+      var prior = getRecentBookingRecord();
+      showBookingSuccessUI(messengerUrl, prior && prior.ref ? prior.ref : "", true);
+      attemptAutoMessengerRedirect(messengerUrl);
+      return;
+    }
+
+    bookingSubmitInFlight = true;
+    var bookingRef = generateBookingRef();
+    payload.subject = payload.subject + " [" + bookingRef + "]";
+
+    var submitBtn = document.getElementById("booking-submit-btn");
+    var submitLabel = submitBtn ? submitBtn.textContent : "Submit Booking";
     if (submitBtn) { submitBtn.disabled = true; submitBtn.textContent = "Sending…"; }
-    var redirected = false;
-    function goMessenger() { if (redirected) return; redirected = true; redirectToMessengerAfterBooking(messengerUrl); }
-    var redirectTimer = window.setTimeout(goMessenger, 3200);
-    var emailJob = getBookingFormSubmitEndpoint() ? sendBookingEmail(payload) : Promise.resolve(false);
-    emailJob.catch(function () {}).finally(function () {
-      window.clearTimeout(redirectTimer);
-      if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = submitLabel || "Submit Booking"; }
-      goMessenger();
+
+    var emailJob = getBookingFormSubmitEndpoint()
+      ? sendBookingEmail(payload).then(function (result) { return result !== false; }).catch(function () { return false; })
+      : Promise.resolve(true);
+
+    emailJob.then(function (emailOk) {
+      markBookingDone(fingerprint, bookingRef);
+      showBookingSuccessUI(messengerUrl, bookingRef, emailOk);
+      attemptAutoMessengerRedirect(messengerUrl);
+    }).catch(function () {
+      bookingSubmitInFlight = false;
+      if (submitBtn) { submitBtn.disabled = false; submitBtn.textContent = submitLabel; }
+      alert("Could not send booking email. Please try again or tap Continue to Messenger on the next screen.");
     });
   }
 
@@ -1473,6 +1659,7 @@
 
   function handleBookingSubmit(event) {
     event.preventDefault();
+    if (bookingSubmitInFlight) return;
     var form = event.target;
     var data = new FormData(form);
     var fullName = data.get("fullName") || "";

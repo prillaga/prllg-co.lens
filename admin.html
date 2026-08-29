@@ -11,6 +11,7 @@
   <link rel="stylesheet" href="theme.css">
   <link rel="stylesheet" href="admin/admin.css">
   <link rel="stylesheet" href="responsive.css">
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
 </head>
 <body>
   <h1>Staff — availability calendar</h1>
@@ -184,6 +185,7 @@
 <script src="scripts/bookings-api.js"></script>
 <script src="scripts/catalog-api.js"></script>
 <script src="scripts/admin-dashboard.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 <script>
 (function () {
   var STORAGE_KEY = 'prillaga_lens_bookings_v1';
@@ -212,6 +214,63 @@
   var saveQueue = Promise.resolve();
   var channel = typeof BroadcastChannel !== 'undefined' ? new BroadcastChannel(CHANNEL_NAME) : null;
   var toastHideTimer = null;
+  var adminDatePickersReady = false;
+  var blockStartPicker = null;
+  var blockEndPicker = null;
+  var addStartPicker = null;
+  var addEndPicker = null;
+
+  function initAdminDatePickers() {
+    if (adminDatePickersReady) return;
+    if (typeof flatpickr !== "function") return;
+
+    var blockStart = document.getElementById("blockStart");
+    var blockEnd = document.getElementById("blockEnd");
+    var addStart = document.getElementById("addStart");
+    var addEnd = document.getElementById("addEnd");
+    if (!blockStart || !blockEnd || !addStart || !addEnd) return;
+
+    var pickerOpts = {
+      dateFormat: "Y-m-d",
+      altInput: true,
+      altFormat: "d/m/Y",
+      altInputClass: "admin-date-input",
+      disableMobile: true,
+      allowInput: true
+    };
+
+    blockStartPicker = flatpickr(blockStart, Object.assign({}, pickerOpts, {
+      onChange: function (selectedDates) {
+        var start = selectedDates && selectedDates[0] ? selectedDates[0] : null;
+        if (!start || !blockEndPicker) return;
+        blockEndPicker.set("minDate", start);
+        if (blockEnd.value && new Date(blockEnd.value + "T00:00:00") < start) {
+          blockEndPicker.setDate(start, true);
+        }
+      }
+    }));
+
+    blockEndPicker = flatpickr(blockEnd, Object.assign({}, pickerOpts, {
+      minDate: blockStart.value || null
+    }));
+
+    addStartPicker = flatpickr(addStart, Object.assign({}, pickerOpts, {
+      onChange: function (selectedDates) {
+        var start = selectedDates && selectedDates[0] ? selectedDates[0] : null;
+        if (!start || !addEndPicker) return;
+        addEndPicker.set("minDate", start);
+        if (addEnd.value && new Date(addEnd.value + "T00:00:00") < start) {
+          addEndPicker.setDate(start, true);
+        }
+      }
+    }));
+
+    addEndPicker = flatpickr(addEnd, Object.assign({}, pickerOpts, {
+      minDate: addStart.value || null
+    }));
+
+    adminDatePickersReady = true;
+  }
 
   function setSyncStatus(text, tone) {
     var el = document.getElementById('syncStatus');
@@ -389,8 +448,8 @@
       createdAt: Date.now()
     });
     saveBookings();
-    document.getElementById('addStart').value = '';
-    document.getElementById('addEnd').value = '';
+    if (addStartPicker) addStartPicker.clear();
+    if (addEndPicker) addEndPicker.clear();
     document.getElementById('addName').value = '';
     toast('Saved as pending — check the public calendar (amber).');
     render();
@@ -427,8 +486,8 @@
     });
     rejectOverlappingPending(unitId, start, end, id);
     saveBookings();
-    document.getElementById('blockStart').value = '';
-    document.getElementById('blockEnd').value = '';
+    if (blockStartPicker) blockStartPicker.clear();
+    if (blockEndPicker) blockEndPicker.clear();
     document.getElementById('blockNote').value = '';
     toast('Blocked — open Availability or Home calendar to see red dates.');
     render();
@@ -554,6 +613,7 @@
   function onAdminUnlocked(pin) {
     adminPinSession = pin;
     fillUnitSelects();
+    initAdminDatePickers();
     loadBookingsFromServer(function () {
       render();
       if (window.prillagaFetchAdminCatalog) {

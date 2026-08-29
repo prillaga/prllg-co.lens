@@ -26,7 +26,34 @@ input[type="password"], input[type="date"], input[type="text"], input[type="numb
   font-size: 14px;
 }
 input[type="password"] { max-width: 280px; }
-input[type="date"] { max-width: 280px; }
+input[type="date"],
+input.admin-date-input,
+.flatpickr-input {
+  max-width: 280px;
+}
+input[type="date"]::-webkit-calendar-picker-indicator {
+  cursor: pointer;
+  filter: invert(0.85);
+  opacity: 0.9;
+}
+input.admin-date-input,
+.flatpickr-input.admin-date-input {
+  width: 100%;
+  max-width: 280px;
+  padding: 10px 12px;
+  border-radius: 8px;
+  border: 1px solid #333;
+  background: #161616;
+  color: #fff;
+  margin-bottom: 12px;
+  font-size: 14px;
+  box-sizing: border-box;
+  cursor: pointer;
+}
+.flatpickr-calendar {
+  z-index: 10050 !important;
+  box-shadow: 0 12px 40px rgba(0, 0, 0, 0.55);
+}
 textarea {
   width: 100%;
   max-width: 100%;
