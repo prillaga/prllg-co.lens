@@ -175,7 +175,7 @@
   <main id="availability-main">
     <h1 class="lux-heading">Availability</h1>
     <p style="text-align: center; margin: 0 0 24px 0; color: #9a9a9a; font-size: 14px; line-height: 1.5;">
-      Confirmed bookings (including staff blocks) show in red as <strong>Booked</strong>. Amber is a pending request. The calendar loads automatically from the live availability server and refreshes after staff save changes in admin.
+      Confirmed bookings (including staff blocks) show in red as <strong>Booked</strong>. Amber is a pending request. Each booked day is a 24-hr rental block; the return/drop-off date is not marked booked. The calendar loads automatically from the live availability server and refreshes after staff save changes in admin.
     </p>
     <p id="availability-load-error" role="alert"></p>
 
@@ -264,8 +264,21 @@
     return a < b ? -1 : a > b ? 1 : 0;
   }
 
-  function dayInBookingRange(dayStr, start, end) {
-    return compareDates(start, dayStr) <= 0 && compareDates(dayStr, end) <= 0;
+  function addDaysISO(iso, n) {
+    var d = new Date(iso + "T00:00:00");
+    d.setDate(d.getDate() + n);
+    return ymd(d.getFullYear(), d.getMonth() + 1, d.getDate());
+  }
+
+  function occupiedUntil(start, end, staffBlock) {
+    if (!start || !end) return end || start || "";
+    if (staffBlock || start === end) return addDaysISO(end, 1);
+    return end;
+  }
+
+  function dayInBookingRange(dayStr, start, end, staffBlock) {
+    var until = occupiedUntil(start, end, staffBlock);
+    return compareDates(start, dayStr) <= 0 && compareDates(dayStr, until) < 0;
   }
 
   function updateAvailabilityLoadNotice() {
@@ -336,7 +349,7 @@
       var b = list[i];
       if (b.status === "rejected") continue;
       if (unitFilter && b.unitId !== unitFilter) continue;
-      if (!dayInBookingRange(dayStr, b.start, b.end)) continue;
+      if (!dayInBookingRange(dayStr, b.start, b.end, b.staffBlock)) continue;
       if (b.status === "approved") {
         if (b.staffBlock) hasStaffApproved = true;
         else hasCustomerApproved = true;

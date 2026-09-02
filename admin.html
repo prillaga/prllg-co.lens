@@ -93,7 +93,7 @@
       <select id="addUnit" aria-label="Unit"></select>
       <label for="addStart">Rental start</label>
       <input id="addStart" type="date" aria-label="Rental start date">
-      <label for="addEnd">Rental end (return day)</label>
+      <label for="addEnd">Rental end (return day — 1 day = 24 hrs)</label>
       <input id="addEnd" type="date" aria-label="Rental end date">
       <label for="addName">Customer name (optional)</label>
       <input id="addName" type="text" placeholder="e.g. Juan" autocomplete="off" aria-label="Customer name">
@@ -257,15 +257,17 @@
       onChange: function (selectedDates) {
         var start = selectedDates && selectedDates[0] ? selectedDates[0] : null;
         if (!start || !addEndPicker) return;
-        addEndPicker.set("minDate", start);
-        if (addEnd.value && new Date(addEnd.value + "T00:00:00") < start) {
-          addEndPicker.setDate(start, true);
+        var startISO = start.getFullYear() + "-" + String(start.getMonth() + 1).padStart(2, "0") + "-" + String(start.getDate()).padStart(2, "0");
+        var minReturn = addDaysISO(startISO, 1);
+        addEndPicker.set("minDate", minReturn);
+        if (!addEnd.value || addEnd.value <= startISO) {
+          addEndPicker.setDate(minReturn, true);
         }
       }
     }));
 
     addEndPicker = flatpickr(addEnd, Object.assign({}, pickerOpts, {
-      minDate: addStart.value || null
+      minDate: addStart.value ? addDaysISO(addStart.value, 1) : null
     }));
 
     adminDatePickersReady = true;
@@ -281,8 +283,20 @@
   }
 
   function compareDates(a, b) { return a < b ? -1 : a > b ? 1 : 0; }
-  function rangesOverlap(s1, e1, s2, e2) {
-    return compareDates(s1, e2) <= 0 && compareDates(s2, e1) <= 0;
+  function addDaysISO(iso, n) {
+    var d = new Date(iso + "T00:00:00");
+    d.setDate(d.getDate() + n);
+    return d.getFullYear() + "-" + String(d.getMonth() + 1).padStart(2, "0") + "-" + String(d.getDate()).padStart(2, "0");
+  }
+  function occupiedUntil(start, end, staffBlock) {
+    if (!start || !end) return end || start || "";
+    if (staffBlock || start === end) return addDaysISO(end, 1);
+    return end;
+  }
+  function rangesOverlap(s1, e1, staff1, s2, e2, staff2) {
+    var u1 = occupiedUntil(s1, e1, staff1);
+    var u2 = occupiedUntil(s2, e2, staff2);
+    return compareDates(s1, u2) < 0 && compareDates(s2, u1) < 0;
   }
 
   function loadBookingsLocal() {
@@ -350,12 +364,12 @@
     return u ? u.label : id;
   }
 
-  function rejectOverlappingPending(unitId, start, end, exceptId) {
+  function rejectOverlappingPending(unitId, start, end, exceptId, staffBlock) {
     for (var i = 0; i < bookings.length; i++) {
       var b = bookings[i];
       if (b.unitId !== unitId || b.id === exceptId) continue;
       if (b.status !== 'pending') continue;
-      if (rangesOverlap(start, end, b.start, b.end)) {
+      if (rangesOverlap(start, end, staffBlock, b.start, b.end, b.staffBlock)) {
         b.status = 'rejected';
         b.rejectedReason = 'Superseded by approved booking';
       }
@@ -379,7 +393,7 @@
     if (!b || b.status !== 'pending') return;
     b.status = 'approved';
     b.approvedAt = Date.now();
-    rejectOverlappingPending(b.unitId, b.start, b.end, b.id);
+    rejectOverlappingPending(b.unitId, b.start, b.end, b.id, !!b.staffBlock);
     saveBookings();
     toast('Approved — dates booked for that unit.');
     render();
@@ -395,13 +409,13 @@
     render();
   }
 
-  function hasApprovedOverlap(unitId, start, end) {
+  function hasApprovedOverlap(unitId, start, end, staffBlock) {
     loadBookings();
     var i;
     for (i = 0; i < bookings.length; i++) {
       var b = bookings[i];
       if (b.unitId !== unitId || b.status !== 'approved') continue;
-      if (rangesOverlap(start, end, b.start, b.end)) return true;
+      if (rangesOverlap(start, end, staffBlock, b.start, b.end, b.staffBlock)) return true;
     }
     return false;
   }
@@ -429,11 +443,11 @@
       toast('Choose unit, start, and end dates.');
       return;
     }
-    if (compareDates(start, end) > 0) {
-      toast('End date must be on or after start.');
+    if (compareDates(start, end) <= 0) {
+      toast('Return day must be after rental start (1 day = 24 hrs).');
       return;
     }
-    if (hasApprovedOverlap(unitId, start, end)) {
+    if (hasApprovedOverlap(unitId, start, end, false)) {
       toast('Those dates already overlap a confirmed booking for that unit.');
       return;
     }
@@ -468,7 +482,7 @@
       toast('Last day must be on or after the first day.');
       return;
     }
-    if (hasApprovedOverlap(unitId, start, end)) {
+    if (hasApprovedOverlap(unitId, start, end, true)) {
       toast('Those dates already overlap a confirmed block for that unit.');
       return;
     }
@@ -483,7 +497,7 @@
       approvedAt: Date.now(),
       staffBlock: true
     });
-    rejectOverlappingPending(unitId, start, end, id);
+    rejectOverlappingPending(unitId, start, end, id, true);
     saveBookings();
     if (blockStartPicker) blockStartPicker.clear();
     if (blockEndPicker) blockEndPicker.clear();

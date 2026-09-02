@@ -160,6 +160,12 @@ select:not([multiple]):not([size]):focus-visible {
 .flatpickr-day.inRange {
   background: rgba(124, 207, 208, 0.2) !important;
 }
+.flatpickr-day.rental-return {
+  background: transparent !important;
+  border-color: var(--color-mint) !important;
+  border-style: dashed !important;
+  color: #4a8b8c !important;
+}
 
 /* Links in content */
 a[style*="color: #d4af37"],

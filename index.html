@@ -723,11 +723,90 @@
     .flatpickr-weekdays { background: #fff !important; }
     .flatpickr-weekday { color: #667085 !important; font-size: 0.95rem !important; font-weight: 600 !important; }
     .flatpickr-days { background: #fff; border-top: 1px solid #eef2f7; }
-    .flatpickr-day { border-radius: 999px !important; color: #1f2937; font-weight: 500; border: 1px solid transparent !important; }
+    .flatpickr-day {
+      height: 46px !important;
+      max-width: 46px;
+      line-height: 1.1 !important;
+      border-radius: 12px !important;
+      color: #1f2937;
+      font-weight: 500;
+      border: 1px solid transparent !important;
+      display: flex !important;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      padding: 3px 0 4px !important;
+    }
+    .flatpickr-day .day-hrs {
+      display: block;
+      font-size: 8px;
+      font-weight: 800;
+      letter-spacing: 0.03em;
+      line-height: 1;
+      margin-top: 2px;
+      text-transform: uppercase;
+    }
     .flatpickr-day.today { border-color: var(--color-mint) !important; color: #4a8b8c !important; }
-    .flatpickr-day.selected, .flatpickr-day.startRange, .flatpickr-day.endRange { background: var(--color-mint) !important; border-color: var(--color-mint) !important; color: #080808 !important; font-weight: 700; }
-    .flatpickr-day.inRange { background: rgba(124,207,208,0.2) !important; border-color: rgba(124,207,208,0.2) !important; color: #4a8b8c !important; }
+    .flatpickr-day.selected,
+    .flatpickr-day.startRange,
+    .flatpickr-day.endRange,
+    .flatpickr-day.rental-billed {
+      background: var(--color-mint) !important;
+      border-color: var(--color-mint) !important;
+      color: #080808 !important;
+      font-weight: 700;
+    }
+    .flatpickr-day.inRange {
+      background: rgba(124,207,208,0.28) !important;
+      border-color: rgba(124,207,208,0.28) !important;
+      color: #1f2937 !important;
+    }
+    .flatpickr-day.rental-return,
+    .flatpickr-day.selected.rental-return {
+      background: transparent !important;
+      border-color: var(--color-mint) !important;
+      border-style: dashed !important;
+      color: #4a8b8c !important;
+      font-weight: 700;
+    }
+    .flatpickr-duration-hint {
+      padding: 8px 12px 12px;
+      text-align: center;
+      color: #1f2937;
+      border-top: 1px solid #eef2f7;
+      background: #f7fbfb;
+    }
+    .flatpickr-duration-hint .fp-hours {
+      font-size: 13px;
+      font-weight: 800;
+      letter-spacing: 0.04em;
+    }
+    .flatpickr-duration-hint .fp-legend {
+      margin-top: 3px;
+      font-size: 10px;
+      font-weight: 600;
+      color: #667085;
+      line-height: 1.35;
+    }
     .flatpickr-day:hover { background: rgba(124,207,208,0.14) !important; border-color: rgba(124,207,208,0.34) !important; }
+    .flatpickr-day.rental-billed:hover,
+    .flatpickr-day.selected:hover,
+    .flatpickr-day.startRange:hover,
+    .flatpickr-day.endRange:hover {
+      background: var(--color-mint) !important;
+      border-color: var(--color-mint) !important;
+      color: #080808 !important;
+    }
+    .flatpickr-day.inRange:hover {
+      background: rgba(124,207,208,0.28) !important;
+      color: #1f2937 !important;
+    }
+    .flatpickr-day.rental-return:hover,
+    .flatpickr-day.selected.rental-return:hover {
+      background: transparent !important;
+      border-color: var(--color-mint) !important;
+      color: #4a8b8c !important;
+    }
     .flatpickr-day.disabled, .flatpickr-day.disabled:hover { color: #c2c7d0 !important; background: transparent !important; }
 
     /* ===== ANIMATIONS ===== */
@@ -878,7 +957,7 @@
   <div class="home-cal-inner">
     <h2 id="availability-calendar-title" class="lux-heading" style="margin: 0 0 10px 0;">Availability</h2>
     <p style="text-align: center; margin: 0 0 22px 0; color: #9a9a9a; font-size: 14px; line-height: 1.5;">
-      Red dates are confirmed bookings; amber is a pending request. Pick a unit or see any hold across gear.
+      Red dates are confirmed bookings; amber is a pending request. Pick a unit or see any hold across gear. Booked days are 24-hr rental blocks; the return/drop-off date is not marked booked.
     </p>
     <p id="availability-load-error" role="alert"></p>
     <div class="home-cal-toolbar">
@@ -1079,16 +1158,16 @@
       <option value="20:00">8:00 PM</option>
     </select>
     <label for="rentalDate" style="font-size: 14px; color: var(--color-mint); letter-spacing: 0.5px;">Rental Date</label>
-    <input id="rentalDate" type="date" name="rentalDate" required onfocus="this.showPicker && this.showPicker()" onclick="this.showPicker && this.showPicker()" onchange="updateUnitPricing()" oninput="updateUnitPricing()" style="padding: 12px 14px; border: 1px solid #2e2e2e; border-radius: 6px; background: #171717; color: #ffffff; font-size: 15px; width: 100%; box-sizing: border-box;">
+    <input id="rentalDate" type="text" name="rentalDate" required placeholder="dd / mm / yyyy" onchange="updateUnitPricing()" oninput="updateUnitPricing()" style="padding: 12px 14px; border: 1px solid #2e2e2e; border-radius: 6px; background: #171717; color: #ffffff; font-size: 15px; width: 100%; box-sizing: border-box;" autocomplete="off" inputmode="none">
     <label for="returnDate" style="font-size: 14px; color: var(--color-mint); letter-spacing: 0.5px;">Return Date</label>
-    <input id="returnDate" type="date" name="returnDate" required onfocus="this.showPicker && this.showPicker()" onclick="this.showPicker && this.showPicker()" onchange="updateUnitPricing()" oninput="updateUnitPricing()" style="padding: 12px 14px; border: 1px solid #2e2e2e; border-radius: 6px; background: #171717; color: #ffffff; font-size: 15px; width: 100%; box-sizing: border-box;">
+    <input id="returnDate" type="text" name="returnDate" required placeholder="dd / mm / yyyy" onchange="updateUnitPricing()" oninput="updateUnitPricing()" style="padding: 12px 14px; border: 1px solid #2e2e2e; border-radius: 6px; background: #171717; color: #ffffff; font-size: 15px; width: 100%; box-sizing: border-box;" autocomplete="off" inputmode="none">
     <div class="booking-date-tools" role="group" aria-label="Quick date presets">
       <button type="button" class="booking-date-chip" data-date-preset="today">Today</button>
       <button type="button" class="booking-date-chip" data-date-preset="tomorrow">Tomorrow</button>
       <button type="button" class="booking-date-chip" data-date-preset="weekend">This Weekend</button>
       <button type="button" class="booking-date-chip" data-date-preset="3days">3 Days</button>
     </div>
-    <p id="rentalDaysDisplay" style="margin: -4px 0 2px 0; color: #cfcfcf; font-size: 13px; line-height: 1.45; min-height: 1.4em;">Select rental and return dates to view rental days.</p>
+    <p id="rentalDaysDisplay" style="margin: -4px 0 2px 0; color: #cfcfcf; font-size: 13px; line-height: 1.45; min-height: 1.4em;">Select pickup and return dates. Each rental day is 24 hrs (e.g. Sep 2 pickup → Sep 3 return = 24 hrs). Return day is drop-off and is not billed.</p>
     <p id="calendarAvailabilityNotice" style="margin: -4px 0 6px 0; font-size: 13px; line-height: 1.45; min-height: 1.4em; color: #9a9a9a;"></p>
     <select name="units" required onchange="updateUnitPricing()">
       <option value="">Select Units</option>
@@ -1100,7 +1179,7 @@
       <option value="">Additional to rent (optional)</option>
     </select>
     <p id="unitPriceDisplay" style="margin: -6px 0 2px 0; color: var(--color-mint); font-size: 14px;">Select a unit to view price details.</p>
-    <p id="estimatedPriceDisplay" style="margin: -6px 0 2px 0; color: #f0f0f0; font-size: 14px;">Total Price (Unit Price x Rental Days) will show here.</p>
+    <p id="estimatedPriceDisplay" style="margin: -6px 0 2px 0; color: #f0f0f0; font-size: 14px;">Total Price (Unit Price × 24 hrs per rental day) will show here.</p>
     <textarea name="notes" placeholder="Project details or special requests" rows="5" style="padding: 12px 14px; border: 1px solid #2e2e2e; border-radius: 6px; background: #171717; color: #ffffff; font-size: 15px; width: 100%; box-sizing: border-box;"></textarea>
     <p style="margin: 0; padding: 10px 12px; border: 1px solid #2e2e2e; border-radius: 6px; background: #151515; color: var(--color-mint); font-size: 14px; line-height: 1.6;">
       Note: To reserve your slots, wait for the confirmation in Messenger and send the reservation fee of 100 pesos in GCash. <a href="payment-methods.html" style="color: var(--color-mint);">Other payment options</a>
@@ -1348,7 +1427,20 @@
   }
 
   function calCompareDates(a, b) { return a < b ? -1 : a > b ? 1 : 0; }
-  function calRangesOverlap(s1, e1, s2, e2) { return calCompareDates(s1, e2) <= 0 && calCompareDates(s2, e1) <= 0; }
+  function calOccupiedUntil(start, end, staffBlock) {
+    if (!start || !end) return end || start || "";
+    if (staffBlock || start === end) return addDaysToISO(end, 1);
+    return end;
+  }
+  function calDayOccupied(dayStr, start, end, staffBlock) {
+    var until = calOccupiedUntil(start, end, staffBlock);
+    return calCompareDates(start, dayStr) <= 0 && calCompareDates(dayStr, until) < 0;
+  }
+  function calRangesOverlap(s1, e1, staff1, s2, e2, staff2) {
+    var u1 = calOccupiedUntil(s1, e1, staff1);
+    var u2 = calOccupiedUntil(s2, e2, staff2);
+    return calCompareDates(s1, u2) < 0 && calCompareDates(s2, u1) < 0;
+  }
 
   function updateAvailabilityLoadNotice() {
     var el = document.getElementById("availability-load-error");
@@ -1395,7 +1487,7 @@
     for (var i = 0; i < list.length; i++) {
       var b = list[i];
       if (b.unitId !== uid || b.status === "rejected") continue;
-      if (!calRangesOverlap(s, e, b.start, b.end)) continue;
+      if (!calRangesOverlap(s, e, false, b.start, b.end, b.staffBlock)) continue;
       if (b.status === "approved") { approvedHit = b; break; }
       if (b.status === "pending") pendingHit = b;
     }
@@ -1432,7 +1524,7 @@
   var homeCalYear, homeCalMonth;
   function homeCalPad(n) { return n < 10 ? "0" + n : String(n); }
   function homeCalYmd(y, m, d) { return y + "-" + homeCalPad(m) + "-" + homeCalPad(d); }
-  function homeDayInBookingRange(dayStr, start, end) { return calCompareDates(start, dayStr) <= 0 && calCompareDates(dayStr, end) <= 0; }
+  function homeDayInBookingRange(dayStr, start, end, staffBlock) { return calDayOccupied(dayStr, start, end, staffBlock); }
   function homeDayStatus(dayStr, unitFilter) {
     var list = calLoadBookings();
     var hasCustomerApproved = false, hasStaffApproved = false, hasPending = false;
@@ -1440,7 +1532,7 @@
       var b = list[i];
       if (b.status === "rejected") continue;
       if (unitFilter && b.unitId !== unitFilter) continue;
-      if (!homeDayInBookingRange(dayStr, b.start, b.end)) continue;
+      if (!homeDayInBookingRange(dayStr, b.start, b.end, b.staffBlock)) continue;
       if (b.status === "approved") { if (b.staffBlock) hasStaffApproved = true; else hasCustomerApproved = true; }
       else if (b.status === "pending") hasPending = true;
     }
@@ -1507,8 +1599,21 @@
     if (!rentalDateValue || !returnDateValue) return 0;
     var start = new Date(rentalDateValue + "T00:00:00");
     var end = new Date(returnDateValue + "T00:00:00");
-    if (isNaN(start.getTime()) || isNaN(end.getTime()) || end < start) return 0;
-    return Math.floor((end - start) / (24*60*60*1000)) + 1;
+    if (isNaN(start.getTime()) || isNaN(end.getTime()) || end <= start) return 0;
+    return Math.round((end - start) / (24 * 60 * 60 * 1000));
+  }
+
+  function formatRentalDurationLabel(days) {
+    if (days <= 0) return "";
+    var hours = days * 24;
+    if (days === 1) return "24 hrs";
+    return hours + " hrs (" + days + " days)";
+  }
+
+  function addDaysToISO(iso, n) {
+    var d = new Date(iso + "T00:00:00");
+    d.setDate(d.getDate() + n);
+    return toLocalISODate(d);
   }
 
   function updateRentalDaysDisplay(form) {
@@ -1518,13 +1623,14 @@
     var returnDateField = form.querySelector('input[name="returnDate"]');
     var rentalDateValue = rentalDateField ? rentalDateField.value : "";
     var returnDateValue = returnDateField ? returnDateField.value : "";
-    if (!rentalDateValue || !returnDateValue) { daysDisplay.textContent = "Select rental and return dates to view rental days."; daysDisplay.style.color = "#cfcfcf"; return; }
+    if (!rentalDateValue || !returnDateValue) { daysDisplay.textContent = "Select pickup and return dates. Each rental day is 24 hrs (e.g. Sep 2 pickup → Sep 3 return = 24 hrs). Return day is drop-off and is not billed."; daysDisplay.style.color = "#cfcfcf"; return; }
     var days = getRentalDaysFromDates(form);
-    if (days <= 0) { daysDisplay.textContent = "Return date cannot be earlier than rental date."; daysDisplay.style.color = "#ff9d9d"; return; }
-    daysDisplay.textContent = "Rental period: " + days + " day(s)."; daysDisplay.style.color = "var(--color-mint)";
+    if (days <= 0) { daysDisplay.textContent = "Return date must be after rental date. 1 rental day = 24 hrs (pickup one day, return the next)."; daysDisplay.style.color = "#ff9d9d"; return; }
+    daysDisplay.textContent = "Rental period: " + formatRentalDurationLabel(days) + " · pickup " + rentalDateValue + " → return " + returnDateValue + " (return day not billed)."; daysDisplay.style.color = "var(--color-mint)";
   }
 
   function toLocalISODate(dateObj) {
+    if (!(dateObj instanceof Date) || isNaN(dateObj.getTime())) return "";
     return dateObj.getFullYear() + "-" + String(dateObj.getMonth()+1).padStart(2,"0") + "-" + String(dateObj.getDate()).padStart(2,"0");
   }
 
@@ -1533,8 +1639,16 @@
     var rentalField = form.querySelector('input[name="rentalDate"]');
     var returnField = form.querySelector('input[name="returnDate"]');
     if (!rentalField || !returnField) return;
-    rentalField.value = toLocalISODate(startDateObj);
-    returnField.value = toLocalISODate(endDateObj);
+    var startISO = toLocalISODate(startDateObj);
+    var endISO = toLocalISODate(endDateObj);
+    if (endISO <= startISO) endISO = addDaysToISO(startISO, 1);
+    if (rentalField._flatpickr) rentalField._flatpickr.setDate(startISO, false);
+    else rentalField.value = startISO;
+    if (returnField._flatpickr) {
+      returnField._flatpickr.set("minDate", addDaysToISO(startISO, 1));
+      returnField._flatpickr.setDate(endISO, false);
+    } else returnField.value = endISO;
+    if (typeof redrawBookingPickers === "function") redrawBookingPickers();
     updateUnitPricing(); updateCalendarAvailabilityNotice();
   }
 
@@ -1549,9 +1663,10 @@
         var start = new Date(now.getFullYear(), now.getMonth(), now.getDate());
         var end = new Date(start);
         var preset = chip.getAttribute("data-date-preset");
-        if (preset === "tomorrow") { start.setDate(start.getDate()+1); end = new Date(start); }
+        if (preset === "tomorrow") { start.setDate(start.getDate()+1); end = new Date(start); end.setDate(start.getDate()+1); }
         else if (preset === "weekend") { var day = start.getDay(); var daysToSat = (6-day+7)%7; start.setDate(start.getDate()+daysToSat); end = new Date(start); end.setDate(start.getDate()+1); }
-        else if (preset === "3days") { end.setDate(start.getDate()+2); }
+        else if (preset === "3days") { end.setDate(start.getDate()+3); }
+        else { end.setDate(start.getDate()+1); }
         setBookingDateRange(start, end);
       });
     });
@@ -1572,21 +1687,23 @@
     var pricing = unitPricingRules[selectedUnit];
     var additionalPrice = (additionalRentPricingRules[selectedAdditionalRent] || 0) + (additionalRentPricingRules[selectedAdditionalRent2] || 0);
     updateRentalDaysDisplay(form);
+    if (typeof refreshBookingPickerHints === "function") refreshBookingPickerHints();
     if (!pricing) {
       if (unitPriceDisplay) unitPriceDisplay.textContent = "Select a unit to view price details.";
-      if (estimatedPriceDisplay) estimatedPriceDisplay.textContent = "Total Price (Unit Price x Rental Days) will show here.";
+      if (estimatedPriceDisplay) estimatedPriceDisplay.textContent = "Total Price (Unit Price × 24 hrs per rental day) will show here.";
       return;
     }
-    if (pricing.hasLongRate) unitPriceDisplay.textContent = "Rate: " + formatPrice(pricing.baseRate) + "/day | " + formatPrice(pricing.longRate) + "/day (3 days up)";
-    else unitPriceDisplay.textContent = "Rate: " + formatPrice(pricing.baseRate) + "/day";
+    if (pricing.hasLongRate) unitPriceDisplay.textContent = "Rate: " + formatPrice(pricing.baseRate) + " / 24 hrs | " + formatPrice(pricing.longRate) + " / 24 hrs (3 days up)";
+    else unitPriceDisplay.textContent = "Rate: " + formatPrice(pricing.baseRate) + " / 24 hrs";
     var days = getRentalDaysFromDates(form);
-    if (days <= 0) { estimatedPriceDisplay.textContent = "Total Price (Unit Price x Rental Days) will show here."; return; }
+    if (days <= 0) { estimatedPriceDisplay.textContent = "Total Price (Unit Price × 24 hrs per rental day) will show here."; return; }
     var appliedDailyRate = pricing.baseRate;
     if (pricing.hasLongRate && days >= (pricing.longRateMinDays || catalogSettings.longRateMinDays || 3)) appliedDailyRate = pricing.longRate;
     var unitSubtotal = appliedDailyRate * days;
     var total = unitSubtotal + additionalPrice;
-    if (additionalPrice > 0) estimatedPriceDisplay.textContent = "Total Price: (" + formatPrice(appliedDailyRate) + " x " + days + " day(s)) + " + formatPrice(additionalPrice) + " = " + formatPrice(total);
-    else estimatedPriceDisplay.textContent = "Total Price: " + formatPrice(appliedDailyRate) + " x " + days + " day(s) = " + formatPrice(total);
+    var durationLabel = formatRentalDurationLabel(days);
+    if (additionalPrice > 0) estimatedPriceDisplay.textContent = "Total Price: (" + formatPrice(appliedDailyRate) + " × " + durationLabel + ") + " + formatPrice(additionalPrice) + " = " + formatPrice(total);
+    else estimatedPriceDisplay.textContent = "Total Price: " + formatPrice(appliedDailyRate) + " × " + durationLabel + " = " + formatPrice(total);
   }
 
   function isMessengerOrFacebookWebView() {
@@ -1757,12 +1874,12 @@
     if (calConflict && calConflict.type === "pending") { if (!window.confirm("These dates overlap a pending calendar request for this unit. Open Messenger anyway?")) return; }
     var selectedPickupTimeText = pickupTimeField && pickupTimeField.selectedIndex >= 0 ? pickupTimeField.options[pickupTimeField.selectedIndex].text : pickupTime;
     var selectedDays = getRentalDaysFromDates(form);
-    var durationText = selectedDays > 0 ? (selectedDays + " day(s)") : "To be confirmed";
+    var durationText = selectedDays > 0 ? formatRentalDurationLabel(selectedDays) : "To be confirmed";
     var selectedPricing = unitPricingRules[selectedUnitId];
     var selectedRate = selectedPricing ? ((selectedPricing.hasLongRate && selectedDays >= (selectedPricing.longRateMinDays || catalogSettings.longRateMinDays || 3)) ? selectedPricing.longRate : selectedPricing.baseRate) : 0;
     var selectedAdditionalPrice = (additionalRentPricingRules[additionalRent] || 0) + (additionalRentPricingRules[additionalRent2] || 0);
     var estimatedTotalText = selectedRate > 0 && selectedDays > 0 ? formatPrice((selectedRate * selectedDays) + selectedAdditionalPrice) : "To be confirmed";
-    var message = "I want to reserve my slots. Please confirm my dates.\n\nFull Name: " + fullName + "\nPhone: " + phone + "\nCustomer Messenger Link: " + (customerMessengerLink || "Not provided") + "\nPick Up Location: " + selectedPickupLocationText + "\nPick Up Time: " + selectedPickupTimeText + "\nRental Date: " + rentalDate + "\nReturn Date: " + returnDate + "\nUnits: " + selectedUnitName + "\nAdditional to rent #1: " + additionalRent + "\nAdditional to rent #2: " + additionalRent2 + "\nRental Days: " + durationText + "\nTotal Price (Unit Price x Rental Days): " + estimatedTotalText + "\nNotes: " + notes;
+    var message = "I want to reserve my slots. Please confirm my dates.\n\nFull Name: " + fullName + "\nPhone: " + phone + "\nCustomer Messenger Link: " + (customerMessengerLink || "Not provided") + "\nPick Up Location: " + selectedPickupLocationText + "\nPick Up Time: " + selectedPickupTimeText + "\nRental Date: " + rentalDate + "\nReturn Date: " + returnDate + "\nUnits: " + selectedUnitName + "\nAdditional to rent #1: " + additionalRent + "\nAdditional to rent #2: " + additionalRent2 + "\nRental duration: " + durationText + "\nTotal Price (Unit Price × 24 hrs per rental day): " + estimatedTotalText + "\nNotes: " + notes;
     var messengerUrl = window.prillagaMessengerUrlWithText ? window.prillagaMessengerUrlWithText(message) : "";
     if (!messengerUrl) { alert("Messenger Page ID is missing. Place site-config.js in the same folder as this page."); return; }
     var emailPayload = { fullName: fullName, phone: phone, customerMessengerLink: customerMessengerLink, pickupLocation: selectedPickupLocationText, pickupTime: selectedPickupTimeText, rentalDate: rentalDate, returnDate: returnDate, unit: selectedUnitName, additionalRent: additionalRent, additionalRent2: additionalRent2, rentalDays: durationText, estimatedTotal: estimatedTotalText, notes: notes, message: message, subject: "New booking request — " + fullName };
@@ -1775,12 +1892,91 @@
     if (!rental || !ret) return;
     function sync() {
       var start = rental.value;
-      if (start) { ret.min = start; if (!ret.value || ret.value < start) ret.value = start; }
-      else ret.removeAttribute("min");
+      if (start) {
+        var minReturn = addDaysToISO(start, 1);
+        ret.min = minReturn;
+        if (!ret.value || ret.value <= start) {
+          if (ret._flatpickr) ret._flatpickr.setDate(minReturn, false);
+          else ret.value = minReturn;
+        }
+      } else ret.removeAttribute("min");
       updateRentalDaysDisplay(rental.form || document.querySelector("#book-now form"));
     }
     rental.addEventListener("change", sync); rental.addEventListener("input", sync);
     ret.addEventListener("change", sync); ret.addEventListener("input", sync); sync();
+  }
+
+  function paintBookingRangeDay(dayElem, dateObj) {
+    if (!dayElem || !dateObj || typeof dateObj.getFullYear !== "function") return;
+    var rental = document.getElementById("rentalDate");
+    var ret = document.getElementById("returnDate");
+    var start = rental ? rental.value : "";
+    var end = ret ? ret.value : "";
+    var d = toLocalISODate(dateObj);
+    if (!d) return;
+    dayElem.classList.remove("startRange", "endRange", "inRange", "rental-pickup", "rental-return", "rental-billed");
+    var oldBadge = dayElem.querySelector(".day-hrs");
+    if (oldBadge) oldBadge.remove();
+    if (!start || !end || end <= start) return;
+    var lastBilled = addDaysToISO(end, -1);
+    var isBilled = d >= start && d < end;
+    var badge = document.createElement("span");
+    badge.className = "day-hrs";
+    if (isBilled) {
+      dayElem.classList.add("rental-billed");
+      if (d === start) dayElem.classList.add("startRange", "rental-pickup");
+      if (d === lastBilled) dayElem.classList.add("endRange");
+      if (d > start && d < lastBilled) dayElem.classList.add("inRange");
+      badge.textContent = "24h";
+      dayElem.appendChild(badge);
+      return;
+    }
+    if (d === end) {
+      dayElem.classList.add("rental-return");
+      badge.textContent = "Return";
+      dayElem.appendChild(badge);
+    }
+  }
+
+  function refreshBookingPickerHints() {
+    var form = document.querySelector("#book-now form");
+    var days = form ? getRentalDaysFromDates(form) : 0;
+    var label = days > 0 ? formatRentalDurationLabel(days) : "24 hrs = 1 rental day";
+    document.querySelectorAll(".flatpickr-duration-hint .fp-hours").forEach(function (el) { el.textContent = label; });
+    document.querySelectorAll(".flatpickr-duration-hint").forEach(function (el) {
+      if (!el.querySelector(".fp-hours")) el.textContent = label;
+    });
+  }
+
+  function attachBookingDurationHint(fp) {
+    if (!fp || !fp.calendarContainer) return;
+    if (fp.calendarContainer.querySelector(".flatpickr-duration-hint")) return;
+    var hint = document.createElement("div");
+    hint.className = "flatpickr-duration-hint";
+    hint.setAttribute("aria-live", "polite");
+    hint.innerHTML = '<div class="fp-hours">24 hrs = 1 rental day</div><div class="fp-legend">Each filled day = 24 hrs. Return date is drop-off and is not billed.</div>';
+    fp.calendarContainer.appendChild(hint);
+  }
+
+  function redrawBookingPickers() {
+    var rental = document.getElementById("rentalDate");
+    var ret = document.getElementById("returnDate");
+    if (rental && rental._flatpickr) rental._flatpickr.redraw();
+    if (ret && ret._flatpickr) ret._flatpickr.redraw();
+    refreshBookingPickerHints();
+  }
+
+  function resetBookingDateInput(el) {
+    if (!el) return;
+    if (el._flatpickr) {
+      try { el._flatpickr.destroy(); } catch (err) {}
+    }
+    var sibling = el.nextElementSibling;
+    if (sibling && sibling.classList && sibling.classList.contains("flatpickr-alt-input")) sibling.parentNode.removeChild(sibling);
+    el.classList.remove("flatpickr-input");
+    el.type = "text";
+    el.style.display = "";
+    el.removeAttribute("hidden");
   }
 
   function initBookingDatePickers() {
@@ -1795,14 +1991,53 @@
     var rental = document.getElementById("rentalDate");
     var ret = document.getElementById("returnDate");
     if (!rental || !ret) return;
-    var rentalPicker = flatpickr(rental, { dateFormat: "Y-m-d", altInput: true, altFormat: "d / m / Y", altInputClass: "flatpickr-alt-input", disableMobile: true, minDate: "today",
-      onChange: function (selectedDates) { var start = selectedDates && selectedDates[0] ? selectedDates[0] : null; if (!start) return; if (returnPicker) { returnPicker.set("minDate", start); if (!ret.value || new Date(ret.value + "T00:00:00") < start) returnPicker.setDate(start, true); } updateUnitPricing(); updateCalendarAvailabilityNotice(); }
+    resetBookingDateInput(rental);
+    resetBookingDateInput(ret);
+    var sharedDayCreate = function (selectedDates, dateStr, fp, dayElem) {
+      if (!dayElem || !dayElem.classList || !dayElem.classList.contains("flatpickr-day")) return;
+      var dateObj = dayElem.dateObj;
+      if (!(dateObj instanceof Date)) return;
+      paintBookingRangeDay(dayElem, dateObj);
+    };
+    var rentalPicker = flatpickr(rental, {
+      dateFormat: "Y-m-d", altInput: true, altFormat: "d / m / Y", altInputClass: "flatpickr-alt-input",
+      disableMobile: true, minDate: "today", allowInput: false,
+      onDayCreate: sharedDayCreate,
+      onReady: function (s, d, fp) { attachBookingDurationHint(fp); refreshBookingPickerHints(); },
+      onOpen: function () { redrawBookingPickers(); },
+      onChange: function (selectedDates) {
+        var start = selectedDates && selectedDates[0] ? selectedDates[0] : null;
+        if (!start) return;
+        var startISO = toLocalISODate(start);
+        var minReturn = addDaysToISO(startISO, 1);
+        var returnFp = ret._flatpickr;
+        if (returnFp) {
+          returnFp.set("minDate", minReturn);
+          if (!ret.value || ret.value <= startISO) returnFp.setDate(minReturn, true);
+        }
+        redrawBookingPickers();
+        updateUnitPricing();
+        updateCalendarAvailabilityNotice();
+      }
     });
-    var returnPicker = flatpickr(ret, { dateFormat: "Y-m-d", altInput: true, altFormat: "d / m / Y", altInputClass: "flatpickr-alt-input", disableMobile: true, minDate: rental.value || "today",
-      onChange: function () { updateUnitPricing(); updateCalendarAvailabilityNotice(); }
+    var returnPicker = flatpickr(ret, {
+      dateFormat: "Y-m-d", altInput: true, altFormat: "d / m / Y", altInputClass: "flatpickr-alt-input",
+      disableMobile: true, minDate: rental.value ? addDaysToISO(rental.value, 1) : "today", allowInput: false,
+      onDayCreate: sharedDayCreate,
+      onReady: function (s, d, fp) { attachBookingDurationHint(fp); refreshBookingPickerHints(); },
+      onOpen: function () { redrawBookingPickers(); },
+      onChange: function () {
+        redrawBookingPickers();
+        updateUnitPricing();
+        updateCalendarAvailabilityNotice();
+      }
     });
-    if (rental.value) rentalPicker.setDate(rental.value, false);
-    if (ret.value) returnPicker.setDate(ret.value, false);
+    rentalPicker = rental._flatpickr || rentalPicker;
+    returnPicker = ret._flatpickr || returnPicker;
+    if (rentalPicker && typeof rentalPicker.setDate === "function" && rental.value) rentalPicker.setDate(rental.value, false);
+    if (returnPicker && typeof returnPicker.setDate === "function" && ret.value) returnPicker.setDate(ret.value, false);
+    if (returnPicker && typeof returnPicker.setDate === "function" && rental.value && (!ret.value || ret.value <= rental.value)) returnPicker.setDate(addDaysToISO(rental.value, 1), false);
+    redrawBookingPickers();
   }
 
   document.addEventListener("DOMContentLoaded", function () {
