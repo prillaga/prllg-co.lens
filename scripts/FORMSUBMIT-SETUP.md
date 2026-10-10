@@ -10,7 +10,7 @@ Text-only test emails may arrive **before** activation — that is normal and co
 
 ### Step 1 — Find the activation email
 
-1. In Gmail for **hjsescabarte2021@gmail.com**, search: **`Activate Form`** or from **`formsubmit.co`**
+1. In Gmail for **prillgacolens@gmail.com**, search: **`Activate Form`** or from **`formsubmit.co`**
 2. Check **Spam** and **Promotions**
 3. Open the email and click **Activate Form**
 
@@ -24,7 +24,7 @@ Put that in **`site-config.js`**:
 
 ```javascript
 window.PRILLAGA_FORMSUBMIT_ENDPOINT = "paste-the-hash-here";
-window.PRILLAGA_BUSINESS_EMAIL = "hjsescabarte2021@gmail.com";
+window.PRILLAGA_BUSINESS_EMAIL = "prillgacolens@gmail.com";
 ```
 
 Using only the Gmail address in AJAX often keeps showing “needs Activation” even after you clicked the link. The **hash** fixes that.
